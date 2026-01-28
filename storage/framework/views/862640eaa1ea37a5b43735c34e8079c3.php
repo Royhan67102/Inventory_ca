@@ -84,6 +84,11 @@
                     <input type="number" name="biaya_pemasangan" class="form-control" value="0">
                 </div>
 
+                <div class="mb-3">
+                    <label class="form-label">Catatan</label>
+                    <input type="text" name="catatan" class="form-control">
+                </div>
+
             </div>
         </div>
     </div>

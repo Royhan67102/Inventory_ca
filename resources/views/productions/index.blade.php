@@ -13,13 +13,12 @@
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-light text-center">
                 <tr>
-                    <th>#</th>
+                    <th>Kode</th>
                     <th>Customer</th>
                     <th>Deadline</th>
-                    <th>Tim Produksi</th>
+                    <th>PIC Produksi</th>
                     <th>Status</th>
-                    <th>Mulai</th>
-                    <th>Selesai</th>
+                    <th>Bukti</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -27,11 +26,15 @@
                 @forelse($productions as $prod)
                 <tr>
                     <td class="text-center">{{ $loop->iteration }}</td>
+
                     <td>{{ $prod->order->customer->nama ?? '-' }}</td>
+
                     <td class="text-center">
                         {{ $prod->order->deadline?->format('d M Y') ?? '-' }}
                     </td>
+
                     <td>{{ $prod->tim_produksi ?? '-' }}</td>
+
                     <td class="text-center">
                         @php
                             $badge = match($prod->status) {
@@ -41,18 +44,37 @@
                                 default => 'secondary'
                             };
                         @endphp
-                        <span class="badge bg-{{ $badge }}">{{ ucfirst($prod->status) }}</span>
+                        <span class="badge bg-{{ $badge }}">
+                            {{ ucfirst($prod->status) }}
+                        </span>
                     </td>
-                    <td class="text-center">{{ $prod->tanggal_mulai?->format('d M Y') ?? '-' }}</td>
-                    <td class="text-center">{{ $prod->tanggal_selesai?->format('d M Y') ?? '-' }}</td>
+
                     <td class="text-center">
-                        <a href="{{ route('productions.show', $prod) }}" class="btn btn-info btn-sm">Detail</a>
-                        <a href="{{ route('productions.edit', $prod) }}" class="btn btn-primary btn-sm">Update</a>
+                        @if($prod->bukti)
+                            <a href="{{ asset('storage/'.$prod->bukti) }}" target="_blank">
+                                <img src="{{ asset('storage/'.$prod->bukti) }}"
+                                     class="img-thumbnail"
+                                     style="width:60px">
+                            </a>
+                        @else
+                            -
+                        @endif
+                    </td>
+
+                    <td class="text-center">
+                        <a href="{{ route('productions.show', $prod) }}" class="btn btn-info btn-sm">
+                            Detail
+                        </a>
+                        <a href="{{ route('productions.edit', $prod) }}" class="btn btn-primary btn-sm">
+                            Update
+                        </a>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="text-center text-muted">Belum ada produksi</td>
+                    <td colspan="9" class="text-center text-muted">
+                        Belum ada produksi
+                    </td>
                 </tr>
                 @endforelse
             </tbody>

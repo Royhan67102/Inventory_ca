@@ -23,8 +23,6 @@
                 {{ ucfirst($production->status) }}
             </span>
         </p>
-        <p><strong>Tanggal Mulai:</strong> {{ $production->tanggal_mulai?->format('d M Y') ?? '-' }}</p>
-        <p><strong>Tanggal Selesai:</strong> {{ $production->tanggal_selesai?->format('d M Y') ?? '-' }}</p>
 
         <hr>
 

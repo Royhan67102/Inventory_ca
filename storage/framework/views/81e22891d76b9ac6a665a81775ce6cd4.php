@@ -45,13 +45,14 @@
         <table class="table table-bordered align-middle">
             <thead class="table-light text-center">
                 <tr>
-                    <th>#</th>
+                    <th>Kode</th>
                     <th>Tanggal</th>
                     <th>Customer</th>
                     <th>Total</th>
                     <th>Pembayaran</th>
                     <th>Produksi</th>
                     <th>Aksi</th>
+                    <th>Catatan</th>
                 </tr>
             </thead>
             <tbody>
@@ -87,15 +88,17 @@
                         </a>
 
                         <button
-    type="button"
-    class="btn btn-danger btn-sm"
-    data-bs-toggle="modal"
-    data-bs-target="#deleteModal"
-    data-id="<?php echo e($order->id); ?>"
->
-    Hapus
-</button>
+                            type="button"
+                            class="btn btn-danger btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"
+                            data-id="<?php echo e($order->id); ?>"
+                            >
+                            Hapus
+                        </button>
                     </td>
+
+                    <td><?php echo e($order->catatan); ?></td>
                 </tr>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <tr>
@@ -107,8 +110,6 @@
     </div>
 </div>
 <?php $__env->stopSection(); ?>
-
-
 
 
 

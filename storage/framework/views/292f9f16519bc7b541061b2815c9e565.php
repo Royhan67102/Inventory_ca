@@ -1,17 +1,15 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Update Produksi'); ?>
+<?php $__env->startSection('page-title', 'Update Produksi'); ?>
 
-@section('title', 'Update Produksi')
-@section('page-title', 'Update Produksi')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <form method="POST"
-      action="{{ route('productions.update', $production) }}"
+      action="<?php echo e(route('productions.update', $production)); ?>"
       enctype="multipart/form-data">
-@csrf
-@method('PUT')
+<?php echo csrf_field(); ?>
+<?php echo method_field('PUT'); ?>
 
 <div class="row">
-    {{-- INFO ORDER (READONLY) --}}
+    
     <div class="col-md-6">
         <div class="card mb-4">
             <div class="card-body">
@@ -20,25 +18,25 @@
                 <div class="mb-3">
                     <label class="form-label">Customer</label>
                     <input type="text" class="form-control" disabled
-                        value="{{ $production->order->customer->nama ?? '-' }}">
+                        value="<?php echo e($production->order->customer->nama ?? '-'); ?>">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Tanggal Pemesanan</label>
                     <input type="text" class="form-control" disabled
-                        value="{{ $production->order->tanggal_pemesanan?->format('d M Y') }}">
+                        value="<?php echo e($production->order->tanggal_pemesanan?->format('d M Y')); ?>">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Deadline</label>
                     <input type="text" class="form-control" disabled
-                        value="{{ $production->order->deadline?->format('d M Y') ?? '-' }}">
+                        value="<?php echo e($production->order->deadline?->format('d M Y') ?? '-'); ?>">
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- UPDATE PRODUKSI --}}
+    
     <div class="col-md-6">
         <div class="card mb-4">
             <div class="card-body">
@@ -47,9 +45,9 @@
                 <div class="mb-3">
                     <label class="form-label">Status Produksi</label>
                     <select name="status" class="form-select" required>
-                        <option value="menunggu" @selected($production->status=='menunggu')>Menunggu</option>
-                        <option value="proses" @selected($production->status=='proses')>Proses</option>
-                        <option value="selesai" @selected($production->status=='selesai')>Selesai</option>
+                        <option value="menunggu" <?php if($production->status=='menunggu'): echo 'selected'; endif; ?>>Menunggu</option>
+                        <option value="proses" <?php if($production->status=='proses'): echo 'selected'; endif; ?>>Proses</option>
+                        <option value="selesai" <?php if($production->status=='selesai'): echo 'selected'; endif; ?>>Selesai</option>
                     </select>
                 </div>
 
@@ -59,7 +57,7 @@
         type="text"
         name="tim_produksi"
         class="form-control border border-dark rounded-0"
-        value="{{ old('tim_produksi', $production->tim_produksi) }}"
+        value="<?php echo e(old('tim_produksi', $production->tim_produksi)); ?>"
         required
     >
 </div>
@@ -83,22 +81,24 @@
         accept="image/*"
     >
 
-    @if($production->bukti)
+    <?php if($production->bukti): ?>
         <small class="d-block mt-2">
-            <img src="{{ asset('storage/' . $production->bukti) }}" alt="Bukti Produksi">
+            <img src="<?php echo e(asset('storage/' . $production->bukti)); ?>" alt="Bukti Produksi">
 
         </small>
-    @endif
+    <?php endif; ?>
 </div>
 
 
                 <div class="text-end">
                     <button class="btn btn-success">Update Produksi</button>
-                    <a href="{{ route('productions.index') }}" class="btn btn-secondary">Batal</a>
+                    <a href="<?php echo e(route('productions.index')); ?>" class="btn btn-secondary">Batal</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 </form>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/productions/edit.blade.php ENDPATH**/ ?>

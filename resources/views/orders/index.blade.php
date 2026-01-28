@@ -47,13 +47,14 @@
         <table class="table table-bordered align-middle">
             <thead class="table-light text-center">
                 <tr>
-                    <th>#</th>
+                    <th>Kode</th>
                     <th>Tanggal</th>
                     <th>Customer</th>
                     <th>Total</th>
                     <th>Pembayaran</th>
                     <th>Produksi</th>
                     <th>Aksi</th>
+                    <th>Catatan</th>
                 </tr>
             </thead>
             <tbody>
@@ -96,6 +97,8 @@
                             Hapus
                         </button>
                     </td>
+
+                    <td>{{ $order->catatan }}</td>
                 </tr>
             @empty
                 <tr>

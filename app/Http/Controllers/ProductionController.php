@@ -58,120 +58,81 @@ class ProductionController extends Controller
      * UPDATE PRODUKSI
      * ===================== */
     public function update(Request $request, Production $production)
-    {
-        if ($production->status_lock) {
-            return back()->with('error', 'SPK sudah terkunci.');
-        }
+{
+    if ($production->status_lock) {
+        return back()->with('error', 'SPK sudah terkunci.');
+    }
 
-        $validated = $request->validate([
-            // STATUS UMUM
-            'status' => 'required|in:menunggu,proses,selesai',
+    $validated = $request->validate([
+        'status'       => 'required|in:menunggu,proses,selesai',
+        'tim_produksi' => 'required|string|max:255',
+        'catatan'      => 'nullable|string|max:1000',
+        'bukti'        => 'nullable|image|max:2048',
+    ]);
 
-            // DESAIN
-            'desain_selesai' => 'nullable|boolean',
-            'catatan_desain' => 'nullable|string|max:1000',
-            'bukti_desain'   => 'nullable|image|max:2048',
+    try {
+        DB::transaction(function () use ($request, $production, $validated) {
 
-            // PRODUKSI
-            'produksi_selesai' => 'nullable|boolean',
-            'catatan_produksi' => 'nullable|string|max:1000',
-            'bukti_produksi'   => 'nullable|image|max:2048',
-        ]);
+            // SET TANGGAL MULAI
+            if ($validated['status'] === 'proses' && !$production->tanggal_mulai) {
+                $production->tanggal_mulai = now();
+            }
 
-        try {
-            DB::transaction(function () use ($request, $production, $validated) {
-
-                /* =====================
-                 * STATUS PROSES
-                 * ===================== */
-                if ($validated['status'] === 'proses' && !$production->tanggal_mulai) {
-                    $production->tanggal_mulai = now();
+            // UPLOAD BUKTI
+            if ($request->hasFile('bukti')) {
+                if ($production->bukti) {
+                    Storage::delete($production->bukti);
                 }
 
-                /* =====================
-                 * UPLOAD BUKTI DESAIN
-                 * ===================== */
-                if ($request->hasFile('bukti_desain')) {
-                    if ($production->bukti_desain) {
-                        Storage::delete($production->bukti_desain);
-                    }
+                $production->bukti = $request
+                    ->file('bukti')
+                    ->store('productions', 'public');
+            }
 
-                    $production->bukti_desain = $request
-                        ->file('bukti_desain')
-                        ->store('productions/desain');
-                }
+            // STATUS SELESAI
+            if ($validated['status'] === 'selesai') {
 
-                /* =====================
-                 * UPLOAD BUKTI PRODUKSI
-                 * ===================== */
-                if ($request->hasFile('bukti_produksi')) {
-                    if ($production->bukti_produksi) {
-                        Storage::delete($production->bukti_produksi);
-                    }
-
-                    $production->bukti_produksi = $request
-                        ->file('bukti_produksi')
-                        ->store('productions/produksi');
-                }
-
-                /* =====================
-                 * VALIDASI SELESAI
-                 * ===================== */
-                if ($validated['status'] === 'selesai') {
-
-                    if (!$request->desain_selesai || !$request->produksi_selesai) {
-                        throw ValidationException::withMessages([
-                            'status' => 'Desain dan Produksi harus selesai.'
-                        ]);
-                    }
-
-                    if (!$production->bukti_produksi) {
-                        throw ValidationException::withMessages([
-                            'bukti_produksi' => 'Bukti produksi wajib diupload.'
-                        ]);
-                    }
-
-                    // POTONG STOK (1x saja)
-                    if (!$production->stok_dipotong) {
-                        foreach ($production->order->items as $item) {
-                            AcrylicStockService::useForOrderItem($item);
-                        }
-                        $production->stok_dipotong = true;
-                    }
-
-                    $production->tanggal_selesai = now();
-                    $production->status_lock     = true;
-                }
-
-                /* =====================
-                 * SIMPAN PRODUKSI
-                 * ===================== */
-                $production->update([
-                    'status'            => $validated['status'],
-                    'desain_selesai'    => $request->desain_selesai ?? false,
-                    'produksi_selesai'  => $request->produksi_selesai ?? false,
-                    'catatan_desain'    => $validated['catatan_desain'] ?? null,
-                    'catatan_produksi'  => $validated['catatan_produksi'] ?? null,
-                ]);
-
-                /* =====================
-                 * UPDATE STATUS ORDER
-                 * ===================== */
-                if ($validated['status'] === 'selesai') {
-                    $production->order->update([
-                        'status_produksi' => 'selesai'
+                if (!$production->bukti) {
+                    throw ValidationException::withMessages([
+                        'bukti' => 'Bukti produksi wajib diupload.'
                     ]);
                 }
-            });
 
-        } catch (\Throwable $e) {
-            return back()
-                ->withInput()
-                ->with('error', $e->getMessage());
-        }
+                if (!$production->stok_dipotong) {
+                    foreach ($production->order->items as $item) {
+                        AcrylicStockService::useForOrderItem($item);
+                    }
+                    $production->stok_dipotong = true;
+                }
 
-        return redirect()
-            ->route('productions.index')
-            ->with('success', 'SPK berhasil diperbarui.');
+                $production->tanggal_selesai = now();
+                $production->status_lock = true;
+            }
+
+            // SIMPAN PRODUKSI
+            $production->update([
+                'status'       => $validated['status'],
+                'tim_produksi' => $validated['tim_produksi'],
+                'catatan'      => $validated['catatan'] ?? null,
+            ]);
+
+            // UPDATE STATUS ORDER
+            if ($validated['status'] === 'selesai') {
+                $production->order->update([
+                    'status_produksi' => 'selesai'
+                ]);
+            }
+        });
+
+    } catch (\Throwable $e) {
+        return back()
+            ->withInput()
+            ->with('error', $e->getMessage());
     }
+
+    return redirect()
+        ->route('productions.index')
+        ->with('success', 'Produksi berhasil diperbarui.');
+}
+
 }
