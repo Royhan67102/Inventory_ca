@@ -1,14 +1,12 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Tambah Order'); ?>
+<?php $__env->startSection('page-title', 'Tambah Order'); ?>
 
-@section('title', 'Tambah Order')
-@section('page-title', 'Tambah Order')
-
-@section('content')
-<form action="{{ route('orders.store') }}" method="POST">
-@csrf
+<?php $__env->startSection('content'); ?>
+<form action="<?php echo e(route('orders.store')); ?>" method="POST">
+<?php echo csrf_field(); ?>
 
 <div class="row">
-    {{-- CUSTOMER --}}
+    
     <div class="col-md-4">
         <div class="card mb-4">
             <div class="card-body">
@@ -33,7 +31,7 @@
         </div>
     </div>
 
-    {{-- ORDER --}}
+    
     <div class="col-md-8">
         <div class="card mb-4">
             <div class="card-body">
@@ -72,7 +70,7 @@
                     <input type="number" name="biaya_pengiriman" class="form-control" value="0">
                 </div>
 
-                {{-- INI YANG KURANG SEBELUMNYA --}}
+                
                 <div class="mb-3">
                     <label class="form-label">Jasa Pemasangan?</label>
                     <select name="jasa_pemasangan" class="form-select" required>
@@ -91,7 +89,7 @@
     </div>
 </div>
 
-{{-- ITEM --}}
+
 <div class="card mb-4">
     <div class="card-body">
         <h6 class="fw-bold">Item Order</h6>
@@ -125,5 +123,7 @@
     <button class="btn btn-success">Simpan Order</button>
 </div>
 </form>
-@endsection
+<?php $__env->stopSection(); ?>
 
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/orders/create.blade.php ENDPATH**/ ?>

@@ -38,6 +38,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('{order}/invoice', [OrderController::class, 'invoice'])->name('invoice');
         Route::get('{order}/invoice/download', [OrderController::class, 'downloadInvoice'])->name('invoice.download');
         Route::resource('/', OrderController::class)->parameters(['' => 'order']);
+        Route::resource('orders', OrderController::class);
+
     });
 
     // ================= ACRYLIC STOCK =================

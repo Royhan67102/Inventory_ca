@@ -29,7 +29,8 @@ return new class extends Migration
             $table->enum('status_produksi', [
                 'menunggu',
                 'proses',
-                'selesai'
+                'selesai', 
+                'dibatalkan'
             ])->default('menunggu');
 
             $table->decimal('total_harga', 15, 2)->default(0);

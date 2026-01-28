@@ -9,6 +9,10 @@ use App\Models\Production;
 use App\Models\DeliveryNote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
+
+
 
 class OrderController extends Controller
 {
@@ -35,44 +39,38 @@ class OrderController extends Controller
     /* =====================
      * SIMPAN ORDER
      * ===================== */
-    public function store(Request $request)
+    public function store(Request $request)  
     {
         $validated = $request->validate([
-            // CUSTOMER
-            'nama'      => 'required|string|max:100',
-            'alamat'    => 'required|string',
-            'no_telp'   => 'required|string|max:20',
+    // CUSTOMER
+    'nama'   => 'required|string|max:100',
+    'alamat' => 'required|string',
 
-            // ORDER
-            'tanggal_pemesanan' => 'required|date',
-            'deadline'          => 'nullable|date',
-            'payment_status'    => 'required|in:belum_bayar,dp,lunas',
-            'keterangan'        => 'nullable|string',
+    // ORDER
+    'tanggal_pemesanan' => 'required|date',
+    'deadline'          => 'nullable|date',
+    'payment_status'    => 'required|in:belum_bayar,dp,lunas',
 
-            // DELIVERY
-            'antar_barang'     => 'required|in:ya,tidak',
-            'biaya_pengiriman' => 'nullable|numeric|min:0',
+    // DELIVERY
+    'antar_barang'     => 'required|in:ya,tidak',
+    'biaya_pengiriman' => 'nullable|numeric|min:0',
 
-            // ITEM
-            'product_name.*' => 'required|string',
-            'jenis_order.*'  => 'required|in:custom,lembar',
+    // JASA PASANG
+    'jasa_pemasangan'  => 'required|in:ya,tidak',
+    'biaya_pemasangan' => 'nullable|numeric|min:0',
 
-            'panjang_cm.*'   => 'required|numeric|min:0',
-            'lebar_cm.*'     => 'required|numeric|min:0',
-            'qty.*'          => 'required|integer|min:1',
+    // ITEM
+    'product_name.*'    => 'required|string',
+    'acrylic_brand.*'   => 'nullable|string',
+    'panjang_cm.*'      => 'required|numeric|min:0',
+    'lebar_cm.*'        => 'required|numeric|min:0',
+    'qty.*'             => 'required|integer|min:1',
+    'harga_per_m2.*'    => 'required|numeric|min:0',
+]);
 
-            'harga_per_cm2.*' => 'nullable|numeric|min:0',
-            'harga_per_lembar.*' => 'nullable|numeric|min:0',
 
-            // MATERIAL SNAPSHOT
-            'acrylic_merk.*'    => 'required|string',
-            'acrylic_warna.*'   => 'required|string',
-            'ketebalan_mm.*'    => 'required|numeric|min:0',
-
-            // SUMBER BAHAN
-            'sumber_bahan.*' => 'required|in:lembar_utuh,limbah',
-        ]);
-
+        
+        Log::info('Validated Order Data:', $validated);
         DB::transaction(function () use ($validated, $request) {
 
             /* =====================
@@ -81,7 +79,6 @@ class OrderController extends Controller
             $customer = Customer::create([
                 'nama'    => $validated['nama'],
                 'alamat'  => $validated['alamat'],
-                'no_telp' => $validated['no_telp'],
             ]);
 
             /* =====================
@@ -105,52 +102,43 @@ class OrderController extends Controller
              * ===================== */
             $totalItem = 0;
 
-            foreach ($validated['product_name'] as $i => $name) {
+foreach ($validated['product_name'] as $i => $name) {
 
-                $panjang = $validated['panjang_cm'][$i];
-                $lebar   = $validated['lebar_cm'][$i];
-                $qty     = $validated['qty'][$i];
-                $luas    = $panjang * $lebar;
+    $panjang = $validated['panjang_cm'][$i];
+    $lebar   = $validated['lebar_cm'][$i];
+    $qty     = $validated['qty'][$i];
 
-                $jenis   = $validated['jenis_order'][$i];
+    // cm → m
+    $luas_m2 = ($panjang / 100) * ($lebar / 100);
+    $harga   = $validated['harga_per_m2'][$i];
 
-                if ($jenis === 'custom') {
-                    $harga   = $validated['harga_per_cm2'][$i] ?? 0;
-                    $subtotal = $luas * $qty * $harga;
-                } else {
-                    $harga   = $validated['harga_per_lembar'][$i] ?? 0;
-                    $subtotal = $qty * $harga;
-                }
+    $subtotal = $luas_m2 * $harga * $qty;
 
-                OrderItem::create([
-                    'order_id'      => $order->id,
-                    'product_name'  => $name,
-                    'jenis_order'   => $jenis,
+    OrderItem::create([
+        'order_id'     => $order->id,
+        'product_name' => $name,
+        'acrylic_merk' => $validated['acrylic_brand'][$i] ?? null,
+        'panjang_cm'   => $panjang,
+        'lebar_cm'     => $lebar,
+        'qty'          => $qty,
+        'harga'        => $harga,
+        'subtotal'     => $subtotal,
+    ]);
 
-                    'panjang_cm'    => $panjang,
-                    'lebar_cm'      => $lebar,
-                    'luas_cm2'      => $luas,
-                    'qty'           => $qty,
+    $totalItem += $subtotal;
+}
 
-                    'acrylic_merk'  => $validated['acrylic_merk'][$i],
-                    'acrylic_warna' => $validated['acrylic_warna'][$i],
-                    'ketebalan_mm'  => $validated['ketebalan_mm'][$i],
-
-                    'harga_per_cm2'     => $jenis === 'custom' ? $harga : null,
-                    'harga_per_lembar' => $jenis === 'lembar' ? $harga : null,
-
-                    'subtotal' => $subtotal,
-                ]);
-
-                $totalItem += $subtotal;
-            }
 
             /* =====================
              * TOTAL ORDER
              * ===================== */
             $order->update([
-                'total_harga' => $totalItem + $order->biaya_pengiriman,
-            ]);
+    'total_harga' =>
+        $totalItem
+        + $order->biaya_pengiriman
+        + ($validated['biaya_pemasangan'] ?? 0),
+]);
+
 
             /* =====================
              * PRODUKSI (SPK)
@@ -186,17 +174,63 @@ class OrderController extends Controller
         return view('orders.show', compact('order'));
     }
 
+    // EDIT
+    public function edit(Order $order)
+{
+    return view('orders.edit', compact('order'));
+}
+
+
+// UPDATE
+
+/* =====================
+ * UPDATE ORDER
+ * ===================== */
+public function update(Request $request, Order $order)
+{
+    $validated = $request->validate([
+        'payment_status' => 'required|in:belum_bayar,dp,lunas',
+        'deadline'       => 'nullable|date',
+        'catatan'        => 'nullable|string',
+    ]);
+
+    $order->update($validated);
+
+    return redirect()
+        ->route('orders.index')
+        ->with('success', 'Order berhasil diperbarui');
+}
+
+
     /* =====================
      * BATALKAN
      * ===================== */
     public function destroy(Order $order)
-    {
-        $order->update([
-            'status_produksi' => 'dibatalkan'
-        ]);
+{
+    $order->delete();
 
-        return redirect()
-            ->route('orders.index')
-            ->with('success', 'Order dibatalkan');
-    }
+    return redirect()
+        ->route('orders.index')
+        ->with('success', 'Order berhasil dihapus');
+}
+
+
+    public function invoice(Order $order)
+{
+    $order->load(['customer', 'items']);
+
+    return view('orders.invoice', compact('order'));
+}
+
+public function downloadInvoice(Order $order)
+{
+    $order->load(['customer', 'items']);
+
+    $pdf = Pdf::loadView('orders.invoice-pdf', compact('order'))
+        ->setPaper('A4', 'portrait');
+
+    return $pdf->download('Invoice-' . $order->invoice_number . '.pdf');
+}
+
+
 }
