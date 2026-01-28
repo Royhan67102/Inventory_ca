@@ -22,8 +22,6 @@
 
             </span>
         </p>
-        <p><strong>Tanggal Mulai:</strong> <?php echo e($production->tanggal_mulai?->format('d M Y') ?? '-'); ?></p>
-        <p><strong>Tanggal Selesai:</strong> <?php echo e($production->tanggal_selesai?->format('d M Y') ?? '-'); ?></p>
 
         <hr>
 

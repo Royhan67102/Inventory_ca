@@ -10,10 +10,10 @@
 
 <div class="row">
     
-    <div class="col-md-6">
-        <div class="card mb-4">
+    <div class="col-md-5">
+        <div class="card shadow-sm mb-4">
             <div class="card-body">
-                <h6 class="fw-bold">Informasi Order</h6>
+                <h6 class="fw-bold mb-3">Informasi Order</h6>
 
                 <div class="mb-3">
                     <label class="form-label">Customer</label>
@@ -37,62 +37,64 @@
     </div>
 
     
-    <div class="col-md-6">
-        <div class="card mb-4">
+    <div class="col-md-7">
+        <div class="card shadow-sm mb-4">
             <div class="card-body">
-                <h6 class="fw-bold">Update Produksi</h6>
+                <h6 class="fw-bold mb-3">Update Produksi</h6>
 
+                
                 <div class="mb-3">
                     <label class="form-label">Status Produksi</label>
                     <select name="status" class="form-select" required>
                         <option value="menunggu" <?php if($production->status=='menunggu'): echo 'selected'; endif; ?>>Menunggu</option>
-                        <option value="proses" <?php if($production->status=='proses'): echo 'selected'; endif; ?>>Proses</option>
+                        <option value="proses" <?php if($production->status=='proses'): echo 'selected'; endif; ?>>Produksi</option>
                         <option value="selesai" <?php if($production->status=='selesai'): echo 'selected'; endif; ?>>Selesai</option>
                     </select>
                 </div>
 
-              <div class="mb-3">
-    <label class="form-label">PIC Produksi</label>
-    <input
-        type="text"
-        name="tim_produksi"
-        class="form-control border border-dark rounded-0"
-        value="<?php echo e(old('tim_produksi', $production->tim_produksi)); ?>"
-        required
-    >
-</div>
+                
+                <div class="mb-3">
+                    <label class="form-label">PIC Produksi</label>
+                    <input type="text"
+                           name="tim_produksi"
+                           class="form-control"
+                           value="<?php echo e(old('tim_produksi', $production->tim_produksi)); ?>"
+                           required>
+                </div>
 
-<div class="mb-3">
-    <label class="form-label">Catatan Produksi</label>
-    <textarea
-        name="catatan"
-        class="form-control border border-dark rounded-0"
-        rows="3"
-        placeholder="Tulis catatan produksi..."
-    ></textarea>
-</div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Catatan Produksi</label>
+                    <textarea name="catatan"
+                              class="form-control"
+                              rows="3"><?php echo e(old('catatan', $production->catatan)); ?></textarea>
+                </div>
 
-<div class="mb-3">
-    <label class="form-label">Bukti Produksi (Foto)</label>
-    <input
-        type="file"
-        name="bukti"
-        class="form-control border border-dark rounded-0"
-        accept="image/*"
-    >
+                
+                <div class="mb-3">
+                    <label class="form-label">Bukti Produksi (Foto)</label>
+                    <input type="file"
+                           name="bukti"
+                           class="form-control"
+                           accept="image/*">
 
-    <?php if($production->bukti): ?>
-        <small class="d-block mt-2">
-            <img src="<?php echo e(asset('storage/' . $production->bukti)); ?>" alt="Bukti Produksi">
-
-        </small>
-    <?php endif; ?>
-</div>
-
+                    <?php if($production->bukti): ?>
+                        <div class="mt-2">
+                            <img src="<?php echo e(asset('storage/'.$production->bukti)); ?>"
+                                 class="img-thumbnail"
+                                 style="max-width: 200px">
+                        </div>
+                    <?php endif; ?>
+                </div>
 
                 <div class="text-end">
-                    <button class="btn btn-success">Update Produksi</button>
-                    <a href="<?php echo e(route('productions.index')); ?>" class="btn btn-secondary">Batal</a>
+                    <button class="btn btn-success">
+                        Simpan Produksi
+                    </button>
+                    <a href="<?php echo e(route('productions.index')); ?>"
+                       class="btn btn-secondary">
+                        Batal
+                    </a>
                 </div>
             </div>
         </div>

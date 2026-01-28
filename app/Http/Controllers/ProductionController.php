@@ -45,11 +45,6 @@ class ProductionController extends Controller
      * ===================== */
     public function edit(Production $production)
     {
-        if ($production->status_lock) {
-            return redirect()
-                ->route('productions.index')
-                ->with('error', 'SPK sudah selesai dan terkunci.');
-        }
 
         return view('productions.edit', compact('production'));
     }
@@ -57,7 +52,7 @@ class ProductionController extends Controller
     /* =====================
      * UPDATE PRODUKSI
      * ===================== */
-    public function update(Request $request, Production $production)
+ public function update(Request $request, Production $production)
 {
     if ($production->status_lock) {
         return back()->with('error', 'SPK sudah terkunci.');
@@ -73,7 +68,7 @@ class ProductionController extends Controller
     try {
         DB::transaction(function () use ($request, $production, $validated) {
 
-            // SET TANGGAL MULAI
+            // TANGGAL MULAI
             if ($validated['status'] === 'proses' && !$production->tanggal_mulai) {
                 $production->tanggal_mulai = now();
             }
@@ -81,7 +76,7 @@ class ProductionController extends Controller
             // UPLOAD BUKTI
             if ($request->hasFile('bukti')) {
                 if ($production->bukti) {
-                    Storage::delete($production->bukti);
+                    Storage::disk('public')->delete($production->bukti);
                 }
 
                 $production->bukti = $request
@@ -116,7 +111,7 @@ class ProductionController extends Controller
                 'catatan'      => $validated['catatan'] ?? null,
             ]);
 
-            // UPDATE STATUS ORDER
+            // UPDATE ORDER
             if ($validated['status'] === 'selesai') {
                 $production->order->update([
                     'status_produksi' => 'selesai'
@@ -128,6 +123,13 @@ class ProductionController extends Controller
         return back()
             ->withInput()
             ->with('error', $e->getMessage());
+    }
+
+    // ✅ REDIRECT FINAL (SELALU ADA RESPONSE)
+    if ($validated['status'] === 'selesai') {
+        return redirect()
+            ->route('dashboard')
+            ->with('success', 'Produksi selesai dan masuk riwayat.');
     }
 
     return redirect()

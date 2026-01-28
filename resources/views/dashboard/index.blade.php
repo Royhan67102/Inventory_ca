@@ -107,41 +107,40 @@
 {{-- ========================= --}}
 <div class="card shadow-sm">
     <div class="card-body">
-        <h6 class="mb-3">Order Terbaru</h6>
-
-        <div class="table-responsive">
-            <table class="table table-bordered table-sm align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Customer</th>
-                        <th>Total</th>
-                        <th>Pembayaran</th>
-                        <th>Produksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($latestOrders as $order)
-                        <tr>
-                            <td>{{ $order->created_at->format('d-m-Y') }}</td>
-                            <td>{{ $order->customer->nama ?? '-' }}</td>
-                            <td>Rp {{ number_format($order->total_harga) }}</td>
-                            <td>
-                                {{ $paymentLabel[$order->payment_status] ?? ucfirst($order->payment_status) }}
-                            </td>
-                            <td>{{ ucfirst($order->production->status ?? '-') }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="text-center text-muted">
-                                Belum ada order
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+        <div class="card mt-4">
+    <div class="card-header fw-bold">
+        Riwayat Produksi
     </div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>SPK</th>
+                    <th>Customer</th>
+                    <th>Selesai</th>
+                    <th>PIC</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($productionHistory as $prod)
+                    <tr>
+                        <td>#{{ $prod->id }}</td>
+                        <td>{{ $prod->order->customer->nama }}</td>
+                        <td>{{ $prod->tanggal_selesai?->format('d M Y') }}</td>
+                        <td>{{ $prod->tim_produksi }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">
+                            Belum ada riwayat produksi
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+
 </div>
 
 {{-- ========================= --}}

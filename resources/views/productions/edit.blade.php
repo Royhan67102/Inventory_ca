@@ -12,10 +12,10 @@
 
 <div class="row">
     {{-- INFO ORDER (READONLY) --}}
-    <div class="col-md-6">
-        <div class="card mb-4">
+    <div class="col-md-5">
+        <div class="card shadow-sm mb-4">
             <div class="card-body">
-                <h6 class="fw-bold">Informasi Order</h6>
+                <h6 class="fw-bold mb-3">Informasi Order</h6>
 
                 <div class="mb-3">
                     <label class="form-label">Customer</label>
@@ -39,62 +39,64 @@
     </div>
 
     {{-- UPDATE PRODUKSI --}}
-    <div class="col-md-6">
-        <div class="card mb-4">
+    <div class="col-md-7">
+        <div class="card shadow-sm mb-4">
             <div class="card-body">
-                <h6 class="fw-bold">Update Produksi</h6>
+                <h6 class="fw-bold mb-3">Update Produksi</h6>
 
+                {{-- STATUS --}}
                 <div class="mb-3">
                     <label class="form-label">Status Produksi</label>
                     <select name="status" class="form-select" required>
                         <option value="menunggu" @selected($production->status=='menunggu')>Menunggu</option>
-                        <option value="proses" @selected($production->status=='proses')>Proses</option>
+                        <option value="proses" @selected($production->status=='proses')>Produksi</option>
                         <option value="selesai" @selected($production->status=='selesai')>Selesai</option>
                     </select>
                 </div>
 
-              <div class="mb-3">
-    <label class="form-label">PIC Produksi</label>
-    <input
-        type="text"
-        name="tim_produksi"
-        class="form-control border border-dark rounded-0"
-        value="{{ old('tim_produksi', $production->tim_produksi) }}"
-        required
-    >
-</div>
+                {{-- PIC --}}
+                <div class="mb-3">
+                    <label class="form-label">PIC Produksi</label>
+                    <input type="text"
+                           name="tim_produksi"
+                           class="form-control"
+                           value="{{ old('tim_produksi', $production->tim_produksi) }}"
+                           required>
+                </div>
 
-<div class="mb-3">
-    <label class="form-label">Catatan Produksi</label>
-    <textarea
-        name="catatan"
-        class="form-control border border-dark rounded-0"
-        rows="3"
-        placeholder="Tulis catatan produksi..."
-    ></textarea>
-</div>
+                {{-- CATATAN --}}
+                <div class="mb-3">
+                    <label class="form-label">Catatan Produksi</label>
+                    <textarea name="catatan"
+                              class="form-control"
+                              rows="3">{{ old('catatan', $production->catatan) }}</textarea>
+                </div>
 
-<div class="mb-3">
-    <label class="form-label">Bukti Produksi (Foto)</label>
-    <input
-        type="file"
-        name="bukti"
-        class="form-control border border-dark rounded-0"
-        accept="image/*"
-    >
+                {{-- BUKTI --}}
+                <div class="mb-3">
+                    <label class="form-label">Bukti Produksi (Foto)</label>
+                    <input type="file"
+                           name="bukti"
+                           class="form-control"
+                           accept="image/*">
 
-    @if($production->bukti)
-        <small class="d-block mt-2">
-            <img src="{{ asset('storage/' . $production->bukti) }}" alt="Bukti Produksi">
-
-        </small>
-    @endif
-</div>
-
+                    @if($production->bukti)
+                        <div class="mt-2">
+                            <img src="{{ asset('storage/'.$production->bukti) }}"
+                                 class="img-thumbnail"
+                                 style="max-width: 200px">
+                        </div>
+                    @endif
+                </div>
 
                 <div class="text-end">
-                    <button class="btn btn-success">Update Produksi</button>
-                    <a href="{{ route('productions.index') }}" class="btn btn-secondary">Batal</a>
+                    <button class="btn btn-success">
+                        Simpan Produksi
+                    </button>
+                    <a href="{{ route('productions.index') }}"
+                       class="btn btn-secondary">
+                        Batal
+                    </a>
                 </div>
             </div>
         </div>

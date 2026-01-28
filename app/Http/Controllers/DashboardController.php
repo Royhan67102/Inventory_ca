@@ -59,7 +59,7 @@ class DashboardController extends Controller
 
         /**
          * =========================
-         * GRAFIK PENJUALAN (HARIAN)
+         * GRAFIK PENJUALAN
          * =========================
          */
         $salesChart = (clone $paidOrdersQuery)
@@ -102,6 +102,16 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
+        /**
+         * =========================
+         * RIWAYAT PRODUKSI (SELESAI)
+         * =========================
+         */
+        $productionHistory = Production::with(['order.customer'])
+            ->where('status', 'selesai')
+            ->orderBy('tanggal_selesai', 'desc')
+            ->limit(10)
+            ->get();
 
         /**
          * =========================
@@ -122,6 +132,7 @@ class DashboardController extends Controller
             'paymentStatus',
             'productionStatus',
             'activeProductions',
+            'productionHistory', // 🔥 INI PENTING
             'latestOrders',
             'from',
             'to'
