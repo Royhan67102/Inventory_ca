@@ -127,7 +127,8 @@ class OrderController extends Controller
                 'jasa_pemasangan'   => $validated['jasa_pemasangan'] == '1',
                 'biaya_pemasangan'  => $validated['biaya_pemasangan'] ?? 0,
 
-                'catatan'           => $validated['keterangan'] ?? null,
+                'catatan' => $validated['catatan'] ?? null,
+
                 'total_harga'       => 0,
             ]);
 
@@ -145,21 +146,24 @@ class OrderController extends Controller
                 $harga   = $validated['harga'][$i];
 
                 // luas m2
-                $luas_m2 = ($panjang * $lebar) / 10000;
-                $subtotal = $luas_m2 * $harga * $qty;
+                // luas cm2
+                $luas_cm2 = $panjang * $lebar;
+
+                $subtotal = $harga * $qty;
 
                 $hasCustomItem = true;
 
                 OrderItem::create([
-                    'order_id'     => $order->id,
-                    'product_name' => $name,
-                    'ketebalan'    => $validated['ketebalan'][$i] ?? null,
-                    'warna'        => $validated['warna'][$i] ?? null,
-                    'panjang_cm'   => $panjang,
-                    'lebar_cm'     => $lebar,
-                    'qty'          => $qty,
-                    'harga'        => $harga,
-                    'subtotal'     => $subtotal,
+                    'order_id'   => $order->id,
+                    'merk'       => $name,
+                    'ketebalan'  => $validated['ketebalan'][$i] ?? null,
+                    'warna'      => $validated['warna'][$i] ?? null,
+                    'panjang_cm' => $panjang,
+                    'lebar_cm'   => $lebar,
+                    'luas_cm2'   => $luas_cm2,
+                    'qty'        => $qty,
+                    'harga'      => $harga,
+                    'subtotal'   => $subtotal,
                 ]);
 
                 $totalItem += $subtotal;
@@ -257,19 +261,31 @@ class OrderController extends Controller
      * UPDATE ORDER
      * ===================== */
     public function update(Request $request, Order $order)
-    {
-        $validated = $request->validate([
-            'payment_status' => 'required|in:belum_bayar,dp,lunas',
-            'deadline'       => 'nullable|date',
-            'catatan'        => 'nullable|string',
-        ]);
+{
+    $validated = $request->validate([
+        'alamat'         => 'required|string',
+        'payment_status' => 'required|in:belum_bayar,dp,lunas',
+        'deadline'       => 'nullable|date',
+        'catatan'        => 'nullable|string',
+    ]);
 
-        $order->update($validated);
+    // UPDATE CUSTOMER (hanya alamat)
+    $order->customer->update([
+        'alamat' => $validated['alamat'],
+    ]);
 
-        return redirect()
-            ->route('orders.index')
-            ->with('success', 'Order berhasil diperbarui');
-    }
+    // UPDATE ORDER
+    $order->update([
+        'payment_status' => $validated['payment_status'],
+        'deadline'       => $validated['deadline'],
+        'catatan'        => $validated['catatan'] ?? null,
+    ]);
+
+    return redirect()
+        ->route('orders.index')
+        ->with('success', 'Order berhasil diperbarui');
+}
+
 
     /* =====================
      * HAPUS

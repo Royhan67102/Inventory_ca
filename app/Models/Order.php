@@ -9,26 +9,21 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'customer_id',
-        'invoice_number',
-        'tanggal_pemesanan',
-        'deadline',
+   protected $fillable = [
+    'customer_id',
+    'invoice_number',
+    'tanggal_pemesanan',
+    'deadline',
+    'payment_status',
+    'status',
+    'antar_barang',
+    'biaya_pengiriman',
+    'jasa_pemasangan',
+    'biaya_pemasangan',
+    'catatan',
+    'total_harga',
+];
 
-        // pembayaran
-        'payment_status', // belum_bayar | dp | lunas
-        'total_harga',
-
-        // jasa tambahan
-        'antar_barang',
-        'biaya_pengiriman',
-        'jasa_pemasangan',
-        'biaya_pemasangan',
-
-        // status internal
-        'status', // desain | produksi | delivery | pickup | selesai
-        'catatan',
-    ];
 
     protected $casts = [
         'tanggal_pemesanan' => 'date',

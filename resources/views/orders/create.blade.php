@@ -188,100 +188,101 @@
 
 @push('scripts')
 <script>
-        // ================= TOGGLE FORM TAMBAHAN =================
-    function toggleForm(selectId, formId) {
-        const selectEl = document.getElementById(selectId);
-        const formEl   = document.getElementById(formId);
+/* ================= TOGGLE FORM ================= */
+function toggleForm(selectId, formId) {
+    const selectEl = document.getElementById(selectId);
+    const formEl   = document.getElementById(formId);
+    if (!selectEl || !formEl) return;
+    formEl.classList.toggle('d-none', selectEl.value == 0);
+}
 
-        if (!selectEl || !formEl) return;
-
-        formEl.classList.toggle('d-none', selectEl.value == 0);
-    }
-
-    // Jasa Desain
-    document.getElementById('jasaDesain')?.addEventListener('change', function () {
-        toggleForm('jasaDesain', 'formDesain');
-    });
-
-    // Antar Barang
-    document.getElementById('antarBarang')?.addEventListener('change', function () {
-        toggleForm('antarBarang', 'formBiayaPengiriman');
-    });
-
-    // Jasa Pemasangan
-    document.getElementById('jasaPasang')?.addEventListener('change', function () {
-        toggleForm('jasaPasang', 'formBiayaPemasangan');
-    });
-
-    // Jalankan saat halaman pertama kali dibuka
-    document.addEventListener('DOMContentLoaded', function () {
+['jasaDesain', 'antarBarang', 'jasaPasang'].forEach(id => {
+    document.getElementById(id)?.addEventListener('change', () => {
         toggleForm('jasaDesain', 'formDesain');
         toggleForm('antarBarang', 'formBiayaPengiriman');
         toggleForm('jasaPasang', 'formBiayaPemasangan');
     });
+});
 
-    function formatRp(val) {
-        return 'Rp' + Math.round(val || 0).toLocaleString('id-ID');
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    toggleForm('jasaDesain', 'formDesain');
+    toggleForm('antarBarang', 'formBiayaPengiriman');
+    toggleForm('jasaPasang', 'formBiayaPemasangan');
+});
 
-    function hitungRow(row) {
-        const panjang = parseFloat(row.querySelector('.panjang').value || 0);
-        const lebar   = parseFloat(row.querySelector('.lebar').value || 0);
-        const qty     = parseInt(row.querySelector('.qty').value || 0);
-        const harga   = parseFloat(row.querySelector('.harga').value || 0);
+/* ================= HELPER ================= */
+function formatRp(val) {
+    return 'Rp' + (val || 0).toLocaleString('id-ID');
+}
 
-        // luas = p x l
-        const luas = (panjang * lebar) / 10000;
-        row.querySelector('.luas').value = luas ? luas.toFixed(2) : '';
+function angka(val) {
+    return parseFloat(val) || 0;
+}
 
-        // total item = harga x qty
-        const total = harga * qty;
-        row.querySelector('.subtotal').value = formatRp(total);
+/* ================= HITUNG ROW ================= */
+function hitungRow(row) {
+    const panjang = angka(row.querySelector('.panjang')?.value);
+    const lebar   = angka(row.querySelector('.lebar')?.value);
+    const qty     = angka(row.querySelector('.qty')?.value);
+    const harga   = angka(row.querySelector('.harga')?.value);
 
-        hitungGrandTotal();
-    }
+    // luas (m²) hanya untuk tampilan
+    const luas = (panjang * lebar) / 10000;
+    row.querySelector('.luas').value = luas ? luas.toFixed(2) : '';
 
-    function hitungGrandTotal() {
-        let totalItem = 0;
+    // subtotal
+    const subtotal = harga * qty;
+    row.querySelector('.subtotal').value = subtotal ? formatRp(subtotal) : '';
 
-        document.querySelectorAll('.subtotal').forEach(el => {
-            totalItem += parseInt(el.value.replace(/[^\d]/g, '') || 0);
-        });
+    hitungGrandTotal();
+}
 
-        const antar  = parseInt(document.querySelector('[name="biaya_pengiriman"]')?.value || 0);
-        const pasang = parseInt(document.querySelector('[name="biaya_pemasangan"]')?.value || 0);
+/* ================= GRAND TOTAL ================= */
+function hitungGrandTotal() {
+    let totalItem = 0;
 
-        const grandTotal = totalItem + antar + pasang;
-
-        document.getElementById('grandTotalText').innerText = formatRp(grandTotal);
-    }
-
-    function bindRow(row) {
-        row.querySelectorAll('input').forEach(el => {
-            el.addEventListener('input', () => hitungRow(row));
-        });
-        hitungRow(row);
-    }
-
-    // bind awal
-    document.querySelectorAll('.item-row').forEach(bindRow);
-
-    // tambah row
-    document.getElementById('addRow').addEventListener('click', () => {
-        const tbody = document.querySelector('#tableItemOrder tbody');
-        const row = tbody.querySelector('.item-row').cloneNode(true);
-
-        row.querySelectorAll('input').forEach(i => i.value = '');
-        tbody.appendChild(row);
-        bindRow(row);
+    document.querySelectorAll('.subtotal').forEach(el => {
+        totalItem += angka(el.value.replace(/[^\d]/g, ''));
     });
 
-    // update kalau biaya tambahan berubah
-    ['biaya_pengiriman', 'biaya_pemasangan'].forEach(name => {
-        const el = document.querySelector(`[name="${name}"]`);
-        if (el) el.addEventListener('input', hitungGrandTotal);
+    const antar  = angka(document.querySelector('[name="biaya_pengiriman"]')?.value);
+    const pasang = angka(document.querySelector('[name="biaya_pemasangan"]')?.value);
+
+    document.getElementById('grandTotalText').innerText =
+        formatRp(totalItem + antar + pasang);
+}
+
+/* ================= BIND ROW ================= */
+function bindRow(row) {
+    row.querySelectorAll('.panjang, .lebar, .qty, .harga').forEach(el => {
+        el.addEventListener('input', () => hitungRow(row));
     });
+    hitungRow(row);
+}
+
+/* ================= INIT ================= */
+document.querySelectorAll('.item-row').forEach(bindRow);
+
+/* ================= TAMBAH ROW ================= */
+document.getElementById('addRow').addEventListener('click', () => {
+    const tbody = document.querySelector('#tableItemOrder tbody');
+    const template = tbody.querySelector('.item-row');
+    const row = template.cloneNode(true);
+
+    // reset input
+    row.querySelectorAll('input').forEach(i => i.value = '');
+
+    tbody.appendChild(row);
+    bindRow(row);
+});
+
+/* ================= BIAYA TAMBAHAN ================= */
+['biaya_pengiriman', 'biaya_pemasangan'].forEach(name => {
+    document.querySelector(`[name="${name}"]`)
+        ?.addEventListener('input', hitungGrandTotal);
+});
 </script>
+
 
 @endpush
 @endsection

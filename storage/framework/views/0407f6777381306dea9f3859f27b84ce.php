@@ -15,19 +15,25 @@
 
                 <div class="mb-3">
                     <label class="form-label">Nama Customer</label>
-                    <input type="text" name="nama" class="form-control"
-                           value="<?php echo e($order->nama); ?>" required>
+                    <input type="text" class="form-control" value="<?php echo e($order->customer->nama); ?>" readonly>
+                    <input type="hidden" name="nama" value="<?php echo e($order->customer->nama); ?>">
+
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Alamat</label>
-                    <textarea name="alamat" class="form-control" rows="3" required><?php echo e($order->alamat); ?></textarea>
+                    <textarea name="alamat" class="form-control" required>
+                    <?php echo e($order->customer->alamat); ?>
+
+                    </textarea>
+
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Telepon</label>
-                    <input type="text" name="telepon" class="form-control"
-                           value="<?php echo e($order->telepon); ?>" required>
+                    <input type="text" class="form-control" value="<?php echo e($order->customer->telepon); ?>" readonly>
+                    <input type="hidden" name="telepon" value="<?php echo e($order->customer->telepon); ?>">
+
                 </div>
             </div>
         </div>
