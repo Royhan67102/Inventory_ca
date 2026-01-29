@@ -49,11 +49,11 @@
                 <div class="row mb-3">
                     <div class="col">
                         <label class="text-muted small">Tanggal Pemesanan</label>
-                        <div><?php echo e($order->tanggal_pemesanan->format('d M Y')); ?></div>
+                        <<div><?php echo e($order->tanggal_pemesanan->format('d M Y')); ?></div>
                     </div>
                     <div class="col">
                         <label class="text-muted small">Deadline</label>
-                        <div><?php echo e($order->deadline?->format('d M Y') ?? '-'); ?></div>
+                        <div><?php echo e($order->deadline ? $order->deadline->format('d M Y') : '-'); ?></div>
                     </div>
                 </div>
 
@@ -82,19 +82,25 @@
                 
                 <div class="mb-3">
                     <label class="text-muted small">Jasa Desain</label>
-                    <div>
-                        <?php echo e($order->design ? 'Ya' : 'Tidak'); ?>
+                    <div><?php echo e($order->design ? 'Ya' : 'Tidak'); ?></div>
 
-                    </div>
+                        <?php if($order->design && $order->design->file_awal): ?>
+                        <div class="mt-2">
+                            <a href="<?php echo e(asset('storage/'.$order->design->file_awal)); ?>"
+                                target="_blank"
+                                class="btn btn-outline-primary btn-sm me-2">
+                                👁 Lihat File
+                            </a>
 
-                    <?php if($order->design && $order->design->file_awal): ?>
-                        <a href="<?php echo e(asset('storage/'.$order->design->file_awal)); ?>"
-                           target="_blank"
-                           class="btn btn-outline-primary btn-sm mt-2">
-                            Lihat File Desain
-                        </a>
+                            <a href="<?php echo e(asset('storage/'.$order->design->file_awal)); ?>"
+                                download
+                                class="btn btn-outline-success btn-sm">
+                                ⬇ Download
+                            </a>
+                        </div>
                     <?php endif; ?>
                 </div>
+
 
                 <hr>
 
@@ -123,13 +129,14 @@
                     </div>
                 </div>
 
-                <?php if($order->catatan): ?>
+                <?php if(!empty($order->catatan)): ?>
                 <hr>
-                <div>
-                    <label class="text-muted small">Catatan</label>
-                    <div><?php echo e($order->catatan); ?></div>
-                </div>
+                    <div>
+                        <label class="text-muted small">Catatan</label>
+                        <div><?php echo e($order->catatan); ?></div>
+                    </div>
                 <?php endif; ?>
+
             </div>
         </div>
     </div>
@@ -158,28 +165,29 @@
                 <tbody>
                     <?php $__currentLoopData = $order->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <?php
-                        $luas = ($item->panjang_cm * $item->lebar_cm) / 10000;
+                        $luas  = ($item->panjang_cm * $item->lebar_cm) / 10000;
                         $total = $item->harga * $item->qty;
                     ?>
-                    <tr>
-                        <td><?php echo e($item->product_name); ?></td>
-                        <td><?php echo e($item->ketebalan); ?></td>
-                        <td><?php echo e($item->warna); ?></td>
-                        <td class="text-end"><?php echo e($item->panjang_cm); ?></td>
-                        <td class="text-end"><?php echo e($item->lebar_cm); ?></td>
-                        <td class="text-end"><?php echo e(number_format($luas,2)); ?></td>
-                        <td class="text-center"><?php echo e($item->qty); ?></td>
-                        <td class="text-end">
-                            Rp<?php echo e(number_format($item->harga,0,',','.')); ?>
+                        <tr>
+                            <td><?php echo e($item->merk); ?></td>
+                            <td><?php echo e($item->ketebalan ?? '-'); ?></td>
+                            <td><?php echo e($item->warna ?? '-'); ?></td>
+                            <td class="text-end"><?php echo e($item->panjang_cm); ?></td>
+                            <td class="text-end"><?php echo e($item->lebar_cm); ?></td>
+                            <td class="text-end"><?php echo e(number_format($luas,2)); ?></td>
+                            <td class="text-center"><?php echo e($item->qty); ?></td>
+                            <td class="text-end">
+                    Rp<?php echo e(number_format($item->harga,0,',','.')); ?>
 
-                        </td>
-                        <td class="text-end">
-                            Rp<?php echo e(number_format($total,0,',','.')); ?>
+                    </td>
+                    <td class="text-end">
+                        Rp<?php echo e(number_format($total,0,',','.')); ?>
 
-                        </td>
-                    </tr>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </tbody>
+                    </td>
+            </tr>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </tbody>
+
             </table>
         </div>
     </div>

@@ -50,11 +50,11 @@
                 <div class="row mb-3">
                     <div class="col">
                         <label class="text-muted small">Tanggal Pemesanan</label>
-                        <div>{{ $order->tanggal_pemesanan->format('d M Y') }}</div>
+                        <<div>{{ $order->tanggal_pemesanan->format('d M Y') }}</div>
                     </div>
                     <div class="col">
                         <label class="text-muted small">Deadline</label>
-                        <div>{{ $order->deadline?->format('d M Y') ?? '-' }}</div>
+                        <div>{{ $order->deadline ? $order->deadline->format('d M Y') : '-' }}</div>
                     </div>
                 </div>
 
@@ -81,18 +81,25 @@
                 {{-- ================= DESAIN ================= --}}
                 <div class="mb-3">
                     <label class="text-muted small">Jasa Desain</label>
-                    <div>
-                        {{ $order->design ? 'Ya' : 'Tidak' }}
-                    </div>
+                    <div>{{ $order->design ? 'Ya' : 'Tidak' }}</div>
 
-                    @if($order->design && $order->design->file_awal)
-                        <a href="{{ asset('storage/'.$order->design->file_awal) }}"
-                           target="_blank"
-                           class="btn btn-outline-primary btn-sm mt-2">
-                            Lihat File Desain
-                        </a>
+                        @if($order->design && $order->design->file_awal)
+                        <div class="mt-2">
+                            <a href="{{ asset('storage/'.$order->design->file_awal) }}"
+                                target="_blank"
+                                class="btn btn-outline-primary btn-sm me-2">
+                                👁 Lihat File
+                            </a>
+
+                            <a href="{{ asset('storage/'.$order->design->file_awal) }}"
+                                download
+                                class="btn btn-outline-success btn-sm">
+                                ⬇ Download
+                            </a>
+                        </div>
                     @endif
                 </div>
+
 
                 <hr>
 
@@ -119,13 +126,14 @@
                     </div>
                 </div>
 
-                @if($order->catatan)
+                @if(!empty($order->catatan))
                 <hr>
-                <div>
-                    <label class="text-muted small">Catatan</label>
-                    <div>{{ $order->catatan }}</div>
-                </div>
+                    <div>
+                        <label class="text-muted small">Catatan</label>
+                        <div>{{ $order->catatan }}</div>
+                    </div>
                 @endif
+
             </div>
         </div>
     </div>
@@ -154,26 +162,27 @@
                 <tbody>
                     @foreach($order->items as $item)
                     @php
-                        $luas = ($item->panjang_cm * $item->lebar_cm) / 10000;
+                        $luas  = ($item->panjang_cm * $item->lebar_cm) / 10000;
                         $total = $item->harga * $item->qty;
                     @endphp
-                    <tr>
-                        <td>{{ $item->product_name }}</td>
-                        <td>{{ $item->ketebalan }}</td>
-                        <td>{{ $item->warna }}</td>
-                        <td class="text-end">{{ $item->panjang_cm }}</td>
-                        <td class="text-end">{{ $item->lebar_cm }}</td>
-                        <td class="text-end">{{ number_format($luas,2) }}</td>
-                        <td class="text-center">{{ $item->qty }}</td>
-                        <td class="text-end">
-                            Rp{{ number_format($item->harga,0,',','.') }}
-                        </td>
-                        <td class="text-end">
-                            Rp{{ number_format($total,0,',','.') }}
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
+                        <tr>
+                            <td>{{ $item->merk }}</td>
+                            <td>{{ $item->ketebalan ?? '-' }}</td>
+                            <td>{{ $item->warna ?? '-' }}</td>
+                            <td class="text-end">{{ $item->panjang_cm }}</td>
+                            <td class="text-end">{{ $item->lebar_cm }}</td>
+                            <td class="text-end">{{ number_format($luas,2) }}</td>
+                            <td class="text-center">{{ $item->qty }}</td>
+                            <td class="text-end">
+                    Rp{{ number_format($item->harga,0,',','.') }}
+                    </td>
+                    <td class="text-end">
+                        Rp{{ number_format($total,0,',','.') }}
+                    </td>
+            </tr>
+            @endforeach
+            </tbody>
+
             </table>
         </div>
     </div>
