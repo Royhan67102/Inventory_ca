@@ -22,19 +22,21 @@ class Order extends Model
         // jasa tambahan
         'antar_barang',
         'biaya_pengiriman',
-        'pasang_barang',
+        'jasa_pemasangan',
         'biaya_pemasangan',
 
         // status internal
-        'status_produksi', // menunggu | proses | selesai
+        'status', // desain | produksi | delivery | pickup | selesai
         'catatan',
     ];
 
     protected $casts = [
         'tanggal_pemesanan' => 'date',
         'deadline'          => 'date',
+
         'antar_barang'      => 'boolean',
-        'pasang_barang'     => 'boolean',
+        'jasa_pemasangan'   => 'boolean',
+
         'total_harga'       => 'float',
         'biaya_pengiriman'  => 'float',
         'biaya_pemasangan'  => 'float',
@@ -42,7 +44,7 @@ class Order extends Model
 
     /* ================= RELATION ================= */
 
-    public function customer()
+   public function customer()
     {
         return $this->belongsTo(Customer::class);
     }
@@ -50,6 +52,11 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function design()
+    {
+        return $this->hasOne(Design::class);
     }
 
     public function production()
@@ -62,18 +69,24 @@ class Order extends Model
         return $this->hasOne(DeliveryNote::class);
     }
 
+    public function pickup()
+    {
+        return $this->hasOne(Pickup::class);
+    }
+
     /* ================= BUSINESS ================= */
 
     public function totalItem(): float
     {
-        return $this->items()->sum('subtotal');
+        return (float) $this->items()->sum('subtotal');
     }
 
     public function totalJasa(): float
     {
         return
-            ($this->biaya_pengiriman ?? 0) +
-            ($this->biaya_pemasangan ?? 0);
+            (float) ($this->biaya_pengiriman ?? 0) +
+            (float) ($this->biaya_pemasangan ?? 0) +
+            (float) ($this->design?->biaya_desain ?? 0);
     }
 
     public function hitungTotal(): float
@@ -83,16 +96,28 @@ class Order extends Model
 
     public function refreshTotal(): void
     {
-        $this->update([
+        $this->updateQuietly([
             'total_harga' => $this->hitungTotal(),
         ]);
     }
 
+    /* ================= AUTO DEFAULT ================= */
+
     protected static function booted()
     {
         static::creating(function ($order) {
+
             $order->invoice_number ??= 'INV-' . now()->format('YmdHis');
-            $order->status_produksi ??= 'menunggu';
+
+            // ⬇️ DEFAULT STATUS ORDER
+            $order->status ??= 'desain';
+
+            // default jasa
+            $order->antar_barang     ??= false;
+            $order->jasa_pemasangan  ??= false;
+            $order->biaya_pengiriman ??= 0;
+            $order->biaya_pemasangan ??= 0;
+            $order->total_harga      ??= 0;
         });
     }
 }

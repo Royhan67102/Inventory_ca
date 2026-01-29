@@ -4,6 +4,7 @@
 @section('page-title', 'Daftar Order')
 
 @section('content')
+
 <!-- DELETE MODAL -->
 <div class="modal fade" id="deleteModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
@@ -36,7 +37,6 @@
   </div>
 </div>
 
-
 <div class="card shadow-sm">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0">Daftar Order</h6>
@@ -52,28 +52,58 @@
                     <th>Customer</th>
                     <th>Total</th>
                     <th>Pembayaran</th>
-                    <th>Produksi</th>
-                    <th>Aksi</th>
+                    <th>Status</th>
                     <th>Catatan</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
+
             <tbody>
             @forelse($orders as $order)
                 <tr>
-                    <td class="text-center">{{ $loop->iteration }}</td>
-                    <td>{{ $order->tanggal_pemesanan->format('d M Y') }}</td>
-                    <td>{{ $order->customer->nama }}</td>
-                    <td>Rp {{ number_format($order->total_harga,0,',','.') }}</td>
+                    {{-- KODE --}}
+                    <td class="text-center fw-bold">
+                        838{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}
+                    </td>
+
+                    {{-- TANGGAL --}}
+                    <td>
+                        {{ $order->tanggal_pemesanan->format('d M Y') }}
+                    </td>
+
+                    {{-- CUSTOMER --}}
+                    <td>
+                        {{ $order->customer->nama }}
+                    </td>
+
+                    {{-- TOTAL --}}
+                    <td>
+                        Rp {{ number_format($order->total_harga, 0, ',', '.') }}
+                    </td>
+
+                    {{-- PEMBAYARAN --}}
                     <td class="text-center">
-                        <span class="badge bg-{{ $order->payment_status=='lunas'?'success':($order->payment_status=='dp'?'warning':'secondary') }}">
-                            {{ strtoupper($order->payment_status) }}
+                        <span class="badge bg-{{
+                            $order->payment_status == 'lunas' ? 'success' :
+                            ($order->payment_status == 'dp' ? 'warning' : 'secondary')
+                        }}">
+                            {{ strtoupper(str_replace('_',' ', $order->payment_status)) }}
                         </span>
                     </td>
+
+                    {{-- STATUS ORDER --}}
                     <td class="text-center">
-                        <span class="badge bg-{{ ($order->production?->status ?? '')=='selesai'?'success':'secondary' }}">
-                            {{ ucfirst($order->production->status ?? 'menunggu') }}
+                        <span class="badge bg-info text-dark">
+                            {{ ucfirst($order->status ?? 'desain') }}
                         </span>
                     </td>
+
+                    {{-- CATATAN --}}
+                    <td>
+                        {{ $order->catatan ?? '-' }}
+                    </td>
+
+                    {{-- AKSI --}}
                     <td class="text-center">
                         <a href="{{ route('orders.show', $order) }}" class="btn btn-info btn-sm">
                             Detail
@@ -92,28 +122,26 @@
                             class="btn btn-danger btn-sm"
                             data-bs-toggle="modal"
                             data-bs-target="#deleteModal"
-                            data-id="{{ $order->id }}"
-                            >
+                            data-id="{{ $order->id }}">
                             Hapus
                         </button>
                     </td>
-
-                    <td>{{ $order->catatan }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="text-center text-muted">Belum ada order</td>
+                    <td colspan="8" class="text-center text-muted">
+                        Belum ada order
+                    </td>
                 </tr>
             @endforelse
             </tbody>
         </table>
     </div>
 </div>
+
 @endsection
 
-
-
-<!-- javascript -->
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const deleteModal = document.getElementById('deleteModal');
@@ -122,8 +150,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const button = event.relatedTarget;
         const orderId = button.getAttribute('data-id');
 
-        const form = document.getElementById('deleteForm');
-        form.action = `/orders/${orderId}`;
+        document.getElementById('deleteForm').action = `/orders/${orderId}`;
     });
 });
 </script>
+@endpush

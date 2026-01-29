@@ -8,6 +8,7 @@ use App\Http\Controllers\AcrylicStockController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\DeliveryNoteController;
+use App\Http\Controllers\PickupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +58,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ================= DELIVERY / SURAT JALAN =================
     Route::resource('delivery', DeliveryNoteController::class)
         ->only(['index', 'show', 'edit', 'update']);
+
+    Route::resource('pickups', PickupController::class)
+    ->only(['index', 'edit', 'update', 'destroy']);
+
 });
 
 require __DIR__.'/auth.php';

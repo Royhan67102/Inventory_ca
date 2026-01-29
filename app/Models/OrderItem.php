@@ -8,30 +8,30 @@ class OrderItem extends Model
 {
     protected $fillable = [
         'order_id',
-        'product_name',
-        'tipe_item', // lembaran | custom
-        'qty',
 
-        // custom
+        // info produk (sesuai create)
+        'merk',
+        'ketebalan',
+        'warna',
+
+        // ukuran
         'panjang_cm',
         'lebar_cm',
         'luas_cm2',
-        'harga_per_cm',
 
-        // lembaran
-        'harga_satuan',
-
+        // transaksi
+        'qty',
+        'harga',
         'subtotal',
     ];
 
     protected $casts = [
-        'qty'            => 'integer',
-        'panjang_cm'     => 'float',
-        'lebar_cm'       => 'float',
-        'luas_cm2'       => 'float',
-        'harga_per_cm'   => 'float',
-        'harga_satuan'   => 'float',
-        'subtotal'       => 'float',
+        'qty'        => 'integer',
+        'panjang_cm' => 'float',
+        'lebar_cm'   => 'float',
+        'luas_cm2'   => 'float',
+        'harga'      => 'float',
+        'subtotal'   => 'float',
     ];
 
     /* ================= RELATION ================= */
@@ -41,33 +41,23 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
 
-    /* ================= ACCESSOR ================= */
-
-    public function getLuasAttribute(): float
-    {
-        return $this->luas_cm2 ?? 0;
-    }
-
     /* ================= AUTO HITUNG ================= */
 
     protected static function booted()
     {
         static::saving(function ($item) {
 
-            // ITEM CUSTOM
-            if ($item->tipe_item === 'custom') {
-                $item->luas_cm2 = ($item->panjang_cm ?? 0) * ($item->lebar_cm ?? 0);
-                $item->subtotal = $item->luas_cm2 * $item->harga_per_cm * $item->qty;
-            }
+            $qty     = max(1, (int) ($item->qty ?? 1));
+            $panjang = (float) ($item->panjang_cm ?? 0);
+            $lebar   = (float) ($item->lebar_cm ?? 0);
+            $harga   = (float) ($item->harga ?? 0);
 
-            // ITEM LEMBARAN
-            if ($item->tipe_item === 'lembaran') {
-                $item->panjang_cm = null;
-                $item->lebar_cm = null;
-                $item->luas_cm2 = null;
-                $item->harga_per_cm = null;
-                $item->subtotal = $item->harga_satuan * $item->qty;
-            }
+            // luas cm2
+            $item->luas_cm2 = $panjang * $lebar;
+
+            // subtotal = harga × qty
+            $item->qty      = $qty;
+            $item->subtotal = $harga * $qty;
         });
 
         static::saved(function ($item) {

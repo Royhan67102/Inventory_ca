@@ -1,109 +1,193 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Invoice {{ $order->invoice_number ?? 'INV-'.$order->id }}</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 12px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #000;
-            padding: 6px;
-        }
-        th {
-            background: #f5f5f5;
-        }
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-    </style>
-</head>
-<body>
+@extends('layouts.app')
 
-<table width="100%" style="border:none;">
-    <tr>
-        <td style="border:none;">
-            <p><strong>Nama Pemesan</strong> : {{ $order->customer->nama }}</p>
-            <p><strong>Nama Penerima</strong> : Cahaya Akrilik</p>
-            <p><strong>Tanggal Pemesanan</strong> : {{ $order->tanggal_pemesanan->format('d F Y') }}</p>
-            <p><strong>No Rekening</strong> : BCA A/N Mahmud</p>
-        </td>
-        <td style="border:none; text-align:right;">
-            <h3>INVOICE</h3>
-            <p>{{ $order->invoice_number }}</p>
-        </td>
-    </tr>
-</table>
+@section('title', 'Detail Order')
+@section('page-title', 'Detail Order')
 
-<br>
+@section('content')
+<div class="container-fluid">
 
-<table>
-    <thead>
-        <tr>
-            <th width="5%">No</th>
-            <th>Keterangan</th>
-            <th width="10%">QTY</th>
-            <th width="15%">Harga</th>
-            <th width="15%">Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($order->items as $i => $item)
-        <tr>
-            <td class="text-center">{{ $i + 1 }}</td>
-            <td>
-                {{ strtoupper($item->product_name) }}
-                {{ $item->panjang_cm }} x {{ $item->lebar_cm }} CM
-            </td>
-            <td class="text-center">{{ $item->qty }} SET</td>
-            <td class="text-right">
-                Rp {{ number_format($item->harga_per_m2,0,',','.') }}
-            </td>
-            <td class="text-right">
-                Rp {{ number_format($item->subtotal,0,',','.') }}
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+{{-- ================= HEADER ================= --}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="fw-bold">
+        Order {{ $order->invoice_number }}
+    </h5>
+    <a href="{{ route('orders.index') }}" class="btn btn-secondary btn-sm">
+        ← Kembali
+    </a>
+</div>
 
-<br>
+<div class="row">
+    {{-- ================= CUSTOMER ================= --}}
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h6 class="fw-bold">Data Customer</h6>
 
-<table width="100%" style="border:none;">
-    <tr>
-        <td style="border:none;">
-            <strong>TOTAL SISA PEMBAYARAN</strong>
-        </td>
-        <td style="border:none;" class="text-right">
-            <p><strong>TOTAL :</strong> Rp {{ number_format($order->total_harga,0,',','.') }}</p>
-            <p><strong>DP :</strong> Rp 0</p>
-            <p><strong>SISA :</strong> Rp {{ number_format($order->total_harga,0,',','.') }}</p>
-        </td>
-    </tr>
-</table>
+                <div class="mb-2">
+                    <label class="text-muted small">Nama</label>
+                    <div>{{ $order->customer->nama }}</div>
+                </div>
 
-<br>
+                <div class="mb-2">
+                    <label class="text-muted small">Alamat</label>
+                    <div>{{ $order->customer->alamat }}</div>
+                </div>
 
-<p>
-Kami tidak menerima selain pembayaran atau transaksi ke No rekening yang tertera.
-</p>
+                <div>
+                    <label class="text-muted small">Telepon</label>
+                    <div>{{ $order->customer->telepon }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<br><br>
+    {{-- ================= ORDER ================= --}}
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h6 class="fw-bold">Informasi Order</h6>
 
-<table width="100%" style="border:none;">
-    <tr>
-        <td style="border:none;"></td>
-        <td style="border:none; text-align:center;">
-            Penerima<br><br><br>
-            <strong>Mahmud</strong>
-        </td>
-    </tr>
-</table>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="text-muted small">Tanggal Pemesanan</label>
+                        <div>{{ $order->tanggal_pemesanan->format('d M Y') }}</div>
+                    </div>
+                    <div class="col">
+                        <label class="text-muted small">Deadline</label>
+                        <div>{{ $order->deadline?->format('d M Y') ?? '-' }}</div>
+                    </div>
+                </div>
 
-</body>
-</html>
+                <div class="mb-2">
+                    <label class="text-muted small">Status Pembayaran</label>
+                    <div>
+                        <span class="badge bg-warning text-dark">
+                            {{ strtoupper(str_replace('_', ' ', $order->payment_status)) }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label class="text-muted small">Status Order</label>
+                    <div>
+                        <span class="badge bg-info">
+                            {{ strtoupper($order->status) }}
+                        </span>
+                    </div>
+                </div>
+
+                <hr>
+
+                {{-- ================= DESAIN ================= --}}
+                <div class="mb-3">
+                    <label class="text-muted small">Jasa Desain</label>
+                    <div>
+                        {{ $order->design ? 'Ya' : 'Tidak' }}
+                    </div>
+
+                    @if($order->design && $order->design->file_awal)
+                        <a href="{{ asset('storage/'.$order->design->file_awal) }}"
+                           target="_blank"
+                           class="btn btn-outline-primary btn-sm mt-2">
+                            Lihat File Desain
+                        </a>
+                    @endif
+                </div>
+
+                <hr>
+
+                {{-- ================= JASA TAMBAHAN ================= --}}
+                <div class="row">
+                    <div class="col">
+                        <label class="text-muted small">Antar Barang</label>
+                        <div>
+                            {{ $order->antar_barang ? 'Ya' : 'Tidak' }}
+                        </div>
+                        @if($order->antar_barang)
+                            <small>Biaya: Rp{{ number_format($order->biaya_pengiriman,0,',','.') }}</small>
+                        @endif
+                    </div>
+
+                    <div class="col">
+                        <label class="text-muted small">Jasa Pemasangan</label>
+                        <div>
+                            {{ $order->jasa_pemasangan ? 'Ya' : 'Tidak' }}
+                        </div>
+                        @if($order->jasa_pemasangan)
+                            <small>Biaya: Rp{{ number_format($order->biaya_pemasangan,0,',','.') }}</small>
+                        @endif
+                    </div>
+                </div>
+
+                @if($order->catatan)
+                <hr>
+                <div>
+                    <label class="text-muted small">Catatan</label>
+                    <div>{{ $order->catatan }}</div>
+                </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ================= ITEM ================= --}}
+<div class="card mb-4">
+    <div class="card-body">
+        <h6 class="fw-bold">Item Order</h6>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="text-center">
+                    <tr>
+                        <th>Merk</th>
+                        <th>Ketebalan</th>
+                        <th>Warna</th>
+                        <th>Panjang</th>
+                        <th>Lebar</th>
+                        <th>Luas (m²)</th>
+                        <th>Qty</th>
+                        <th>Harga</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($order->items as $item)
+                    @php
+                        $luas = ($item->panjang_cm * $item->lebar_cm) / 10000;
+                        $total = $item->harga * $item->qty;
+                    @endphp
+                    <tr>
+                        <td>{{ $item->product_name }}</td>
+                        <td>{{ $item->ketebalan }}</td>
+                        <td>{{ $item->warna }}</td>
+                        <td class="text-end">{{ $item->panjang_cm }}</td>
+                        <td class="text-end">{{ $item->lebar_cm }}</td>
+                        <td class="text-end">{{ number_format($luas,2) }}</td>
+                        <td class="text-center">{{ $item->qty }}</td>
+                        <td class="text-end">
+                            Rp{{ number_format($item->harga,0,',','.') }}
+                        </td>
+                        <td class="text-end">
+                            Rp{{ number_format($total,0,',','.') }}
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{{-- ================= TOTAL ================= --}}
+<div class="text-end mb-5">
+    <h5>
+        Grand Total :
+        <strong class="text-success">
+            Rp{{ number_format($order->total_harga,0,',','.') }}
+        </strong>
+    </h5>
+</div>
+
+</div>
+@endsection

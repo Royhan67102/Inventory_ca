@@ -20,23 +20,31 @@ return new class extends Migration
             $table->date('tanggal_pemesanan');
             $table->date('deadline')->nullable();
 
+            // ================= PEMBAYARAN =================
             $table->enum('payment_status', [
                 'belum_bayar',
                 'dp',
                 'lunas'
             ])->default('belum_bayar');
 
-            $table->enum('status_produksi', [
-                'menunggu',
-                'proses',
-                'selesai', 
-                'dibatalkan'
-            ])->default('menunggu');
+            // ================= STATUS ORDER =================
+            $table->enum('status', [
+                'desain',
+                'produksi',
+                'delivery',
+                'pickup',
+                'selesai'
+            ])->default('desain');
 
+            // ================= TOTAL =================
             $table->decimal('total_harga', 15, 2)->default(0);
 
+            // ================= JASA TAMBAHAN =================
             $table->boolean('antar_barang')->default(false);
             $table->decimal('biaya_pengiriman', 15, 2)->default(0);
+
+            $table->boolean('jasa_pemasangan')->default(false);
+            $table->decimal('biaya_pemasangan', 15, 2)->default(0);
 
             $table->text('catatan')->nullable();
 

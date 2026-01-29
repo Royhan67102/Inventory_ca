@@ -7,6 +7,8 @@ use App\Models\Production;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
+
 
 class DashboardController extends Controller
 {
@@ -42,11 +44,12 @@ class DashboardController extends Controller
             ->sum('total_harga');
 
         $week = (clone $paidOrdersQuery)
-            ->whereBetween('created_at', [
-                now()->startOfWeek(Carbon::MONDAY),
-                now()->endOfWeek(Carbon::SUNDAY)
-            ])
-            ->sum('total_harga');
+        ->whereBetween('created_at', [
+            now()->startOfWeek(CarbonInterface::MONDAY),
+            now()->endOfWeek(CarbonInterface::SUNDAY)
+        ])
+        ->sum('total_harga');
+
 
         $month = (clone $paidOrdersQuery)
             ->whereMonth('created_at', now()->month)
@@ -95,8 +98,8 @@ class DashboardController extends Controller
          * =========================
          */
         $activeProductions = Production::with(['order.customer'])
-            ->whereIn('status', ['menunggu', 'proses'])
             ->join('orders', 'productions.order_id', '=', 'orders.id')
+            ->whereIn('productions.status', ['menunggu', 'proses']) // ✅ FIX
             ->orderBy('orders.deadline', 'asc')
             ->select('productions.*')
             ->limit(10)
@@ -132,7 +135,7 @@ class DashboardController extends Controller
             'paymentStatus',
             'productionStatus',
             'activeProductions',
-            'productionHistory', // 🔥 INI PENTING
+            'productionHistory',
             'latestOrders',
             'from',
             'to'

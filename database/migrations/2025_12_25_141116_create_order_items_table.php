@@ -15,26 +15,20 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->string('product_name');
+            // INFO PRODUK (SESUAI FORM)
+            $table->string('merk')->nullable();
+            $table->string('ketebalan')->nullable();
+            $table->string('warna')->nullable();
 
-            // TIPE ITEM
-            $table->enum('tipe_item', [
-                'custom',
-                'lembaran'
-            ]);
-
-            $table->integer('qty')->default(1);
-
-            // CUSTOM
+            // UKURAN
             $table->decimal('panjang_cm', 8, 2)->nullable();
             $table->decimal('lebar_cm', 8, 2)->nullable();
             $table->decimal('luas_cm2', 12, 2)->nullable();
-            $table->decimal('harga_per_cm', 12, 2)->nullable();
 
-            // LEMBARAN
-            $table->decimal('harga_satuan', 15, 2)->nullable();
-
-            $table->decimal('subtotal', 15, 2);
+            // TRANSAKSI
+            $table->integer('qty')->default(1);
+            $table->decimal('harga', 15, 2)->default(0);
+            $table->decimal('subtotal', 15, 2)->default(0);
 
             $table->timestamps();
         });

@@ -4,12 +4,12 @@
 @section('page-title', 'Edit Order')
 
 @section('content')
-<form action="{{ route('orders.update', $order) }}" method="POST">
+<form action="{{ route('orders.update', $order->id) }}" method="POST" enctype="multipart/form-data">
 @csrf
 @method('PUT')
 
 <div class="row">
-    {{-- CUSTOMER --}}
+    {{-- ================= CUSTOMER ================= --}}
     <div class="col-md-4">
         <div class="card mb-4">
             <div class="card-body">
@@ -17,29 +17,25 @@
 
                 <div class="mb-3">
                     <label class="form-label">Nama Customer</label>
-                    <input
-                        type="text"
-                        name="nama"
-                        class="form-control border border-dark rounded-0"
-                        value="{{ old('nama', $order->customer->nama) }}"
-                        required
-                    >
+                    <input type="text" name="nama" class="form-control"
+                           value="{{ $order->nama }}" required>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Alamat</label>
-                    <textarea
-                        name="alamat"
-                        class="form-control border border-dark rounded-0"
-                        rows="3"
-                        required
-                    >{{ old('alamat', $order->customer->alamat) }}</textarea>
+                    <textarea name="alamat" class="form-control" rows="3" required>{{ $order->alamat }}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Telepon</label>
+                    <input type="text" name="telepon" class="form-control"
+                           value="{{ $order->telepon }}" required>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- ORDER --}}
+    {{-- ================= ORDER ================= --}}
     <div class="col-md-8">
         <div class="card mb-4">
             <div class="card-body">
@@ -48,121 +44,228 @@
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label">Tanggal Pemesanan</label>
-                        <input
-                            type="date"
-                            name="tanggal_pemesanan"
-                            class="form-control"
-                            value="{{ old('tanggal_pemesanan', $order->tanggal_pemesanan->format('Y-m-d')) }}"
-                            required
-                        >
+                        <input type="date" name="tanggal_pemesanan"
+                               class="form-control"
+                               value="{{ $order->tanggal_pemesanan }}" required>
                     </div>
                     <div class="col">
                         <label class="form-label">Deadline</label>
-                        <input
-                            type="date"
-                            name="deadline"
-                            class="form-control"
-                            value="{{ old('deadline', $order->deadline?->format('Y-m-d')) }}"
-                        >
+                        <input type="date" name="deadline"
+                               class="form-control"
+                               value="{{ $order->deadline }}">
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Status Pembayaran</label>
                     <select name="payment_status" class="form-select" required>
-                        <option value="belum_bayar" @selected($order->payment_status=='belum_bayar')>Belum Bayar</option>
-                        <option value="dp" @selected($order->payment_status=='dp')>DP</option>
-                        <option value="lunas" @selected($order->payment_status=='lunas')>Lunas</option>
+                        <option value="belum_bayar" {{ $order->payment_status=='belum_bayar'?'selected':'' }}>Belum Bayar</option>
+                        <option value="dp" {{ $order->payment_status=='dp'?'selected':'' }}>DP</option>
+                        <option value="lunas" {{ $order->payment_status=='lunas'?'selected':'' }}>Lunas</option>
                     </select>
                 </div>
 
+                <hr>
+
+                {{-- ================= DESAIN ================= --}}
+                <div class="mb-3">
+                    <label class="form-label">Menggunakan Jasa Desain?</label>
+                    <select name="jasa_desain" class="form-select" id="jasaDesain">
+                        <option value="0" {{ !$order->jasa_desain ? 'selected' : '' }}>Tidak</option>
+                        <option value="1" {{ $order->jasa_desain ? 'selected' : '' }}>Ya</option>
+                    </select>
+                </div>
+
+                <div class="mb-3 {{ !$order->jasa_desain ? 'd-none' : '' }}" id="formDesain">
+                    <label class="form-label">Upload File Desain</label>
+                    <input type="file" name="file_desain" class="form-control">
+                </div>
+
+                <hr>
+
+                {{-- ================= JASA TAMBAHAN ================= --}}
                 <div class="mb-3">
                     <label class="form-label">Antar Barang?</label>
-                    <select name="antar_barang" class="form-select" required>
-                        <option value="tidak" @selected($order->antar_barang=='tidak')>Tidak</option>
-                        <option value="ya" @selected($order->antar_barang=='ya')>Ya</option>
+                    <select name="antar_barang" class="form-select" id="antarBarang">
+                        <option value="0" {{ !$order->antar_barang ? 'selected' : '' }}>Tidak</option>
+                        <option value="1" {{ $order->antar_barang ? 'selected' : '' }}>Ya</option>
                     </select>
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3 {{ !$order->antar_barang ? 'd-none' : '' }}" id="formBiayaPengiriman">
                     <label class="form-label">Biaya Pengiriman</label>
-                    <input
-                        type="number"
-                        name="biaya_pengiriman"
-                        class="form-control"
-                        value="{{ old('biaya_pengiriman', $order->biaya_pengiriman) }}"
-                    >
+                    <input type="number" name="biaya_pengiriman"
+                           class="form-control"
+                           value="{{ $order->biaya_pengiriman }}">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Jasa Pemasangan?</label>
-                    <select name="jasa_pemasangan" class="form-select" required>
-                        <option value="tidak" @selected($order->jasa_pemasangan=='tidak')>Tidak</option>
-                        <option value="ya" @selected($order->jasa_pemasangan=='ya')>Ya</option>
+                    <select name="jasa_pemasangan" class="form-select" id="jasaPasang">
+                        <option value="0" {{ !$order->jasa_pemasangan ? 'selected' : '' }}>Tidak</option>
+                        <option value="1" {{ $order->jasa_pemasangan ? 'selected' : '' }}>Ya</option>
                     </select>
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3 {{ !$order->jasa_pemasangan ? 'd-none' : '' }}" id="formBiayaPemasangan">
                     <label class="form-label">Biaya Pemasangan</label>
-                    <input
-                        type="number"
-                        name="biaya_pemasangan"
-                        class="form-control"
-                        value="{{ old('biaya_pemasangan', $order->biaya_pemasangan) }}"
-                    >
+                    <input type="number" name="biaya_pemasangan"
+                           class="form-control"
+                           value="{{ $order->biaya_pemasangan }}">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Catatan</label>
-                    <input
-                        type="text"
-                        name="catatan"
-                        class="form-control"
-                        value="{{ old('catatan', $order->catatan) }}"
-                    >
+                    <input type="text" name="catatan"
+                           class="form-control"
+                           value="{{ $order->catatan }}">
                 </div>
-
             </div>
         </div>
     </div>
 </div>
 
-{{-- ITEM --}}
+{{-- ================= ITEM ================= --}}
 <div class="card mb-4">
     <div class="card-body">
         <h6 class="fw-bold">Item Order</h6>
 
-        <table class="table table-bordered">
+        <table class="table table-bordered" id="tableItemOrder">
             <thead class="text-center">
                 <tr>
-                    <th>Produk</th>
                     <th>Merk</th>
-                    <th>Panjang (cm)</th>
-                    <th>Lebar (cm)</th>
+                    <th>Ketebalan</th>
+                    <th>Warna</th>
+                    <th>Panjang</th>
+                    <th>Lebar</th>
+                    <th>Luas</th>
                     <th>Qty</th>
-                    <th>Harga / m²</th>
+                    <th>Harga</th>
+                    <th>Total</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($order->items as $item)
-                <tr>
-                    <td><input name="product_name[]" class="form-control" value="{{ $item->product_name }}" required></td>
-                    <td><input name="acrylic_brand[]" class="form-control" value="{{ $item->acrylic_brand }}"></td>
-                    <td><input type="number" name="panjang_cm[]" class="form-control" value="{{ $item->panjang_cm }}" required></td>
-                    <td><input type="number" name="lebar_cm[]" class="form-control" value="{{ $item->lebar_cm }}" required></td>
-                    <td><input type="number" name="qty[]" class="form-control" value="{{ $item->qty }}" required></td>
-                    <td><input type="number" name="harga_per_m2[]" class="form-control" value="{{ $item->harga_per_m2 }}" required></td>
+            @foreach($order->items as $item)
+                <tr class="item-row">
+                    <td><input name="merk[]" class="form-control form-control-sm" value="{{ $item->merk }}"></td>
+                    <td><input name="ketebalan[]" class="form-control form-control-sm" value="{{ $item->ketebalan }}"></td>
+                    <td><input name="warna[]" class="form-control form-control-sm" value="{{ $item->warna }}"></td>
+                    <td><input name="panjang_cm[]" class="form-control form-control-sm panjang" value="{{ $item->panjang_cm }}"></td>
+                    <td><input name="lebar_cm[]" class="form-control form-control-sm lebar" value="{{ $item->lebar_cm }}"></td>
+                    <td><input name="luas[]" class="form-control form-control-sm luas" readonly></td>
+                    <td><input name="qty[]" class="form-control form-control-sm qty" value="{{ $item->qty }}"></td>
+                    <td><input name="harga[]" class="form-control form-control-sm harga" value="{{ $item->harga }}"></td>
+                    <td><input name="subtotal[]" class="form-control form-control-sm subtotal" readonly></td>
                 </tr>
-                @endforeach
+            @endforeach
             </tbody>
         </table>
     </div>
 </div>
 
-<div class="text-end">
-    <button class="btn btn-success">Update Order</button>
-    <a href="{{ route('orders.index') }}" class="btn btn-secondary">Batal</a>
+<div class="text-end mt-3">
+    <h5>Grand Total : <span id="grandTotalText">Rp0</span></h5>
 </div>
 
-</form>
+<div class="text-end mb-5">
+    <button type="submit" class="btn btn-success">Update Order</button>
+</div>
+
+@push('scripts')
+<script>
+        // ================= TOGGLE FORM TAMBAHAN =================
+    function toggleForm(selectId, formId) {
+        const selectEl = document.getElementById(selectId);
+        const formEl   = document.getElementById(formId);
+
+        if (!selectEl || !formEl) return;
+
+        formEl.classList.toggle('d-none', selectEl.value == 0);
+    }
+
+    // Jasa Desain
+    document.getElementById('jasaDesain')?.addEventListener('change', function () {
+        toggleForm('jasaDesain', 'formDesain');
+    });
+
+    // Antar Barang
+    document.getElementById('antarBarang')?.addEventListener('change', function () {
+        toggleForm('antarBarang', 'formBiayaPengiriman');
+    });
+
+    // Jasa Pemasangan
+    document.getElementById('jasaPasang')?.addEventListener('change', function () {
+        toggleForm('jasaPasang', 'formBiayaPemasangan');
+    });
+
+    // Jalankan saat halaman pertama kali dibuka
+    document.addEventListener('DOMContentLoaded', function () {
+        toggleForm('jasaDesain', 'formDesain');
+        toggleForm('antarBarang', 'formBiayaPengiriman');
+        toggleForm('jasaPasang', 'formBiayaPemasangan');
+    });
+
+    function formatRp(val) {
+        return 'Rp' + Math.round(val || 0).toLocaleString('id-ID');
+    }
+
+    function hitungRow(row) {
+        const panjang = parseFloat(row.querySelector('.panjang').value || 0);
+        const lebar   = parseFloat(row.querySelector('.lebar').value || 0);
+        const qty     = parseInt(row.querySelector('.qty').value || 0);
+        const harga   = parseFloat(row.querySelector('.harga').value || 0);
+
+        // luas = p x l
+        const luas = (panjang * lebar) / 10000;
+        row.querySelector('.luas').value = luas ? luas.toFixed(2) : '';
+
+        // total item = harga x qty
+        const total = harga * qty;
+        row.querySelector('.subtotal').value = formatRp(total);
+
+        hitungGrandTotal();
+    }
+
+    function hitungGrandTotal() {
+        let totalItem = 0;
+
+        document.querySelectorAll('.subtotal').forEach(el => {
+            totalItem += parseInt(el.value.replace(/[^\d]/g, '') || 0);
+        });
+
+        const antar  = parseInt(document.querySelector('[name="biaya_pengiriman"]')?.value || 0);
+        const pasang = parseInt(document.querySelector('[name="biaya_pemasangan"]')?.value || 0);
+
+        const grandTotal = totalItem + antar + pasang;
+
+        document.getElementById('grandTotalText').innerText = formatRp(grandTotal);
+    }
+
+    function bindRow(row) {
+        row.querySelectorAll('input').forEach(el => {
+            el.addEventListener('input', () => hitungRow(row));
+        });
+        hitungRow(row);
+    }
+
+    // bind awal
+    document.querySelectorAll('.item-row').forEach(bindRow);
+
+    // tambah row
+    document.getElementById('addRow').addEventListener('click', () => {
+        const tbody = document.querySelector('#tableItemOrder tbody');
+        const row = tbody.querySelector('.item-row').cloneNode(true);
+
+        row.querySelectorAll('input').forEach(i => i.value = '');
+        tbody.appendChild(row);
+        bindRow(row);
+    });
+
+    // update kalau biaya tambahan berubah
+    ['biaya_pengiriman', 'biaya_pemasangan'].forEach(name => {
+        const el = document.querySelector(`[name="${name}"]`);
+        if (el) el.addEventListener('input', hitungGrandTotal);
+    });
+</script>
+@endpush {{-- pakai script yang sama persis dengan create --}}
 @endsection
