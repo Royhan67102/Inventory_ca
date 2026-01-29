@@ -171,9 +171,17 @@
     <h5>Grand Total : <span id="grandTotalText">Rp0</span></h5>
 </div>
 
-<div class="text-end mb-5">
-    <button type="submit" class="btn btn-success">Update Order</button>
+<div class="d-flex justify-content-end gap-2 mb-5">
+    <a href="<?php echo e(route('orders.index')); ?>" class="btn btn-secondary">
+        Batal
+    </a>
+    <button type="submit" class="btn btn-success">
+        Update Order
+    </button>
 </div>
+
+
+
 
 <?php $__env->startPush('scripts'); ?>
 <script>
@@ -253,7 +261,19 @@
     }
 
     // bind awal
+   document.addEventListener('DOMContentLoaded', function () {
+
+    // ================= TOGGLE FORM TAMBAHAN =================
+    toggleForm('jasaDesain', 'formDesain');
+    toggleForm('antarBarang', 'formBiayaPengiriman');
+    toggleForm('jasaPasang', 'formBiayaPemasangan');
+
+    // bind awal item
     document.querySelectorAll('.item-row').forEach(bindRow);
+
+    // hitung ulang grand total
+    hitungGrandTotal();
+});
 
     // tambah row
     document.getElementById('addRow').addEventListener('click', () => {

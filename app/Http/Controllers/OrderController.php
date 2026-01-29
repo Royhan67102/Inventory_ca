@@ -75,10 +75,11 @@ class OrderController extends Controller
             'merk.*'       => 'nullable|string',
             'ketebalan.*'  => 'nullable|string',
             'warna.*'      => 'nullable|string',
-            'panjang_cm.*' => 'required|numeric|min:0',
-            'lebar_cm.*'   => 'required|numeric|min:0',
-            'qty.*'        => 'required|integer|min:1',
-            'harga.*'      => 'required|numeric|min:0',
+            'panjang_cm.*' => 'nullable|numeric|min:0',
+            'lebar_cm.*'   => 'nullable|numeric|min:0',
+            'qty.*'        => 'nullable|integer|min:1',
+            'harga.*'      => 'nullable|numeric|min:0',
+
             'subtotal.*'   => 'required|string',
 
             // === TAMBAHAN ===
@@ -140,34 +141,42 @@ class OrderController extends Controller
 
             foreach ($validated['merk'] as $i => $name) {
 
-                $panjang = $validated['panjang_cm'][$i];
-                $lebar   = $validated['lebar_cm'][$i];
-                $qty     = $validated['qty'][$i];
-                $harga   = $validated['harga'][$i];
+    // ⛔ SKIP BARIS KOSONG
+    if (
+        empty($validated['panjang_cm'][$i]) ||
+        empty($validated['lebar_cm'][$i]) ||
+        empty($validated['qty'][$i]) ||
+        empty($validated['harga'][$i])
+    ) {
+        continue;
+    }
 
-                // luas m2
-                // luas cm2
-                $luas_cm2 = $panjang * $lebar;
+    $panjang = $validated['panjang_cm'][$i];
+    $lebar   = $validated['lebar_cm'][$i];
+    $qty     = $validated['qty'][$i];
+    $harga   = $validated['harga'][$i];
 
-                $subtotal = $harga * $qty;
+    $luas_cm2 = $panjang * $lebar;
+    $subtotal = $harga * $qty;
 
-                $hasCustomItem = true;
+    $hasCustomItem = true;
 
-                OrderItem::create([
-                    'order_id'   => $order->id,
-                    'merk'       => $name,
-                    'ketebalan'  => $validated['ketebalan'][$i] ?? null,
-                    'warna'      => $validated['warna'][$i] ?? null,
-                    'panjang_cm' => $panjang,
-                    'lebar_cm'   => $lebar,
-                    'luas_cm2'   => $luas_cm2,
-                    'qty'        => $qty,
-                    'harga'      => $harga,
-                    'subtotal'   => $subtotal,
-                ]);
+    OrderItem::create([
+        'order_id'   => $order->id,
+        'merk'       => $name,
+        'ketebalan'  => $validated['ketebalan'][$i] ?? null,
+        'warna'      => $validated['warna'][$i] ?? null,
+        'panjang_cm' => $panjang,
+        'lebar_cm'   => $lebar,
+        'luas_cm2'   => $luas_cm2,
+        'qty'        => $qty,
+        'harga'      => $harga,
+        'subtotal'   => $subtotal,
+    ]);
 
-                $totalItem += $subtotal;
-            }
+    $totalItem += $subtotal;
+}
+
 
             /* =====================
              * TOTAL ORDER

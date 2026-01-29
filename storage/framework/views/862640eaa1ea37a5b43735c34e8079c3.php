@@ -14,17 +14,17 @@
 
                 <div class="mb-3">
                     <label class="form-label">Nama Customer</label>
-                    <input type="text" name="nama" class="form-control" required>
+                    <input type="text" name="nama" class="form-control border rounded-2" required>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Alamat</label>
-                    <textarea name="alamat" class="form-control" rows="3" required></textarea>
+                    <textarea name="alamat" class="form-control border rounded-2" rows="3" required></textarea>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Telepon</label>
-                    <input type="text" name="telepon" class="form-control" required>
+                    <input type="text" name="telepon" class="form-control border rounded-2" required>
                 </div>
             </div>
         </div>
@@ -69,7 +69,7 @@
 
                 <div class="mb-3 d-none" id="formDesain">
                     <label class="form-label">Upload File Desain (Opsional)</label>
-                    <input type="file" name="file_desain" class="form-control">
+                    <input type="file" name="file_desain" class="form-control border rounded-2">
                     <small class="text-muted">Boleh kosong jika desain dibuat oleh tim desain</small>
                 </div>
 
@@ -104,7 +104,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">Catatan</label>
-                    <input type="text" name="catatan" class="form-control">
+                    <input type="text" name="catatan" class="form-control border rounded-2">
                 </div>
             </div>
         </div>
@@ -224,7 +224,7 @@ function hitungRow(row) {
     const qty     = angka(row.querySelector('.qty')?.value);
     const harga   = angka(row.querySelector('.harga')?.value);
 
-    // luas (m²) hanya untuk tampilan
+    // luas (m²) hanya tampilan
     const luas = (panjang * lebar) / 10000;
     row.querySelector('.luas').value = luas ? luas.toFixed(2) : '';
 
@@ -269,6 +269,9 @@ document.getElementById('addRow').addEventListener('click', () => {
 
     // reset input
     row.querySelectorAll('input').forEach(i => i.value = '');
+
+    // default qty = 1
+    row.querySelector('.qty').value = 1;
 
     tbody.appendChild(row);
     bindRow(row);
