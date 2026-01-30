@@ -49,15 +49,22 @@
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label">Tanggal Pemesanan</label>
-                        <input type="date" name="tanggal_pemesanan"
-                               class="form-control"
-                               value="{{ $order->tanggal_pemesanan }}" required>
+                        <input type="date"
+                            name="tanggal_pemesanan"
+                            class="form-control"
+                            value="{{ \Carbon\Carbon::parse($order->tanggal_pemesanan)->format('Y-m-d') }}"
+                            required>
+
                     </div>
                     <div class="col">
                         <label class="form-label">Deadline</label>
-                        <input type="date" name="deadline"
-                               class="form-control"
-                               value="{{ $order->deadline }}">
+                        <input type="date"
+                            name="deadline"
+                            class="form-control"
+                            value="{{ $order->deadline 
+                            ? \Carbon\Carbon::parse($order->deadline)->format('Y-m-d') 
+                            : '' }}">
+
                     </div>
                 </div>
 
