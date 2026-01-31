@@ -1,60 +1,55 @@
-<?php $__env->startSection('title', 'Update Produksi'); ?>
-<?php $__env->startSection('page-title', 'Update Produksi'); ?>
-
 <?php $__env->startSection('content'); ?>
-<form method="POST"
-      action="<?php echo e(route('productions.update', $production)); ?>"
-      enctype="multipart/form-data">
-<?php echo csrf_field(); ?>
-<?php echo method_field('PUT'); ?>
+<div class="container">
 
-<div class="row">
+    <h4 class="mb-3">Update Produksi (SPK)</h4>
+
+    <?php if(session('error')): ?>
+        <div class="alert alert-danger">
+            <?php echo e(session('error')); ?>
+
+        </div>
+    <?php endif; ?>
+
+    <?php if($errors->any()): ?>
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <li><?php echo e($error); ?></li>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+
     
-    <div class="col-md-5">
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h6 class="fw-bold mb-3">Informasi Order</h6>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5>Informasi Order</h5>
 
-                <div class="mb-3">
-                    <label class="form-label">Customer</label>
-                    <input type="text" class="form-control" disabled
-                        value="<?php echo e($production->order->customer->nama ?? '-'); ?>">
-                </div>
+            <p><b>No Order:</b> #<?php echo e($production->order->id); ?></p>
+            <p><b>Customer:</b>
+                <?php echo e($production->order->customer->nama ?? '-'); ?>
 
-                <div class="mb-3">
-                    <label class="form-label">Tanggal Pemesanan</label>
-                    <input type="text" class="form-control" disabled
-                        value="<?php echo e($production->order->tanggal_pemesanan?->format('d M Y')); ?>">
-                </div>
+            </p>
 
-                <div class="mb-3">
-                    <label class="form-label">Deadline</label>
-                    <input type="text" class="form-control" disabled
-                        value="<?php echo e($production->order->deadline?->format('d M Y') ?? '-'); ?>">
-                </div>
-            </div>
+            <p><b>Status Order:</b>
+                <?php echo e(ucfirst($production->order->status)); ?>
+
+            </p>
         </div>
     </div>
 
     
-    <div class="col-md-7">
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h6 class="fw-bold mb-3">Update Produksi</h6>
+    <div class="card">
+        <div class="card-body">
 
-                
-                <div class="mb-3">
-                    <label class="form-label">Status Produksi</label>
-                    <select name="status" class="form-select" required>
-                        <option value="menunggu" <?php if($production->status=='menunggu'): echo 'selected'; endif; ?>>Menunggu</option>
-                        <option value="proses" <?php if($production->status=='proses'): echo 'selected'; endif; ?>>Produksi</option>
-                        <option value="selesai" <?php if($production->status=='selesai'): echo 'selected'; endif; ?>>Selesai</option>
-                    </select>
-                </div>
+            <form action="<?php echo e(route('productions.update', $production)); ?>"
+                  method="POST"
+                  enctype="multipart/form-data">
+                <?php echo csrf_field(); ?>
+                <?php echo method_field('PUT'); ?>
 
-                
                 <div class="mb-3">
-                    <label class="form-label">PIC Produksi</label>
+                    <label class="form-label">Tim Produksi</label>
                     <input type="text"
                            name="tim_produksi"
                            class="form-control"
@@ -62,7 +57,24 @@
                            required>
                 </div>
 
-                
+                <div class="mb-3">
+                    <label class="form-label">Status Produksi</label>
+                    <select name="status" class="form-control" required>
+                        <option value="menunggu"
+                            <?php echo e($production->status=='menunggu'?'selected':''); ?>>
+                            Menunggu
+                        </option>
+                        <option value="proses"
+                            <?php echo e($production->status=='proses'?'selected':''); ?>>
+                            Proses
+                        </option>
+                        <option value="selesai"
+                            <?php echo e($production->status=='selesai'?'selected':''); ?>>
+                            Selesai
+                        </option>
+                    </select>
+                </div>
+
                 <div class="mb-3">
                     <label class="form-label">Catatan Produksi</label>
                     <textarea name="catatan"
@@ -70,37 +82,38 @@
                               rows="3"><?php echo e(old('catatan', $production->catatan)); ?></textarea>
                 </div>
 
-                
                 <div class="mb-3">
-                    <label class="form-label">Bukti Produksi (Foto)</label>
+                    <label class="form-label">Upload Bukti Produksi</label>
                     <input type="file"
                            name="bukti"
-                           class="form-control"
-                           accept="image/*">
+                           class="form-control">
 
                     <?php if($production->bukti): ?>
                         <div class="mt-2">
-                            <img src="<?php echo e(asset('storage/'.$production->bukti)); ?>"
-                                 class="img-thumbnail"
-                                 style="max-width: 200px">
+                            <small>Bukti saat ini:</small><br>
+                            <a href="<?php echo e(asset('storage/'.$production->bukti)); ?>"
+                               target="_blank">
+                                Lihat Bukti
+                            </a>
                         </div>
                     <?php endif; ?>
                 </div>
 
-                <div class="text-end">
-                    <button class="btn btn-success">
-                        Simpan Produksi
-                    </button>
-                    <a href="<?php echo e(route('productions.index')); ?>"
-                       class="btn btn-secondary">
-                        Batal
-                    </a>
-                </div>
-            </div>
+                <button class="btn btn-primary">
+                    Update Produksi
+                </button>
+
+                <a href="<?php echo e(route('productions.index')); ?>"
+                   class="btn btn-secondary">
+                    Kembali
+                </a>
+
+            </form>
+
         </div>
     </div>
+
 </div>
-</form>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/productions/edit.blade.php ENDPATH**/ ?>

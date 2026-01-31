@@ -30,18 +30,10 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('acrylic-stocks.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
-                    href="{{ route('acrylic-stocks.index') }}">
-                        <i class="material-symbols-rounded opacity-5">package_2</i>
-                        <span class="nav-link-text ms-1">Acrylic Stocks</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('inventories.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
-                    href="{{ route('inventories.index') }}">
-                        <i class="material-symbols-rounded opacity-5">inventory</i>
-                        <span class="nav-link-text ms-1">Inventory</span>
+                    <a class="nav-link {{ request()->routeIs('designs.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
+                    href="{{ route('designs.index') }}">
+                        <i class="material-symbols-rounded opacity-5">draw</i>
+                        <span class="nav-link-text ms-1">Desain</span>
                     </a>
                 </li>
 
@@ -57,10 +49,33 @@
                     <a class="nav-link {{ request()->routeIs('delivery.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
                     href="{{ route('delivery.index') }}">
                         <i class="material-symbols-rounded opacity-5">local_shipping</i>
-                        <span class="nav-link-text ms-1">Surat Jalan</span>
+                        <span class="nav-link-text ms-1">Pengiriman</span>
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('pickup.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
+                    href="{{ route('pickup.index') }}">
+                        <i class="material-symbols-rounded opacity-5">move_to_inbox</i>
+                        <span class="nav-link-text ms-1">Pickup</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('acrylic-stocks.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
+                    href="{{ route('acrylic-stocks.index') }}">
+                        <i class="material-symbols-rounded opacity-5">package_2</i>
+                        <span class="nav-link-text ms-1">Acrylic Stocks</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('inventories.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
+                    href="{{ route('inventories.index') }}">
+                        <i class="material-symbols-rounded opacity-5">inventory</i>
+                        <span class="nav-link-text ms-1">Inventory</span>
+                    </a>
+                </li>
 
                 <li class="nav-item">
                     <a class="nav-link text-dark">

@@ -14,22 +14,30 @@ return new class extends Migration {
                 ->constrained()
                 ->cascadeOnDelete();
 
+            // ================= TIM =================
             $table->string('tim_produksi')->nullable();
 
+            // ================= STATUS PRODUKSI =================
             $table->enum('status', [
                 'menunggu',
                 'proses',
                 'selesai'
             ])->default('menunggu');
 
+            // ================= WAKTU =================
             $table->dateTime('tanggal_mulai')->nullable();
             $table->dateTime('tanggal_selesai')->nullable();
 
+            // ================= KONTROL =================
             $table->boolean('stok_dipotong')->default(false);
             $table->boolean('status_lock')->default(false);
 
+            // ================= BUKTI =================
             $table->string('bukti')->nullable();
             $table->text('catatan')->nullable();
+
+            // ================= KIRIM ATAU AMBIL =================
+            $table->boolean('perlu_pengiriman')->default(true);
 
             $table->timestamps();
         });

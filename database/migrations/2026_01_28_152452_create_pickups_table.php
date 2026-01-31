@@ -10,18 +10,22 @@ return new class extends Migration {
         Schema::create('pickups', function (Blueprint $table) {
             $table->id();
 
+            // RELASI ORDER
             $table->foreignId('order_id')
                   ->constrained()
                   ->cascadeOnDelete();
 
+            // STATUS PICKUP
             $table->enum('status', ['menunggu', 'siap', 'diambil'])
                   ->default('menunggu');
 
-            // simpan path foto
+            // FOTO / BUKTI PICKUP
             $table->string('bukti')->nullable();
 
+            // CATATAN TAMBAHAN
             $table->text('catatan')->nullable();
 
+            // Timestamps
             $table->timestamps();
         });
     }

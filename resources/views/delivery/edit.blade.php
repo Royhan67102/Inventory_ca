@@ -1,64 +1,108 @@
 @extends('layouts.app')
 
-@section('title', 'Update Pengiriman')
-@section('page-title', 'Update Pengiriman')
-
 @section('content')
-<form action="{{ route('delivery_notes.update', $deliveryNote) }}" method="POST">
-@csrf
-@method('PUT')
+<div class="container">
+    <h4 class="mb-3">Update Pengiriman</h4>
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <h5 class="mb-4">Update Status Pengiriman</h5>
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
 
-        {{-- INFO ORDER (READ ONLY) --}}
-        <div class="mb-3">
-            <label>Customer</label>
-            <input type="text" class="form-control" value="{{ $deliveryNote->customerName() }}" readonly>
-        </div>
+    <div class="card">
+        <div class="card-body">
+            <form action="{{ route('delivery.update', $deliveryNote->id) }}"
+                  method="POST"
+                  enctype="multipart/form-data">
 
-        <div class="mb-3">
-            <label>No Invoice</label>
-            <input type="text" class="form-control" value="{{ $deliveryNote->invoiceNumber() }}" readonly>
-        </div>
+                @csrf
+                @method('PUT')
 
-        <hr>
+                {{-- DRIVER --}}
+                <div class="mb-3">
+                    <label class="form-label">Driver</label>
+                    <input type="text"
+                           name="driver"
+                           class="form-control"
+                           value="{{ old('driver', $deliveryNote->driver) }}"
+                           required>
+                </div>
 
-        {{-- DATA PENGIRIMAN --}}
-        <div class="mb-3">
-            <label>Nama Pengirim</label>
-            <input type="text" name="nama_pengirim" class="form-control"
-                   value="{{ old('nama_pengirim', $deliveryNote->nama_pengirim) }}">
-        </div>
+                {{-- STATUS --}}
+                <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-control" required>
+                        <option value="menunggu"
+                            {{ $deliveryNote->status=='menunggu'?'selected':'' }}>
+                            Menunggu
+                        </option>
+                        <option value="berangkat"
+                            {{ $deliveryNote->status=='berangkat'?'selected':'' }}>
+                            Berangkat
+                        </option>
+                        <option value="sampai"
+                            {{ $deliveryNote->status=='sampai'?'selected':'' }}>
+                            Sampai
+                        </option>
+                        <option value="selesai"
+                            {{ $deliveryNote->status=='selesai'?'selected':'' }}>
+                            Selesai
+                        </option>
+                    </select>
+                </div>
 
-        <div class="mb-3">
-            <label>Driver</label>
-            <input type="text" name="driver" class="form-control"
-                   value="{{ old('driver', $deliveryNote->driver) }}">
-        </div>
+                {{-- TANGGAL KIRIM --}}
+                <div class="mb-3">
+                    <label class="form-label">Tanggal Kirim</label>
+                    <input type="date"
+                           name="tanggal_kirim"
+                           class="form-control"
+                           value="{{ old('tanggal_kirim', optional($deliveryNote->tanggal_kirim)->format('Y-m-d')) }}"
+                           required>
+                </div>
 
-        <div class="mb-3">
-            <label>Tanggal Kirim</label>
-            <input type="date" name="tanggal_kirim" class="form-control"
-                   value="{{ old('tanggal_kirim', $deliveryNote->tanggal_kirim?->format('Y-m-d')) }}">
-        </div>
+                {{-- JAM --}}
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>Jam Berangkat</label>
+                        <input type="time" name="jam_berangkat"
+                               class="form-control"
+                               value="{{ $deliveryNote->jam_berangkat }}">
+                    </div>
 
-        <div class="mb-3">
-            <label>TTD Admin</label>
-            <textarea name="ttd_admin" class="form-control" rows="3">{{ old('ttd_admin', $deliveryNote->ttd_admin) }}</textarea>
-        </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Jam Sampai</label>
+                        <input type="time" name="jam_sampai_tujuan"
+                               class="form-control"
+                               value="{{ $deliveryNote->jam_sampai_tujuan }}">
+                    </div>
 
-        <div class="mb-3">
-            <label>TTD Penerima</label>
-            <textarea name="ttd_penerima" class="form-control" rows="3">{{ old('ttd_penerima', $deliveryNote->ttd_penerima) }}</textarea>
-        </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Jam Kembali</label>
+                        <input type="time" name="jam_kembali"
+                               class="form-control"
+                               value="{{ $deliveryNote->jam_kembali }}">
+                    </div>
+                </div>
 
-        <div class="text-end">
-            <button class="btn btn-success">Simpan</button>
-            <a href="{{ route('delivery_notes.index') }}" class="btn btn-secondary">Batal</a>
+                {{-- FOTO --}}
+                <div class="mb-3">
+                    <label class="form-label">Bukti Foto</label>
+                    <input type="file" name="bukti_foto" class="form-control">
+
+                    @if($deliveryNote->bukti_foto)
+                        <div class="mt-2">
+                            <img src="{{ asset('storage/'.$deliveryNote->bukti_foto) }}"
+                                 width="150">
+                        </div>
+                    @endif
+                </div>
+
+                <button class="btn btn-primary">Update</button>
+                <a href="{{ route('delivery.index') }}"
+                   class="btn btn-secondary">Kembali</a>
+
+            </form>
         </div>
     </div>
 </div>
-</form>
 @endsection

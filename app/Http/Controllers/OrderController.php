@@ -83,6 +83,7 @@ class OrderController extends Controller
             'subtotal.*'   => 'required|string',
 
             // === TAMBAHAN ===
+            'tipe_order' => 'required|in:custom,lembaran',
             'jasa_desain'     => 'nullable|in:0,1',
             'file_desain'     => 'nullable|file'
         ]);
@@ -103,9 +104,9 @@ class OrderController extends Controller
              /* =====================
              * STATUS AWAL ORDER
              * ===================== */
-            $status = 'desain';
-
-            if (($validated['jasa_desain'] ?? '0') == '0') {
+            if ($validated['tipe_order'] === 'custom') {
+                $status = 'desain';
+            } else {
                 $status = $validated['antar_barang'] == '1'
                     ? 'delivery'
                     : 'pickup';
@@ -139,43 +140,43 @@ class OrderController extends Controller
             $totalItem = 0;
             $hasCustomItem = false;
 
-            foreach ($validated['merk'] as $i => $name) {
+            foreach ($validated['merk'] ?? [] as $i => $name) {
 
-    // ⛔ SKIP BARIS KOSONG
-    if (
-        empty($validated['panjang_cm'][$i]) ||
-        empty($validated['lebar_cm'][$i]) ||
-        empty($validated['qty'][$i]) ||
-        empty($validated['harga'][$i])
-    ) {
-        continue;
-    }
+                // ⛔ SKIP BARIS KOSONG
+                if (
+                    empty($validated['panjang_cm'][$i]) ||
+                    empty($validated['lebar_cm'][$i]) ||
+                    empty($validated['qty'][$i]) ||
+                    empty($validated['harga'][$i])
+                ) {
+                    continue;
+                }
 
-    $panjang = $validated['panjang_cm'][$i];
-    $lebar   = $validated['lebar_cm'][$i];
-    $qty     = $validated['qty'][$i];
-    $harga   = $validated['harga'][$i];
+                $panjang = $validated['panjang_cm'][$i];
+                $lebar   = $validated['lebar_cm'][$i];
+                $qty     = $validated['qty'][$i];
+                $harga   = $validated['harga'][$i];
 
-    $luas_cm2 = $panjang * $lebar;
-    $subtotal = $harga * $qty;
+                $luas_cm2 = $panjang * $lebar;
+                $subtotal = $harga * $qty;
 
-    $hasCustomItem = true;
+                $hasCustomItem = $validated['jasa_desain'] == '1';
 
-    OrderItem::create([
-        'order_id'   => $order->id,
-        'merk'       => $name,
-        'ketebalan'  => $validated['ketebalan'][$i] ?? null,
-        'warna'      => $validated['warna'][$i] ?? null,
-        'panjang_cm' => $panjang,
-        'lebar_cm'   => $lebar,
-        'luas_cm2'   => $luas_cm2,
-        'qty'        => $qty,
-        'harga'      => $harga,
-        'subtotal'   => $subtotal,
-    ]);
+                OrderItem::create([
+                    'order_id'   => $order->id,
+                    'merk'       => $name,
+                    'ketebalan'  => $validated['ketebalan'][$i] ?? null,
+                    'warna'      => $validated['warna'][$i] ?? null,
+                    'panjang_cm' => $panjang,
+                    'lebar_cm'   => $lebar,
+                    'luas_cm2'   => $luas_cm2,
+                    'qty'        => $qty,
+                    'harga'      => $harga,
+                    'subtotal'   => $subtotal,
+                ]);
 
-    $totalItem += $subtotal;
-}
+                $totalItem += $subtotal;
+            }
 
 
             /* =====================
@@ -263,6 +264,8 @@ class OrderController extends Controller
     // EDIT
     public function edit(Order $order)
     {
+        $order->load('customer');
+
         return view('orders.edit', compact('order'));
     }
 

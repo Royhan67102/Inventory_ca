@@ -1,62 +1,54 @@
 @extends('layouts.app')
 
-@section('title', 'Update Produksi')
-@section('page-title', 'Update Produksi')
-
 @section('content')
-<form method="POST"
-      action="{{ route('productions.update', $production) }}"
-      enctype="multipart/form-data">
-@csrf
-@method('PUT')
+<div class="container">
 
-<div class="row">
-    {{-- INFO ORDER (READONLY) --}}
-    <div class="col-md-5">
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h6 class="fw-bold mb-3">Informasi Order</h6>
+    <h4 class="mb-3">Update Produksi (SPK)</h4>
 
-                <div class="mb-3">
-                    <label class="form-label">Customer</label>
-                    <input type="text" class="form-control" disabled
-                        value="{{ $production->order->customer->nama ?? '-' }}">
-                </div>
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
 
-                <div class="mb-3">
-                    <label class="form-label">Tanggal Pemesanan</label>
-                    <input type="text" class="form-control" disabled
-                        value="{{ $production->order->tanggal_pemesanan?->format('d M Y') }}">
-                </div>
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-                <div class="mb-3">
-                    <label class="form-label">Deadline</label>
-                    <input type="text" class="form-control" disabled
-                        value="{{ $production->order->deadline?->format('d M Y') ?? '-' }}">
-                </div>
-            </div>
+    {{-- DETAIL ORDER --}}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5>Informasi Order</h5>
+
+            <p><b>No Order:</b> #{{ $production->order->id }}</p>
+            <p><b>Customer:</b>
+                {{ $production->order->customer->nama ?? '-' }}
+            </p>
+
+            <p><b>Status Order:</b>
+                {{ ucfirst($production->order->status) }}
+            </p>
         </div>
     </div>
 
-    {{-- UPDATE PRODUKSI --}}
-    <div class="col-md-7">
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h6 class="fw-bold mb-3">Update Produksi</h6>
+    {{-- FORM UPDATE --}}
+    <div class="card">
+        <div class="card-body">
 
-                {{-- STATUS --}}
-                <div class="mb-3">
-                    <label class="form-label">Status Produksi</label>
-                    <select name="status" class="form-select" required>
-                        <option value="menunggu" @selected($production->status=='menunggu')>Menunggu</option>
-                        <option value="proses" @selected($production->status=='proses')>Produksi</option>
-                        <option value="selesai" @selected($production->status=='selesai')>Selesai</option>
-                    </select>
-                </div>
+            <form action="{{ route('productions.update', $production) }}"
+                  method="POST"
+                  enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
 
-                {{-- PIC --}}
                 <div class="mb-3">
-                    <label class="form-label">PIC Produksi</label>
+                    <label class="form-label">Tim Produksi</label>
                     <input type="text"
                            name="tim_produksi"
                            class="form-control"
@@ -64,7 +56,24 @@
                            required>
                 </div>
 
-                {{-- CATATAN --}}
+                <div class="mb-3">
+                    <label class="form-label">Status Produksi</label>
+                    <select name="status" class="form-control" required>
+                        <option value="menunggu"
+                            {{ $production->status=='menunggu'?'selected':'' }}>
+                            Menunggu
+                        </option>
+                        <option value="proses"
+                            {{ $production->status=='proses'?'selected':'' }}>
+                            Proses
+                        </option>
+                        <option value="selesai"
+                            {{ $production->status=='selesai'?'selected':'' }}>
+                            Selesai
+                        </option>
+                    </select>
+                </div>
+
                 <div class="mb-3">
                     <label class="form-label">Catatan Produksi</label>
                     <textarea name="catatan"
@@ -72,35 +81,36 @@
                               rows="3">{{ old('catatan', $production->catatan) }}</textarea>
                 </div>
 
-                {{-- BUKTI --}}
                 <div class="mb-3">
-                    <label class="form-label">Bukti Produksi (Foto)</label>
+                    <label class="form-label">Upload Bukti Produksi</label>
                     <input type="file"
                            name="bukti"
-                           class="form-control"
-                           accept="image/*">
+                           class="form-control">
 
                     @if($production->bukti)
                         <div class="mt-2">
-                            <img src="{{ asset('storage/'.$production->bukti) }}"
-                                 class="img-thumbnail"
-                                 style="max-width: 200px">
+                            <small>Bukti saat ini:</small><br>
+                            <a href="{{ asset('storage/'.$production->bukti) }}"
+                               target="_blank">
+                                Lihat Bukti
+                            </a>
                         </div>
                     @endif
                 </div>
 
-                <div class="text-end">
-                    <button class="btn btn-success">
-                        Simpan Produksi
-                    </button>
-                    <a href="{{ route('productions.index') }}"
-                       class="btn btn-secondary">
-                        Batal
-                    </a>
-                </div>
-            </div>
+                <button class="btn btn-primary">
+                    Update Produksi
+                </button>
+
+                <a href="{{ route('productions.index') }}"
+                   class="btn btn-secondary">
+                    Kembali
+                </a>
+
+            </form>
+
         </div>
     </div>
+
 </div>
-</form>
 @endsection

@@ -9,6 +9,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\DeliveryNoteController;
 use App\Http\Controllers\PickupController;
+use App\Http\Controllers\DesignController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,9 +60,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('delivery', DeliveryNoteController::class)
         ->only(['index', 'show', 'edit', 'update']);
 
-    Route::resource('pickups', PickupController::class)
-    ->only(['index', 'edit', 'update', 'destroy']);
+    Route::resource('pickup', PickupController::class)
+    ->only(['index', 'show', 'update', 'edit']);
 
-});
+    // ================= DESIGN =================
+    Route::resource('designs', DesignController::class)
+    ->only(['index', 'show', 'edit', 'update']); // jangan ganti parameter
+    });
+
 
 require __DIR__.'/auth.php';

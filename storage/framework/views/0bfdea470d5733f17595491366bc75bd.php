@@ -17,5 +17,7 @@
 <!-- Material Dashboard CSS -->
 <link id="pagestyle" href="<?php echo e(asset('assets/css/material-dashboard.css?v=3.2.0')); ?>" rel="stylesheet" />
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
 <?php echo $__env->yieldPushContent('styles'); ?>
 <?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/layouts/partials/head.blade.php ENDPATH**/ ?>

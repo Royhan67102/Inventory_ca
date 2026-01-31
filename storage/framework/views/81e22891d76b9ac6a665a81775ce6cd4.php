@@ -73,7 +73,7 @@
 
                     
                     <td>
-                        <?php echo e($order->customer->nama); ?>
+                        <?php echo e(optional($order->customer)->nama ?? '-'); ?>
 
                     </td>
 

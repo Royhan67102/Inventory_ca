@@ -6,28 +6,38 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('designs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
 
-            $table->enum('status', ['menunggu', 'proses', 'selesai'])->default('menunggu');
+            $table->foreignId('order_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            // ================= STATUS DESAIN =================
+            $table->enum('status', [
+                'menunggu',
+                'proses',
+                'selesai'
+            ])->default('menunggu');
+
             $table->text('catatan')->nullable();
 
-            $table->string('file_awal')->nullable();   // dari order
-            $table->string('file_hasil')->nullable();  // upload tim desain
+            // ================= FILE =================
+            // file dari order (auto copy)
+            $table->string('file_awal')->nullable();
+
+            // hasil desain tim
+            $table->string('file_hasil')->nullable();
+
+            // optional: siapa desainer
+            $table->string('designer')->nullable();
 
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('designs');

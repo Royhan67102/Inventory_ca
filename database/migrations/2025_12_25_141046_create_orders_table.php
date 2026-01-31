@@ -20,6 +20,12 @@ return new class extends Migration
             $table->date('tanggal_pemesanan');
             $table->date('deadline')->nullable();
 
+            // ================= TIPE ORDER =================
+            // custom = lewat desain & produksi
+            // lembaran = langsung delivery / pickup
+            $table->enum('tipe_order', ['custom', 'lembaran'])
+                ->default('custom');
+
             // ================= PEMBAYARAN =================
             $table->enum('payment_status', [
                 'belum_bayar',

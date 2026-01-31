@@ -73,7 +73,7 @@
 
                     {{-- CUSTOMER --}}
                     <td>
-                        {{ $order->customer->nama }}
+                        {{ optional($order->customer)->nama ?? '-' }}
                     </td>
 
                     {{-- TOTAL --}}

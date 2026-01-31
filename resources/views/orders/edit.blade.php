@@ -17,8 +17,8 @@
 
                 <div class="mb-3">
                     <label class="form-label">Nama Customer</label>
-                    <input type="text" class="form-control" value="{{ $order->customer->nama }}" readonly>
-                    <input type="hidden" name="nama" value="{{ $order->customer->nama }}">
+                    <input type="text" class="form-control" value="{{ optional($order->customer)->nama ?? '-' }}" readonly>
+                    <input type="hidden" name="nama" value="{{ optional($order->customer)->nama ?? '-' }}">
 
                 </div>
 
@@ -61,8 +61,8 @@
                         <input type="date"
                             name="deadline"
                             class="form-control"
-                            value="{{ $order->deadline 
-                            ? \Carbon\Carbon::parse($order->deadline)->format('Y-m-d') 
+                            value="{{ $order->deadline
+                            ? \Carbon\Carbon::parse($order->deadline)->format('Y-m-d')
                             : '' }}">
 
                     </div>
@@ -145,6 +145,7 @@
         <table class="table table-bordered" id="tableItemOrder">
             <thead class="text-center">
                 <tr>
+                    <th style="width:40px"></th>
                     <th>Merk</th>
                     <th>Ketebalan</th>
                     <th>Warna</th>
@@ -159,6 +160,11 @@
             <tbody>
             @foreach($order->items as $item)
                 <tr class="item-row">
+                    <td class="text-center align-middle">
+                        <button type="button" class="btn btn-danger btn-sm btn-remove-row">
+                            ×
+                        </button>
+                    </td>
                     <td><input name="merk[]" class="form-control form-control-sm" value="{{ $item->merk }}"></td>
                     <td><input name="ketebalan[]" class="form-control form-control-sm" value="{{ $item->ketebalan }}"></td>
                     <td><input name="warna[]" class="form-control form-control-sm" value="{{ $item->warna }}"></td>
@@ -172,6 +178,9 @@
             @endforeach
             </tbody>
         </table>
+        <button type="button" id="addRow" class="btn btn-primary btn-sm">
+            + Tambah Item
+        </button>
     </div>
 </div>
 
@@ -293,10 +302,31 @@
         bindRow(row);
     });
 
+
     // update kalau biaya tambahan berubah
     ['biaya_pengiriman', 'biaya_pemasangan'].forEach(name => {
         const el = document.querySelector(`[name="${name}"]`);
         if (el) el.addEventListener('input', hitungGrandTotal);
+    });
+
+    /* ================= HAPUS BARIS ITEM ================= */
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-remove-row');
+        if (!btn) return;
+
+        const row = btn.closest('.item-row');
+        const tbody = row.closest('tbody');
+
+        // minimal 1 baris
+        if (tbody.querySelectorAll('.item-row').length === 1) {
+            row.querySelectorAll('input').forEach(i => i.value = '');
+            row.querySelector('.qty').value = 1;
+            hitungRow(row);
+            return;
+        }
+
+        row.remove();
+        hitungGrandTotal();
     });
 </script>
 @endpush {{-- pakai script yang sama persis dengan create --}}

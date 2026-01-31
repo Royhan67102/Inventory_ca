@@ -58,6 +58,14 @@
 
                 <hr>
 
+                <div class="mb-3">
+                    <label class="form-label">Tipe Order</label>
+                    <select name="tipe_order" class="form-select" id="tipeOrder" required>
+                        <option value="custom">Custom</option>
+                        <option value="lembaran">Lembaran</option>
+                    </select>
+                </div>
+
                 
                 <div class="mb-3">
                     <label class="form-label">Menggunakan Jasa Desain?</label>
@@ -119,6 +127,7 @@
         <table class="table table-bordered" id="tableItemOrder">
             <thead class="text-center">
                 <tr>
+                    <th style="width:30px"></th>
                     <th>Merk</th>
                     <th>Ketebalan</th>
                     <th>Warna</th>
@@ -132,6 +141,12 @@
             </thead>
             <tbody>
                 <tr class="item-row">
+                    <td class="text-center align-middle">
+                        <button type="button"
+                            class="btn btn-danger btn-sm btn-clear-row">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </td>
                     <td><input name="merk[]" class="form-control form-control-sm"></td>
                     <td><input name="ketebalan[]" class="form-control form-control-sm"></td>
                     <td><input name="warna[]" class="form-control form-control-sm"></td>
@@ -282,6 +297,41 @@ document.getElementById('addRow').addEventListener('click', () => {
     document.querySelector(`[name="${name}"]`)
         ?.addEventListener('input', hitungGrandTotal);
 });
+
+/* ================= HAPUS SATU BARIS ================= */
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-clear-row');
+    if (!btn) return;
+
+    const row = btn.closest('.item-row');
+    const tbody = row.closest('tbody');
+
+    // minimal harus ada 1 baris
+    if (tbody.querySelectorAll('.item-row').length === 1) {
+        // kalau tinggal satu, jangan hapus — cukup reset
+        row.querySelectorAll('input, select, textarea').forEach(el => el.value = '');
+        row.querySelector('.qty').value = 1;
+        hitungRow(row);
+        return;
+    }
+
+    // hapus baris
+    row.remove();
+    hitungGrandTotal();
+});
+
+document.getElementById('tipeOrder')?.addEventListener('change', function() {
+    const jasaDesain = document.getElementById('jasaDesain');
+
+    if (this.value === 'custom') {
+        jasaDesain.value = '1';
+    } else {
+        jasaDesain.value = '0';
+    }
+
+    toggleForm('jasaDesain', 'formDesain');
+});
+
 </script>
 
 

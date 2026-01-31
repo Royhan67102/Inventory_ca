@@ -4,26 +4,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Design;
 
 class Order extends Model
 {
     use HasFactory;
 
-   protected $fillable = [
-    'customer_id',
-    'invoice_number',
-    'tanggal_pemesanan',
-    'deadline',
-    'payment_status',
-    'status',
-    'antar_barang',
-    'biaya_pengiriman',
-    'jasa_pemasangan',
-    'biaya_pemasangan',
-    'catatan',
-    'total_harga',
-];
+    protected $fillable = [
+        'customer_id',
+        'invoice_number',
+        'tanggal_pemesanan',
+        'deadline',
+        'payment_status',
+        'status',
 
+        'antar_barang',
+        'biaya_pengiriman',
+
+        'jasa_pemasangan',
+        'biaya_pemasangan',
+
+        'catatan',
+        'total_harga',
+    ];
 
     protected $casts = [
         'tanggal_pemesanan' => 'date',
@@ -39,7 +42,7 @@ class Order extends Model
 
     /* ================= RELATION ================= */
 
-   public function customer()
+    public function customer()
     {
         return $this->belongsTo(Customer::class);
     }
@@ -96,6 +99,33 @@ class Order extends Model
         ]);
     }
 
+    /* ================= FLOW HELPER ================= */
+
+    // apakah order custom (butuh desain)
+    public function isCustom(): bool
+    {
+        return $this->design()->exists();
+    }
+
+
+    // apakah order hanya lembaran
+    public function isLembaran(): bool
+    {
+        return !$this->isCustom();
+    }
+
+    // cek apakah pakai delivery
+    public function isDelivery(): bool
+    {
+        return $this->antar_barang === true;
+    }
+
+    // cek apakah pickup
+    public function isPickup(): bool
+    {
+        return $this->antar_barang === false;
+    }
+
     /* ================= AUTO DEFAULT ================= */
 
     protected static function booted()
@@ -104,8 +134,8 @@ class Order extends Model
 
             $order->invoice_number ??= 'INV-' . now()->format('YmdHis');
 
-            // ⬇️ DEFAULT STATUS ORDER
-            $order->status ??= 'desain';
+            // ⬇️ DEFAULT STATUS (sementara)
+            $order->status ??= 'order';
 
             // default jasa
             $order->antar_barang     ??= false;
@@ -113,6 +143,23 @@ class Order extends Model
             $order->biaya_pengiriman ??= 0;
             $order->biaya_pemasangan ??= 0;
             $order->total_harga      ??= 0;
+        });
+
+        static::created(function ($order) {
+
+            if ($order->isCustom()) {
+
+                $order->updateQuietly(['status' => 'desain']);
+
+                // otomatis buat desain
+                Design::create([
+                    'order_id' => $order->id,
+                    'status' => 'menunggu',
+                ]);
+
+            } else {
+                $order->updateQuietly(['status' => 'produksi']);
+            }
         });
     }
 }

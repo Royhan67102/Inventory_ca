@@ -1,85 +1,140 @@
-<?php $__env->startSection('title', 'Daftar Produksi'); ?>
-<?php $__env->startSection('page-title', 'Daftar Produksi'); ?>
-
 <?php $__env->startSection('content'); ?>
-<div class="card shadow-sm">
-    <div class="card-header">
-        <h6 class="mb-0">Daftar Produksi</h6>
+<div class="container">
+
+    <h4 class="mb-3">Antrian Produksi (SPK)</h4>
+
+    
+    <?php if(session('success')): ?>
+        <div class="alert alert-success"><?php echo e(session('success')); ?></div>
+    <?php endif; ?>
+
+    
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="GET">
+                <div class="row">
+
+                    <div class="col-md-4">
+                        <input type="text"
+                               name="search"
+                               value="<?php echo e(request('search')); ?>"
+                               class="form-control"
+                               placeholder="Cari Order / Customer">
+                    </div>
+
+                    <div class="col-md-3">
+                        <select name="status" class="form-control">
+                            <option value="">Semua Status</option>
+                            <option value="menunggu"
+                                <?php echo e(request('status')=='menunggu'?'selected':''); ?>>
+                                Menunggu
+                            </option>
+                            <option value="proses"
+                                <?php echo e(request('status')=='proses'?'selected':''); ?>>
+                                Proses
+                            </option>
+                            <option value="selesai"
+                                <?php echo e(request('status')=='selesai'?'selected':''); ?>>
+                                Selesai
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100">
+                            Filter
+                        </button>
+                    </div>
+
+                    <div class="col-md-2">
+                        <a href="<?php echo e(route('productions.index')); ?>"
+                           class="btn btn-secondary w-100">
+                            Reset
+                        </a>
+                    </div>
+
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div class="card-body table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-            <thead class="table-light text-center">
-                <tr>
-                    <th>Kode</th>
-                    <th>Customer</th>
-                    <th>Deadline</th>
-                    <th>PIC Produksi</th>
-                    <th>Status</th>
-                    <th>Bukti</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php $__empty_1 = true; $__currentLoopData = $productions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prod): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <tr>
-                    <td class="text-center"><?php echo e($loop->iteration); ?></td>
+    
+    <div class="card">
+        <div class="card-body table-responsive">
 
-                    <td><?php echo e($prod->order->customer->nama ?? '-'); ?></td>
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Order</th>
+                        <th>Customer</th>
+                        <th>Tim</th>
+                        <th>Status</th>
+                        <th>Mulai</th>
+                        <th>Selesai</th>
+                        <th width="140">Aksi</th>
+                    </tr>
+                </thead>
 
-                    <td class="text-center">
-                        <?php echo e($prod->order->deadline?->format('d M Y') ?? '-'); ?>
+                <tbody>
+                <?php $__empty_1 = true; $__currentLoopData = $productions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <tr>
+                        <td><?php echo e($i + 1); ?></td>
 
-                    </td>
+                        <td>#<?php echo e($p->order->id); ?></td>
 
-                    <td><?php echo e($prod->tim_produksi ?? '-'); ?></td>
+                        <td><?php echo e($p->order->customer->nama ?? '-'); ?></td>
 
-                    <td class="text-center">
-                        <?php
-                            $badge = match($prod->status) {
-                                'menunggu' => 'secondary',
-                                'proses' => 'warning',
-                                'selesai' => 'success',
-                                default => 'secondary'
-                            };
-                        ?>
-                        <span class="badge bg-<?php echo e($badge); ?>">
-                            <?php echo e(ucfirst($prod->status)); ?>
+                        <td><?php echo e($p->tim_produksi ?? '-'); ?></td>
 
-                        </span>
-                    </td>
+                        <td>
+                            <?php if($p->status=='menunggu'): ?>
+                                <span class="badge bg-secondary">Menunggu</span>
+                            <?php elseif($p->status=='proses'): ?>
+                                <span class="badge bg-warning text-dark">Proses</span>
+                            <?php else: ?>
+                                <span class="badge bg-success">Selesai</span>
+                            <?php endif; ?>
+                        </td>
 
-                    <td class="text-center">
-                        <?php if($prod->bukti): ?>
-                            <a href="<?php echo e(asset('storage/'.$prod->bukti)); ?>" target="_blank">
-                                <img src="<?php echo e(asset('storage/'.$prod->bukti)); ?>"
-                                     class="img-thumbnail"
-                                     style="width:60px">
+                        <td>
+                            <?php echo e(optional($p->tanggal_mulai)->format('d-m H:i')); ?>
+
+                        </td>
+
+                        <td>
+                            <?php echo e(optional($p->tanggal_selesai)->format('d-m H:i')); ?>
+
+                        </td>
+
+                        <td>
+                            <a href="<?php echo e(route('productions.show',$p)); ?>"
+                               class="btn btn-sm btn-info">
+                                Detail
                             </a>
-                        <?php else: ?>
-                            -
-                        <?php endif; ?>
-                    </td>
 
-                    <td class="text-center">
-                        <a href="<?php echo e(route('productions.show', $prod)); ?>" class="btn btn-info btn-sm">
-                            Detail
-                        </a>
-                        <a href="<?php echo e(route('productions.edit', $prod)); ?>" class="btn btn-primary btn-sm">
-                            Update
-                        </a>
-                    </td>
-                </tr>
+                            <?php if(!$p->status_lock): ?>
+                                <a href="<?php echo e(route('productions.edit',$p)); ?>"
+                                   class="btn btn-sm btn-primary">
+                                    Update
+                                </a>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                <tr>
-                    <td colspan="9" class="text-center text-muted">
-                        Belum ada produksi
-                    </td>
-                </tr>
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            Tidak ada data produksi
+                        </td>
+                    </tr>
                 <?php endif; ?>
-            </tbody>
-        </table>
+                </tbody>
+
+            </table>
+
+        </div>
     </div>
+
 </div>
 <?php $__env->stopSection(); ?>
 
