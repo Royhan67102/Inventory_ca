@@ -83,15 +83,51 @@
                 <div class="mb-3">
                     <label class="form-label">Menggunakan Jasa Desain?</label>
                     <select name="jasa_desain" class="form-select" id="jasaDesain">
-                        <option value="0" {{ !$order->jasa_desain ? 'selected' : '' }}>Tidak</option>
-                        <option value="1" {{ $order->jasa_desain ? 'selected' : '' }}>Ya</option>
+                        <option value="0" {{ !$order->design ? 'selected' : '' }}>Tidak</option>
+                        <option value="1" {{ $order->design ? 'selected' : '' }}>Ya</option>
                     </select>
                 </div>
 
-                <div class="mb-3 {{ !$order->jasa_desain ? 'd-none' : '' }}" id="formDesain">
-                    <label class="form-label">Upload File Desain</label>
-                    <input type="file" name="file_desain" class="form-control">
+                <div class="mb-3 {{ !$order->design ? 'd-none' : '' }}" id="formDesain">
+                    <label class="form-label">File Desain</label>
+
+                    @if($order->design && $order->design->file_awal)
+                        <div class="mb-3">
+                            <p class="text-muted small mb-2"><strong>File Desain Saat Ini:</strong></p>
+                            <a href="{{ asset('storage/'.$order->design->file_awal) }}"
+                               target="_blank"
+                               class="btn btn-outline-primary btn-sm me-2">
+                               👁 Lihat File
+                            </a>
+                            <a href="{{ asset('storage/'.$order->design->file_awal) }}"
+                               download
+                               class="btn btn-outline-secondary btn-sm">
+                               ⬇ Download
+                            </a>
+                            
+                            @if(Str::endsWith($order->design->file_awal, ['jpg','jpeg','png','gif','webp']))
+                                <div class="mt-2">
+                                    <img src="{{ asset('storage/'.$order->design->file_awal) }}"
+                                         class="img-fluid rounded"
+                                         style="max-height:200px; max-width:100%;">
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+
+                    <div class="mb-2">
+                        <label class="form-label text-muted">Ganti File Desain (Opsional)</label>
+                        <input type="file" name="file_desain" class="form-control" accept="image/*,.pdf">
+                        <small class="text-muted">
+                            @if($order->design && $order->design->file_awal)
+                                Kosongkan jika tidak ingin mengganti file
+                            @else
+                                Upload file desain awal dari customer
+                            @endif
+                        </small>
+                    </div>
                 </div>
+
 
                 <hr>
 

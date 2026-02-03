@@ -82,15 +82,51 @@
                 <div class="mb-3">
                     <label class="form-label">Menggunakan Jasa Desain?</label>
                     <select name="jasa_desain" class="form-select" id="jasaDesain">
-                        <option value="0" <?php echo e(!$order->jasa_desain ? 'selected' : ''); ?>>Tidak</option>
-                        <option value="1" <?php echo e($order->jasa_desain ? 'selected' : ''); ?>>Ya</option>
+                        <option value="0" <?php echo e(!$order->design ? 'selected' : ''); ?>>Tidak</option>
+                        <option value="1" <?php echo e($order->design ? 'selected' : ''); ?>>Ya</option>
                     </select>
                 </div>
 
-                <div class="mb-3 <?php echo e(!$order->jasa_desain ? 'd-none' : ''); ?>" id="formDesain">
-                    <label class="form-label">Upload File Desain</label>
-                    <input type="file" name="file_desain" class="form-control">
+                <div class="mb-3 <?php echo e(!$order->design ? 'd-none' : ''); ?>" id="formDesain">
+                    <label class="form-label">File Desain</label>
+
+                    <?php if($order->design && $order->design->file_awal): ?>
+                        <div class="mb-3">
+                            <p class="text-muted small mb-2"><strong>File Desain Saat Ini:</strong></p>
+                            <a href="<?php echo e(asset('storage/'.$order->design->file_awal)); ?>"
+                               target="_blank"
+                               class="btn btn-outline-primary btn-sm me-2">
+                               👁 Lihat File
+                            </a>
+                            <a href="<?php echo e(asset('storage/'.$order->design->file_awal)); ?>"
+                               download
+                               class="btn btn-outline-secondary btn-sm">
+                               ⬇ Download
+                            </a>
+                            
+                            <?php if(Str::endsWith($order->design->file_awal, ['jpg','jpeg','png','gif','webp'])): ?>
+                                <div class="mt-2">
+                                    <img src="<?php echo e(asset('storage/'.$order->design->file_awal)); ?>"
+                                         class="img-fluid rounded"
+                                         style="max-height:200px; max-width:100%;">
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="mb-2">
+                        <label class="form-label text-muted">Ganti File Desain (Opsional)</label>
+                        <input type="file" name="file_desain" class="form-control" accept="image/*,.pdf">
+                        <small class="text-muted">
+                            <?php if($order->design && $order->design->file_awal): ?>
+                                Kosongkan jika tidak ingin mengganti file
+                            <?php else: ?>
+                                Upload file desain awal dari customer
+                            <?php endif; ?>
+                        </small>
+                    </div>
                 </div>
+
 
                 <hr>
 

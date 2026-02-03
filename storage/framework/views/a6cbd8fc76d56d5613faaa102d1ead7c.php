@@ -49,7 +49,7 @@
                 <div class="row mb-3">
                     <div class="col">
                         <label class="text-muted small">Tanggal Pemesanan</label>
-                        <<div><?php echo e($order->tanggal_pemesanan->format('d M Y')); ?></div>
+                        <div><?php echo e($order->tanggal_pemesanan->format('d M Y')); ?></div>
                     </div>
                     <div class="col">
                         <label class="text-muted small">Deadline</label>
@@ -81,25 +81,46 @@
 
                 
                 <div class="mb-3">
-                    <label class="text-muted small">Jasa Desain</label>
-                    <div><?php echo e($order->design ? 'Ya' : 'Tidak'); ?></div>
+    <label class="text-muted small">Jasa Desain</label>
 
-                        <?php if($order->design && $order->design->file_awal): ?>
-                        <div class="mt-2">
-                            <a href="<?php echo e(asset('storage/'.$order->design->file_awal)); ?>"
-                                target="_blank"
-                                class="btn btn-outline-primary btn-sm me-2">
-                                👁 Lihat File
-                            </a>
+    <div class="fw-semibold">
+        <?php echo e($order->design ? 'Ya' : 'Tidak'); ?>
 
-                            <a href="<?php echo e(asset('storage/'.$order->design->file_awal)); ?>"
-                                download
-                                class="btn btn-outline-success btn-sm">
-                                ⬇ Download
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                </div>
+    </div>
+
+    <?php if($order->design): ?>
+        <div class="mt-2">
+            <?php if($order->design->file_awal): ?>
+                <a href="<?php echo e(asset('storage/'.$order->design->file_awal)); ?>"
+                   target="_blank"
+                   class="btn btn-outline-primary btn-sm me-2">
+                    👁 Lihat File Desain
+                </a>
+
+                <a href="<?php echo e(asset('storage/'.$order->design->file_awal)); ?>"
+                   download
+                   class="btn btn-outline-success btn-sm">
+                    ⬇ Download
+                </a>
+
+                <?php if(Str::endsWith($order->design->file_awal, ['jpg','jpeg','png','gif','webp'])): ?>
+                    <div class="mt-3">
+                        <img src="<?php echo e(asset('storage/'.$order->design->file_awal)); ?>"
+                             class="img-fluid rounded"
+                             style="max-height:300px; max-width:100%;">
+                    </div>
+                <?php endif; ?>
+            <?php else: ?>
+                <span class="text-muted fst-italic">
+                    File desain belum diupload
+                </span>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+</div>
+
+
+
 
 
                 <hr>

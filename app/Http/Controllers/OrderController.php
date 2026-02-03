@@ -197,7 +197,7 @@ class OrderController extends Controller
                 $fileDesain = null;
                 if ($request->hasFile('file_desain')) {
                     $fileDesain = $request->file('file_desain')
-                        ->store('desain/order');
+                        ->store('desain/order', 'public');
                 }
 
                 Design::create([
@@ -264,7 +264,7 @@ class OrderController extends Controller
     // EDIT
     public function edit(Order $order)
     {
-        $order->load('customer');
+        $order->load(['customer', 'design', 'items']);
 
         return view('orders.edit', compact('order'));
     }
@@ -279,6 +279,8 @@ class OrderController extends Controller
         'payment_status' => 'required|in:belum_bayar,dp,lunas',
         'deadline'       => 'nullable|date',
         'catatan'        => 'nullable|string',
+        'jasa_desain'    => 'nullable|in:0,1',
+        'file_desain'    => 'nullable|file',
     ]);
 
     // UPDATE CUSTOMER (hanya alamat)
@@ -292,6 +294,34 @@ class OrderController extends Controller
         'deadline'       => $validated['deadline'],
         'catatan'        => $validated['catatan'] ?? null,
     ]);
+
+    // UPDATE DESAIN JIKA ADA FILE BARU
+    if ($validated['jasa_desain'] == '1') {
+        // Refresh relasi design
+        $order->refresh();
+        
+        if (!$order->design) {
+            // Buat design record baru jika belum ada
+            Design::create([
+                'order_id'  => $order->id,
+                'status'    => 'menunggu',
+                'file_awal' => null,
+            ]);
+            
+            // Load ulang relasi design
+            $order->load('design');
+        }
+
+        // Upload file desain jika ada
+        if ($request->hasFile('file_desain')) {
+            $fileDesain = $request->file('file_desain')
+                ->store('desain/order', 'public');
+
+            $order->design->update([
+                'file_awal' => $fileDesain,
+            ]);
+        }
+    }
 
     return redirect()
         ->route('orders.index')

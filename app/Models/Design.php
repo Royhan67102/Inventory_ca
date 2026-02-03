@@ -14,6 +14,7 @@ class Design extends Model
         'designer',
         'status',
         'catatan',
+        'file_awal',
         'file_desain',
         'file_hasil',
 

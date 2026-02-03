@@ -50,7 +50,7 @@
                 <div class="row mb-3">
                     <div class="col">
                         <label class="text-muted small">Tanggal Pemesanan</label>
-                        <<div>{{ $order->tanggal_pemesanan->format('d M Y') }}</div>
+                        <div>{{ $order->tanggal_pemesanan->format('d M Y') }}</div>
                     </div>
                     <div class="col">
                         <label class="text-muted small">Deadline</label>
@@ -80,25 +80,45 @@
 
                 {{-- ================= DESAIN ================= --}}
                 <div class="mb-3">
-                    <label class="text-muted small">Jasa Desain</label>
-                    <div>{{ $order->design ? 'Ya' : 'Tidak' }}</div>
+    <label class="text-muted small">Jasa Desain</label>
 
-                        @if($order->design && $order->design->file_awal)
-                        <div class="mt-2">
-                            <a href="{{ asset('storage/'.$order->design->file_awal) }}"
-                                target="_blank"
-                                class="btn btn-outline-primary btn-sm me-2">
-                                👁 Lihat File
-                            </a>
+    <div class="fw-semibold">
+        {{ $order->design ? 'Ya' : 'Tidak' }}
+    </div>
 
-                            <a href="{{ asset('storage/'.$order->design->file_awal) }}"
-                                download
-                                class="btn btn-outline-success btn-sm">
-                                ⬇ Download
-                            </a>
-                        </div>
-                    @endif
-                </div>
+    @if($order->design)
+        <div class="mt-2">
+            @if($order->design->file_awal)
+                <a href="{{ asset('storage/'.$order->design->file_awal) }}"
+                   target="_blank"
+                   class="btn btn-outline-primary btn-sm me-2">
+                    👁 Lihat File Desain
+                </a>
+
+                <a href="{{ asset('storage/'.$order->design->file_awal) }}"
+                   download
+                   class="btn btn-outline-success btn-sm">
+                    ⬇ Download
+                </a>
+
+                @if(Str::endsWith($order->design->file_awal, ['jpg','jpeg','png','gif','webp']))
+                    <div class="mt-3">
+                        <img src="{{ asset('storage/'.$order->design->file_awal) }}"
+                             class="img-fluid rounded"
+                             style="max-height:300px; max-width:100%;">
+                    </div>
+                @endif
+            @else
+                <span class="text-muted fst-italic">
+                    File desain belum diupload
+                </span>
+            @endif
+        </div>
+    @endif
+</div>
+
+
+
 
 
                 <hr>
