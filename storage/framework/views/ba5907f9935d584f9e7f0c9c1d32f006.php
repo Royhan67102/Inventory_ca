@@ -1,140 +1,104 @@
+<?php $__env->startSection('title', 'Daftar Production'); ?>
+<?php $__env->startSection('page-title', 'Daftar Production'); ?>
+
 <?php $__env->startSection('content'); ?>
-<div class="container">
-
-    <h4 class="mb-3">Antrian Produksi (SPK)</h4>
-
-    
-    <?php if(session('success')): ?>
-        <div class="alert alert-success"><?php echo e(session('success')); ?></div>
-    <?php endif; ?>
-
-    
-    <div class="card mb-3">
-        <div class="card-body">
-            <form method="GET">
-                <div class="row">
-
-                    <div class="col-md-4">
-                        <input type="text"
-                               name="search"
-                               value="<?php echo e(request('search')); ?>"
-                               class="form-control"
-                               placeholder="Cari Order / Customer">
-                    </div>
-
-                    <div class="col-md-3">
-                        <select name="status" class="form-control">
-                            <option value="">Semua Status</option>
-                            <option value="menunggu"
-                                <?php echo e(request('status')=='menunggu'?'selected':''); ?>>
-                                Menunggu
-                            </option>
-                            <option value="proses"
-                                <?php echo e(request('status')=='proses'?'selected':''); ?>>
-                                Proses
-                            </option>
-                            <option value="selesai"
-                                <?php echo e(request('status')=='selesai'?'selected':''); ?>>
-                                Selesai
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-2">
-                        <button class="btn btn-primary w-100">
-                            Filter
-                        </button>
-                    </div>
-
-                    <div class="col-md-2">
-                        <a href="<?php echo e(route('productions.index')); ?>"
-                           class="btn btn-secondary w-100">
-                            Reset
-                        </a>
-                    </div>
-
-                </div>
-            </form>
-        </div>
+<div class="card">
+    <div class="card-header">
+        <h5>Daftar Production</h5>
     </div>
 
-    
-    <div class="card">
-        <div class="card-body table-responsive">
+    <div class="card-body">
 
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Order</th>
-                        <th>Customer</th>
-                        <th>Tim</th>
-                        <th>Status</th>
-                        <th>Mulai</th>
-                        <th>Selesai</th>
-                        <th width="140">Aksi</th>
-                    </tr>
-                </thead>
+        <?php if(session('success')): ?>
+            <div class="alert alert-success"><?php echo e(session('success')); ?></div>
+        <?php endif; ?>
 
-                <tbody>
-                <?php $__empty_1 = true; $__currentLoopData = $productions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                    <tr>
-                        <td><?php echo e($i + 1); ?></td>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Kode</th>
+                    <th>Customer</th>
+                    <th>Catatan</th>
+                    <th>File Hasil</th>
+                    <th>Deadline</th>
+                    <th>Status Production</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
 
-                        <td>#<?php echo e($p->order->id); ?></td>
+            <tbody>
+            <?php $__empty_1 = true; $__currentLoopData = $productions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $production): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
 
-                        <td><?php echo e($p->order->customer->nama ?? '-'); ?></td>
+                <?php
+                    $design = $production->order->design;
+                ?>
 
-                        <td><?php echo e($p->tim_produksi ?? '-'); ?></td>
+                <tr>
+                    <td><?php echo e($loop->iteration); ?></td>
 
-                        <td>
-                            <?php if($p->status=='menunggu'): ?>
-                                <span class="badge bg-secondary">Menunggu</span>
-                            <?php elseif($p->status=='proses'): ?>
-                                <span class="badge bg-warning text-dark">Proses</span>
-                            <?php else: ?>
-                                <span class="badge bg-success">Selesai</span>
-                            <?php endif; ?>
-                        </td>
+                    <td><?php echo e($production->order->invoice_number); ?></td>
 
-                        <td>
-                            <?php echo e(optional($p->tanggal_mulai)->format('d-m H:i')); ?>
+                    <td><?php echo e($production->order->customer->nama); ?></td>
 
-                        </td>
+                    <td><?php echo e($design->catatan ?? '-'); ?></td>
 
-                        <td>
-                            <?php echo e(optional($p->tanggal_selesai)->format('d-m H:i')); ?>
-
-                        </td>
-
-                        <td>
-                            <a href="<?php echo e(route('productions.show',$p)); ?>"
-                               class="btn btn-sm btn-info">
-                                Detail
+                    
+                    <td>
+                        <?php if($design?->file_hasil): ?>
+                            <a href="<?php echo e(asset('storage/'.$design->file_hasil)); ?>"
+                               target="_blank"
+                               class="btn btn-sm btn-success">
+                               Lihat
                             </a>
+                        <?php else: ?>
+                            -
+                        <?php endif; ?>
+                    </td>
 
-                            <?php if(!$p->status_lock): ?>
-                                <a href="<?php echo e(route('productions.edit',$p)); ?>"
-                                   class="btn btn-sm btn-primary">
-                                    Update
-                                </a>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                    <tr>
-                        <td colspan="8" class="text-center">
-                            Tidak ada data produksi
-                        </td>
-                    </tr>
-                <?php endif; ?>
-                </tbody>
+                    
+                    <td>
+                        <?php echo e($production->order->deadline
+                            ? $production->order->deadline->format('d/m/Y')
+                            : '-'); ?>
 
-            </table>
+                    </td>
 
-        </div>
+                    
+                    <td>
+                        <span class="badge
+                            <?php if($production->status == 'menunggu'): ?> bg-warning
+                            <?php elseif($production->status == 'proses'): ?> bg-info
+                            <?php elseif($production->status == 'selesai'): ?> bg-success
+                            <?php endif; ?>">
+                            <?php echo e(ucfirst($production->status)); ?>
+
+                        </span>
+                    </td>
+
+                    <td>
+                        <a href="<?php echo e(route('productions.edit',$production->id)); ?>"
+                           class="btn btn-warning btn-sm">
+                           Update
+                        </a>
+
+                        <a href="<?php echo e(route('orders.show',$production->order_id)); ?>"
+                           class="btn btn-info btn-sm">
+                           Order
+                        </a>
+                    </td>
+                </tr>
+
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                <tr>
+                    <td colspan="8" class="text-center">
+                        Belum ada data production
+                    </td>
+                </tr>
+            <?php endif; ?>
+            </tbody>
+        </table>
     </div>
-
 </div>
 <?php $__env->stopSection(); ?>
 
