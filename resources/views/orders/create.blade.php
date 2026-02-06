@@ -7,6 +7,13 @@
 <form action="{{ route('orders.store') }}" method="POST" enctype="multipart/form-data">
 @csrf
 
+<div class="d-flex justify-content-end mb-3">
+    <a href="{{ route('orders.index') }}" class="btn btn-secondary">
+        ← Kembali
+    </a>
+</div>
+
+
 <div class="row">
     {{-- ================= CUSTOMER ================= --}}
     <div class="col-md-4">

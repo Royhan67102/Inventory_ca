@@ -19,59 +19,103 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Order ID</th>
+                            <th>Kode</th>
                             <th>Nama Customer</th>
                             <th>Status Desain</th>
                             <th>Designer</th>
                             <th>Catatan</th>
                             <th>File Awal</th>
                             <th>File Hasil</th>
-                            <th>Tanggal Dibuat</th>
+                            <th>Deadline</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($designs as $design)
+                    @forelse($designs as $design)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{ $design->order_id }}</td>
-                            <td>{{ $design->order?->customer?->name ?? '-' }}</td>
+
+                                {{-- KODE ORDER --}}
+                            <td>
+                            {{ $design->order->invoice_number ?? '-' }}
+                            </td>
+
+                        {{-- CUSTOMER --}}
+                            <td>
+                                {{ $design->order->customer->nama ?? '-' }}
+                            </td>
+
+                        {{-- STATUS DESAIN --}}
                             <td>
                                 <span class="badge
-                                    @if($design->status == 'menunggu') bg-warning
-                                    @elseif($design->status == 'proses') bg-info
-                                    @elseif($design->status == 'selesai') bg-success
-                                    @endif">
-                                    {{ ucfirst($design->status) }}
-                                </span>
-                            </td>
-                            <td>{{ $design->designer ?? '-' }}</td>
-                            <td>{{ $design->catatan ?? '-' }}</td>
-                            <td>
-                                @if($design->file_awal)
-                                    <a href="{{ asset('storage/' . $design->file_awal) }}" target="_blank">Lihat File</a>
-                                @else
-                                    -
-                                @endif
-                            </td>
-                            <td>
-                                @if($design->file_hasil)
-                                    <a href="{{ asset('storage/' . $design->file_hasil) }}" target="_blank">Lihat Hasil</a>
-                                @else
-                                    -
-                                @endif
-                            </td>
-                            <td>{{ $design->created_at->format('d/m/Y H:i') }}</td>
-                            <td>
-                                <a href="{{ route('designs.edit', $design->order_id) }}" class="btn btn-sm btn-warning">Update</a>
-                                <a href="{{ route('designs.show', $design->id) }}" class="btn btn-sm btn-info">Detail</a>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="10" class="text-center">Belum ada desain</td>
-                        </tr>
-                        @endforelse
+                                    @if($design->status === 'menunggu') bg-warning
+                                    @elseif($design->status === 'proses') bg-info
+                                    @elseif($design->status === 'selesai') bg-success
+                                    @endif
+                                ">
+                                {{ ucfirst($design->status) }}
+                            </span>
+                        </td>
+
+                        {{-- DESIGNER --}}
+                        <td>{{ $design->designer ?? '-' }}</td>
+
+                        {{-- CATATAN --}}
+                        <td>{{ $design->catatan ?? '-' }}</td>
+
+                        {{-- FILE AWAL --}}
+                        <td class="text-center">
+                            @if($design->file_awal)
+                                <a href="{{ asset('storage/'.$design->file_awal) }}"
+                                target="_blank"
+                                class="btn btn-sm btn-outline-primary">
+                                    Lihat
+                                </a>
+                            @else
+                                -
+                            @endif
+                        </td>
+
+                        {{-- FILE HASIL --}}
+                        <td class="text-center">
+                            @if($design->file_hasil)
+                                <a href="{{ asset('storage/'.$design->file_hasil) }}"
+                                target="_blank"
+                                class="btn btn-sm btn-outline-success">
+                                    Lihat
+                                </a>
+                            @else
+                                -
+                            @endif
+                        </td>
+
+                        {{-- DEADLINE (AMBIL DARI ORDER) --}}
+                        <td>
+                            {{ $design->order->deadline
+                                ? $design->order->deadline->format('d/m/Y')
+                                : '-' }}
+                        </td>
+
+                        {{-- AKSI --}}
+                        <td class="text-nowrap">
+                            <a href="{{ route('designs.edit', $design->id) }}"
+                            class="btn btn-sm btn-warning">
+                                Update
+                            </a>
+
+                            <a href="{{ route('orders.show', $design->order_id) }}"
+                            class="btn btn-sm btn-info">
+                                Order
+                            </a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="10" class="text-center text-muted">
+                            Belum ada data desain
+                        </td>
+                    </tr>
+                    @endforelse
                     </tbody>
                 </table>
 

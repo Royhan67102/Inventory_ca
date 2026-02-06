@@ -15,19 +15,17 @@ class Design extends Model
         'status',
         'catatan',
         'file_awal',
-        'file_desain',
         'file_hasil',
 
         // tambahan aman (opsional dipakai sekarang / nanti)
-        'tanggal_mulai',
-        'tanggal_selesai',
+        'deadline',
         'bukti_pengerjaan',
         'biaya_desain',
+        'tanggal_selesai',
     ];
 
     protected $casts = [
-        'tanggal_mulai'   => 'datetime',
-        'tanggal_selesai' => 'datetime',
+        'deadline'   => 'datetime',
         'biaya_desain'    => 'float',
     ];
 

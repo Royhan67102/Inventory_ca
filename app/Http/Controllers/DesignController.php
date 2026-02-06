@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Design;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class DesignController extends Controller
 {
@@ -12,9 +13,15 @@ class DesignController extends Controller
      * ===================== */
     public function index()
     {
-        $designs = Design::with('order.customer')->latest()->get();
-        return view('designs.index', compact('designs'));
+        $designs = Design::with([
+        'order.customer'
+        ])
+        ->latest()
+        ->get();
+
+    return view('designs.index', compact('designs'));
     }
+
 
     public function show(Design $design)
     {
@@ -39,34 +46,37 @@ class DesignController extends Controller
     }
 
     public function update(Request $request, Design $design)
-    {
-        $design->load('order');
+        {
+            $validated = $request->validate([
+                'designer'   => 'nullable|string|max:100',
+                'status'     => 'required|in:menunggu,proses,selesai',
+                'catatan'    => 'nullable|string',
+                'file_hasil' => 'nullable|file|max:10240',
+            ]);
 
-        $validated = $request->validate([
-            'designer' => 'nullable|string|max:100',
-            'status'   => 'required|in:menunggu,proses,revisi,selesai',
-            'catatan'  => 'nullable|string',
-            'file_hasil' => 'nullable|file|max:10240',
-        ]);
+            $data = [
+                'designer' => $validated['designer'] ?? null,
+                'status'   => $validated['status'],
+                'catatan'  => $validated['catatan'] ?? null,
+            ];
 
-        $data = [
-            'designer' => $validated['designer'] ?? null,
-            'status'   => $validated['status'],
-            'catatan'  => $validated['catatan'] ?? null,
-        ];
+            if ($request->hasFile('file_hasil')) {
+                $data['file_hasil'] = $request->file('file_hasil')
+                    ->store('designs', 'public');
+            }
 
-        // upload file jika ada
-        if ($request->hasFile('file_hasil')) {
-            $path = $request->file('file_hasil')
-                            ->store('designs', 'public');
+            if ($validated['status'] === 'selesai') {
+                $data['tanggal_selesai'] = now();
+            } else {
+                $data['tanggal_selesai'] = null;
+            }
 
-            $data['file_hasil'] = $path;
-        }
 
-        $design->update($data);
+            $design->update($data);
 
-        return redirect()
+            return redirect()
             ->route('designs.index')
             ->with('success', 'Status desain berhasil diperbarui');
+        }
+
     }
-}
