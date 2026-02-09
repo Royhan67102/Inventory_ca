@@ -11,93 +11,126 @@
 
     <div class="card-body">
 
+        {{-- ALERT --}}
         @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
         @endif
 
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Kode</th>
-                    <th>Customer</th>
-                    <th>Catatan</th>
-                    <th>File Hasil</th>
-                    <th>Deadline</th>
-                    <th>Status Production</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
 
-            <tbody>
-            @forelse($productions as $production)
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="text-center">
+                    <tr>
+                        <th>#</th>
+                        <th>Invoice</th>
+                        <th>Customer</th>
+                        <th>Tim</th>
+                        <th>Bukti</th>
+                        <th>Deadline</th>
+                        <th>Status</th>
+                        <th width="170">Aksi</th>
+                    </tr>
+                </thead>
 
-                @php
-                    $design = $production->order->design;
-                @endphp
+                <tbody>
+                @forelse($productions as $production)
 
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
+                    <tr>
+                        <td class="text-center">
+                            {{ $loop->iteration }}
+                        </td>
 
-                    <td>{{ $production->order->invoice_number }}</td>
+                        {{-- INVOICE --}}
+                        <td>
+                            {{ $production->order->invoice_number ?? '-' }}
+                        </td>
 
-                    <td>{{ $production->order->customer->nama }}</td>
+                        {{-- CUSTOMER --}}
+                        <td>
+                            {{ $production->order->customer->nama ?? '-' }}
+                        </td>
 
-                    <td>{{ $design->catatan ?? '-' }}</td>
+                        {{-- TIM --}}
+                        <td>
+                            {{ $production->tim_produksi ?? '-' }}
+                        </td>
 
-                    {{-- FILE HASIL DESIGN --}}
-                    <td>
-                        @if($design?->file_hasil)
-                            <a href="{{ asset('storage/'.$design->file_hasil) }}"
-                               target="_blank"
-                               class="btn btn-sm btn-success">
-                               Lihat
+                        {{-- BUKTI PRODUKSI --}}
+                        <td class="text-center">
+                            @if($production->bukti)
+                                <a href="{{ asset('storage/'.$production->bukti) }}"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-primary">
+                                   Lihat
+                                </a>
+                            @else
+                                -
+                            @endif
+                        </td>
+
+                        {{-- DEADLINE --}}
+                        <td class="text-center">
+                            {{ optional($production->order->deadline)->format('d/m/Y') ?? '-' }}
+                        </td>
+
+                        {{-- STATUS --}}
+                        <td class="text-center">
+                            <span class="badge
+                                @if($production->status == 'menunggu') bg-warning text-dark
+                                @elseif($production->status == 'proses') bg-info
+                                @elseif($production->status == 'selesai') bg-success
+                                @endif">
+                                {{ ucfirst($production->status) }}
+                            </span>
+                        </td>
+
+                        {{-- AKSI --}}
+                        <td class="text-center">
+
+                            <a href="{{ route('productions.show',$production->id) }}"
+                                class="btn btn-primary btn-sm">
+                                Detail
                             </a>
-                        @else
-                            -
-                        @endif
-                    </td>
 
-                    {{-- DEADLINE --}}
-                    <td>
-                        {{ $production->order->deadline
-                            ? $production->order->deadline->format('d/m/Y')
-                            : '-' }}
-                    </td>
+                            {{-- UPDATE --}}
+                            @if($production->status !== 'selesai')
+                                <a href="{{ route('productions.edit',$production->id) }}"
+                                   class="btn btn-warning btn-sm">
+                                   Update
+                                </a>
+                            @else
+                                <button class="btn btn-secondary btn-sm" disabled>
+                                    Locked
+                                </button>
+                            @endif
 
-                    {{-- STATUS PRODUCTION --}}
-                    <td>
-                        <span class="badge
-                            @if($production->status == 'menunggu') bg-warning
-                            @elseif($production->status == 'proses') bg-info
-                            @elseif($production->status == 'selesai') bg-success
-                            @endif">
-                            {{ ucfirst($production->status) }}
-                        </span>
-                    </td>
+                            {{-- LIHAT ORDER --}}
+                            <a href="{{ route('orders.show',$production->order_id) }}"
+                               class="btn btn-info btn-sm">
+                               Order
+                            </a>
 
-                    <td>
-                        <a href="{{ route('productions.edit',$production->id) }}"
-                           class="btn btn-warning btn-sm">
-                           Update
-                        </a>
+                        </td>
+                    </tr>
 
-                        <a href="{{ route('orders.show',$production->order_id) }}"
-                           class="btn btn-info btn-sm">
-                           Order
-                        </a>
-                    </td>
-                </tr>
+                @empty
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            Belum ada data production
+                        </td>
+                    </tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
 
-            @empty
-                <tr>
-                    <td colspan="8" class="text-center">
-                        Belum ada data production
-                    </td>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
     </div>
 </div>
 @endsection

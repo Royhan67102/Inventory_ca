@@ -1,75 +1,81 @@
+<?php $__env->startSection('title','Pickup'); ?>
+<?php $__env->startSection('page-title','Pickup'); ?>
+
 <?php $__env->startSection('content'); ?>
-<div class="container">
-    <h3 class="mb-4">Daftar Pickup Order</h3>
+<div class="card">
+    <div class="card-body">
 
-    <?php if(session('success')): ?>
-        <div class="alert alert-success">
-            <?php echo e(session('success')); ?>
+        <?php if(session('success')): ?>
+            <div class="alert alert-success"><?php echo e(session('success')); ?></div>
+        <?php endif; ?>
 
-        </div>
-    <?php endif; ?>
+        <?php if(session('error')): ?>
+            <div class="alert alert-danger"><?php echo e(session('error')); ?></div>
+        <?php endif; ?>
 
-    <div class="card">
-        <div class="card-body table-responsive">
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Kode Order</th>
-                        <th>Customer</th>
-                        <th>Status Pickup</th>
-                        <th>Bukti</th>
-                        <th>Catatan</th>
-                        <th width="120">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php $__empty_1 = true; $__currentLoopData = $pickups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $pickup): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                        <tr>
-                            <td><?php echo e($index + 1); ?></td>
-                            <td>#<?php echo e($pickup->order->id); ?></td>
-                            <td><?php echo e($pickup->order->customer->nama ?? '-'); ?></td>
+        <table class="table table-bordered align-middle">
+            <thead class="text-center">
+                <tr>
+                    <th>#</th>
+                    <th>Invoice</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th width="180">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php $__empty_1 = true; $__currentLoopData = $pickups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pickup): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <tr>
+                    <td><?php echo e($loop->iteration); ?></td>
+                    <td><?php echo e($pickup->order->invoice_number ?? '-'); ?></td>
+                    <td><?php echo e($pickup->order->customer->nama ?? '-'); ?></td>
+                    <td class="text-center">
+                        <span class="badge
+                            <?php echo e($pickup->status === 'selesai' ? 'bg-success' : 'bg-warning text-dark'); ?>">
+                            <?php echo e(ucfirst($pickup->status)); ?>
 
-                            <td>
-                                <?php if($pickup->status == 'menunggu'): ?>
-                                    <span class="badge bg-secondary">Menunggu</span>
-                                <?php elseif($pickup->status == 'siap'): ?>
-                                    <span class="badge bg-warning text-dark">Siap Diambil</span>
-                                <?php elseif($pickup->status == 'diambil'): ?>
-                                    <span class="badge bg-success">Sudah Diambil</span>
-                                <?php endif; ?>
-                            </td>
+                        </span>
+                    </td>
 
-                            <td>
-                                <?php if($pickup->bukti): ?>
-                                    <a href="<?php echo e(asset('storage/'.$pickup->bukti)); ?>"
-                                       target="_blank">
-                                        Lihat Bukti
-                                    </a>
-                                <?php else: ?>
-                                    -
-                                <?php endif; ?>
-                            </td>
+                    
+                    
+                        <td class="text-center">
 
-                            <td><?php echo e($pickup->catatan ?? '-'); ?></td>
+                            <a href="<?php echo e(route('pickup.show',$pickup->id)); ?>"
+                                class="btn btn-primary btn-sm">
+                                Detail
+                            </a>
 
-                            <td>
-                                <a href="<?php echo e(route('pickup.edit', $pickup->order->id)); ?>"
-                                   class="btn btn-sm btn-primary">
-                                    Update
+                            
+                            <?php if($pickup->status !== 'selesai'): ?>
+                                <a href="<?php echo e(route('pickup.edit',$pickup->id)); ?>"
+                                   class="btn btn-warning btn-sm">
+                                   Update
                                 </a>
-                            </td>
-                        </tr>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                        <tr>
-                            <td colspan="7" class="text-center">
-                                Belum ada data pickup
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+                            <?php else: ?>
+                                <button class="btn btn-secondary btn-sm" disabled>
+                                    Locked
+                                </button>
+                            <?php endif; ?>
+
+                            
+                            <a href="<?php echo e(route('orders.show',$pickup->order_id)); ?>"
+                               class="btn btn-info btn-sm">
+                               Order
+                            </a>
+
+                        </td>
+                </tr>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                <tr>
+                    <td colspan="5" class="text-center">
+                        Belum ada pickup
+                    </td>
+                </tr>
+            <?php endif; ?>
+            </tbody>
+        </table>
+
     </div>
 </div>
 <?php $__env->stopSection(); ?>

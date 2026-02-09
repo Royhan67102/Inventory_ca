@@ -79,6 +79,20 @@
 
                 <hr>
 
+                <div class="mb-3">
+                    <label class="form-label">Tipe Order</label>
+                    <select name="tipe_order" class="form-select" id="tipeOrder" required>
+                        <option value="custom" {{ $order->tipe_order == 'custom' ? 'selected' : '' }}>
+                            Custom
+                        </option>
+                        <option value="lembaran" {{ $order->tipe_order == 'lembaran' ? 'selected' : '' }}>
+                            Lembaran
+                        </option>
+                    </select>
+                </div>
+
+                <hr>
+
                 {{-- ================= DESAIN ================= --}}
                 <div class="mb-3">
                     <label class="form-label">Menggunakan Jasa Desain?</label>
@@ -104,7 +118,7 @@
                                class="btn btn-outline-secondary btn-sm">
                                ⬇ Download
                             </a>
-                            
+
                             @if(Str::endsWith($order->design->file_awal, ['jpg','jpeg','png','gif','webp']))
                                 <div class="mt-2">
                                     <img src="{{ asset('storage/'.$order->design->file_awal) }}"
@@ -117,7 +131,7 @@
 
                     <div class="mb-2">
                         <label class="form-label text-muted">Ganti File Desain (Opsional)</label>
-                        <input type="file" name="file_desain" class="form-control" accept="image/*,.pdf">
+                        <input type="file" name="file_desain" class="form-control">
                         <small class="text-muted">
                             @if($order->design && $order->design->file_awal)
                                 Kosongkan jika tidak ingin mengganti file
@@ -364,6 +378,20 @@
         row.remove();
         hitungGrandTotal();
     });
+
+    // ================= TIPE ORDER =================
+    document.getElementById('tipeOrder')?.addEventListener('change', function() {
+        const jasaDesain = document.getElementById('jasaDesain');
+
+        if (this.value === 'custom') {
+            jasaDesain.value = '1';
+        } else {
+            jasaDesain.value = '0';
+        }
+
+        toggleForm('jasaDesain', 'formDesain');
+    });
+
 </script>
 @endpush {{-- pakai script yang sama persis dengan create --}}
 @endsection

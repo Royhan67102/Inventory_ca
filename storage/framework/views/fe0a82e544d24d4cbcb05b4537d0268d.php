@@ -1,23 +1,21 @@
-@extends('layouts.app')
+<?php $__env->startSection('title','Update Pickup'); ?>
+<?php $__env->startSection('page-title','Update Pickup'); ?>
 
-@section('title','Update Pickup')
-@section('page-title','Update Pickup')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="card">
     <div class="card-body">
 
-        <form action="{{ route('pickup.update',$pickup->id) }}"
+        <form action="<?php echo e(route('pickup.update',$pickup->id)); ?>"
               method="POST"
               enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
+            <?php echo csrf_field(); ?>
+            <?php echo method_field('PUT'); ?>
 
             <div class="mb-3">
                 <label class="form-label">Status</label>
                 <select name="status" class="form-select" required>
                     <option value="menunggu"
-                        {{ $pickup->status == 'menunggu' ? 'selected' : '' }}>
+                        <?php echo e($pickup->status == 'menunggu' ? 'selected' : ''); ?>>
                         Menunggu
                     </option>
                     <option value="selesai">
@@ -35,14 +33,14 @@
                 <label class="form-label">Catatan</label>
                 <textarea name="catatan"
                           class="form-control"
-                          rows="3">{{ old('catatan',$pickup->catatan) }}</textarea>
+                          rows="3"><?php echo e(old('catatan',$pickup->catatan)); ?></textarea>
             </div>
 
             <button class="btn btn-success">
                 Simpan
             </button>
 
-            <a href="{{ route('pickup.index') }}"
+            <a href="<?php echo e(route('pickup.index')); ?>"
                class="btn btn-secondary">
                Batal
             </a>
@@ -51,4 +49,6 @@
 
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/pickups/edit.blade.php ENDPATH**/ ?>

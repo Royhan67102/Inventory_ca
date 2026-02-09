@@ -36,7 +36,7 @@ class Pickup extends Model
             'bukti'  => $bukti,
         ]);
 
-        // order masuk history penjualan
+        // sinkron ke order
         $this->order?->updateQuietly([
             'status'   => 'selesai',
             'catatan' => 'Barang sudah diambil customer',

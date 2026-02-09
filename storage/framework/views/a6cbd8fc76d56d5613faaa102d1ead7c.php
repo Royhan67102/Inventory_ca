@@ -2,6 +2,10 @@
 <?php $__env->startSection('page-title', 'Detail Order'); ?>
 
 <?php $__env->startSection('content'); ?>
+<?php
+use Illuminate\Support\Facades\Storage;
+?>
+
 <div class="container-fluid">
 
 
@@ -68,6 +72,17 @@
                 </div>
 
                 <div class="mb-2">
+                    <label class="text-muted small">Tipe Order</label>
+                    <div>
+                        <span class="badge bg-secondary">
+                            <?php echo e(strtoupper($order->tipe_order)); ?>
+
+                        </span>
+                    </div>
+                </div>
+
+
+                <div class="mb-2">
                     <label class="text-muted small">Status Order</label>
                     <div>
                         <span class="badge bg-info">
@@ -81,46 +96,44 @@
 
                 
                 <div class="mb-3">
-    <label class="text-muted small">Jasa Desain</label>
+                    <label class="text-muted small">Jasa Desain</label>
 
-    <div class="fw-semibold">
-        <?php echo e($order->design ? 'Ya' : 'Tidak'); ?>
+                    <div class="fw-semibold">
+                        <?php echo e($order->design ? 'Ya' : 'Tidak'); ?>
 
-    </div>
-
-    <?php if($order->design): ?>
-        <div class="mt-2">
-            <?php if($order->design->file_awal): ?>
-                <a href="<?php echo e(asset('storage/'.$order->design->file_awal)); ?>"
-                   target="_blank"
-                   class="btn btn-outline-primary btn-sm me-2">
-                    👁 Lihat File Desain
-                </a>
-
-                <a href="<?php echo e(asset('storage/'.$order->design->file_awal)); ?>"
-                   download
-                   class="btn btn-outline-success btn-sm">
-                    ⬇ Download
-                </a>
-
-                <?php if(Str::endsWith($order->design->file_awal, ['jpg','jpeg','png','gif','webp'])): ?>
-                    <div class="mt-3">
-                        <img src="<?php echo e(asset('storage/'.$order->design->file_awal)); ?>"
-                             class="img-fluid rounded"
-                             style="max-height:300px; max-width:100%;">
                     </div>
-                <?php endif; ?>
-            <?php else: ?>
-                <span class="text-muted fst-italic">
-                    File desain belum diupload
-                </span>
-            <?php endif; ?>
-        </div>
-    <?php endif; ?>
-</div>
 
+                    <?php if($order->design): ?>
+                        <div class="mt-2">
+                            <?php if($order->design->file_awal): ?>
+                                <a href="<?php echo e(Storage::url($order->design->file_awal)); ?>"
+                                target="_blank"
+                                class="btn btn-outline-primary btn-sm me-2">
+                                👁 Lihat File
+                                </a>
 
+                                <a href="<?php echo e(Storage::url($order->design->file_awal)); ?>"
+                                download
+                                class="btn btn-outline-success btn-sm">
+                                ⬇ Download
+                                </a>
 
+                                <?php if(Str::endsWith($order->design->file_awal, ['jpg','jpeg','png','gif','webp'])): ?>
+                                    <div class="mt-3">
+                                        <img src="<?php echo e(Storage::url($order->design->file_awal)); ?>"
+                                            class="img-fluid rounded"
+                                            style="max-height:300px; max-width:100%;">
+                                    </div>
+                                <?php endif; ?>
+
+                            <?php else: ?>
+                                <span class="text-muted fst-italic">
+                                    File desain belum diupload
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
 
 
                 <hr>

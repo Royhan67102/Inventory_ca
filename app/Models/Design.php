@@ -20,13 +20,11 @@ class Design extends Model
         // tambahan aman (opsional dipakai sekarang / nanti)
         'deadline',
         'bukti_pengerjaan',
-        'biaya_desain',
         'tanggal_selesai',
     ];
 
     protected $casts = [
         'deadline'   => 'datetime',
-        'biaya_desain'    => 'float',
     ];
 
     /* ================= RELATION ================= */

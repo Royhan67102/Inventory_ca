@@ -100,6 +100,11 @@
 
                         
                         <td class="text-nowrap">
+                            <a href="<?php echo e(route('designs.show',$design->id)); ?>"
+                                class="btn btn-primary btn-sm">
+                                Detail
+                            </a>
+
                             <a href="<?php echo e(route('designs.edit', $design->id)); ?>"
                             class="btn btn-sm btn-warning">
                                 Update

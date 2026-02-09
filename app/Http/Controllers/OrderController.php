@@ -7,20 +7,17 @@ use App\Models\OrderItem;
 use App\Models\Customer;
 use App\Models\Production;
 use App\Models\DeliveryNote;
-
-// === TAMBAHAN ===
 use App\Models\Design;
 use App\Models\Pickup;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
     /* =====================
-     * LIST ORDER (ADMIN)
+     * LIST ORDER
      * ===================== */
     public function index()
     {
@@ -28,13 +25,9 @@ class OrderController extends Controller
             'customer',
             'production',
             'deliveryNote',
-
-            // === TAMBAHAN ===
             'design',
             'pickup'
-        ])
-        ->latest()
-        ->get();
+        ])->latest()->get();
 
         return view('orders.index', compact('orders'));
     }
@@ -47,31 +40,37 @@ class OrderController extends Controller
         return view('orders.create');
     }
 
+    public function edit(Order $order)
+    {
+        return view('orders.edit', compact('order'));
+    }
+
+
     /* =====================
      * SIMPAN ORDER
      * ===================== */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            // CUSTOMER
-            'nama'   => 'required|string|max:100',
-            'alamat' => 'required|string',
-            'telepon' => 'required|string|max:20',
+            // customer
+            'nama'     => 'required|string|max:100',
+            'alamat'   => 'required|string',
+            'telepon'  => 'required|string|max:20',
 
-            // ORDER
+            // order
             'tanggal_pemesanan' => 'required|date',
             'deadline'          => 'nullable|date',
             'payment_status'    => 'required|in:belum_bayar,dp,lunas',
+            'tipe_order'        => 'required|in:custom,lembaran',
 
-            // DELIVERY
-            'antar_barang'     => 'required|in:0,1',
-            'biaya_pengiriman' => 'nullable|numeric|min:0',
+            // jasa
+            'antar_barang'      => 'required|in:0,1',
+            'biaya_pengiriman'  => 'nullable|numeric|min:0',
+            'jasa_pemasangan'   => 'required|in:0,1',
+            'biaya_pemasangan'  => 'nullable|numeric|min:0',
+            'jasa_desain'       => 'nullable|in:0,1',
 
-            // JASA PASANG
-            'jasa_pemasangan'  => 'required|in:0,1',
-            'biaya_pemasangan' => 'nullable|numeric|min:0',
-
-            // ITEM
+            // items
             'merk.*'       => 'nullable|string',
             'ketebalan.*'  => 'nullable|string',
             'warna.*'      => 'nullable|string',
@@ -80,41 +79,25 @@ class OrderController extends Controller
             'qty.*'        => 'nullable|integer|min:1',
             'harga.*'      => 'nullable|numeric|min:0',
 
-            'subtotal.*'   => 'required|string',
-
-            // === TAMBAHAN ===
-            'tipe_order' => 'required|in:custom,lembaran',
-            'jasa_desain'     => 'nullable|in:0,1',
-            'file_desain'     => 'nullable|file'
+            // file
+            'file_desain'  => 'nullable|file|max:51200',
         ]);
-
-        Log::info('Validated Order Data:', $validated);
 
         DB::transaction(function () use ($validated, $request) {
 
-            /* =====================
-             * CUSTOMER
-             * ===================== */
+            /* ========== CUSTOMER ========== */
             $customer = Customer::create([
-                'nama'   => $validated['nama'],
-                'alamat' => $validated['alamat'],
+                'nama'    => $validated['nama'],
+                'alamat'  => $validated['alamat'],
                 'telepon' => $validated['telepon'],
             ]);
 
-             /* =====================
-             * STATUS AWAL ORDER
-             * ===================== */
-            if ($validated['tipe_order'] === 'custom') {
-                $status = 'desain';
-            } else {
-                $status = $validated['antar_barang'] == '1'
-                    ? 'delivery'
-                    : 'pickup';
-            }
+            /* ========== STATUS AWAL ========== */
+            $status = $validated['tipe_order'] === 'custom'
+                ? 'desain'
+                : ($validated['antar_barang'] ? 'delivery' : 'pickup');
 
-            /* =====================
-             * ORDER
-             * ===================== */
+            /* ========== ORDER ========== */
             $order = Order::create([
                 'customer_id'       => $customer->id,
                 'invoice_number'    => 'INV-' . now()->format('YmdHis'),
@@ -122,114 +105,80 @@ class OrderController extends Controller
                 'deadline'          => $validated['deadline'] ?? null,
                 'payment_status'    => $validated['payment_status'],
                 'status'            => $status,
-
-                'antar_barang'      => $validated['antar_barang'] == '1',
+                'antar_barang'      => $validated['antar_barang'],
                 'biaya_pengiriman'  => $validated['biaya_pengiriman'] ?? 0,
-
-                'jasa_pemasangan'   => $validated['jasa_pemasangan'] == '1',
+                'jasa_pemasangan'   => $validated['jasa_pemasangan'],
                 'biaya_pemasangan'  => $validated['biaya_pemasangan'] ?? 0,
-
-                'catatan' => $validated['catatan'] ?? null,
-
+                'catatan'           => $validated['catatan'] ?? null,
                 'total_harga'       => 0,
             ]);
 
-            /* =====================
-            * ORDER ITEMS
-            * ===================== */
+            /* ========== ITEMS ========== */
             $totalItem = 0;
-            $hasCustomItem = false;
+            $hasDesign = ($validated['jasa_desain'] ?? '0') == '1';
 
-            foreach ($validated['merk'] ?? [] as $i => $name) {
+            foreach ($validated['merk'] ?? [] as $i => $merk) {
 
-                // ⛔ SKIP BARIS KOSONG
                 if (
                     empty($validated['panjang_cm'][$i]) ||
                     empty($validated['lebar_cm'][$i]) ||
                     empty($validated['qty'][$i]) ||
                     empty($validated['harga'][$i])
-                ) {
-                    continue;
-                }
+                ) continue;
 
-                $panjang = $validated['panjang_cm'][$i];
-                $lebar   = $validated['lebar_cm'][$i];
-                $qty     = $validated['qty'][$i];
-                $harga   = $validated['harga'][$i];
-
-                $luas_cm2 = $panjang * $lebar;
-                $subtotal = $harga * $qty;
-
-                $hasCustomItem = $validated['jasa_desain'] == '1';
+                $subtotal = $validated['harga'][$i] * $validated['qty'][$i];
 
                 OrderItem::create([
                     'order_id'   => $order->id,
-                    'merk'       => $name,
+                    'merk'       => $merk,
                     'ketebalan'  => $validated['ketebalan'][$i] ?? null,
                     'warna'      => $validated['warna'][$i] ?? null,
-                    'panjang_cm' => $panjang,
-                    'lebar_cm'   => $lebar,
-                    'luas_cm2'   => $luas_cm2,
-                    'qty'        => $qty,
-                    'harga'      => $harga,
+                    'panjang_cm' => $validated['panjang_cm'][$i],
+                    'lebar_cm'   => $validated['lebar_cm'][$i],
+                    'luas_cm2'   => $validated['panjang_cm'][$i] * $validated['lebar_cm'][$i],
+                    'qty'        => $validated['qty'][$i],
+                    'harga'      => $validated['harga'][$i],
                     'subtotal'   => $subtotal,
                 ]);
 
                 $totalItem += $subtotal;
             }
 
-
-            /* =====================
-             * TOTAL ORDER
-             * ===================== */
+            /* ========== TOTAL ========== */
             $order->update([
                 'total_harga' =>
-                    $totalItem
-                    + $order->biaya_pengiriman
-                    + ($validated['biaya_pemasangan'] ?? 0),
+                    $totalItem +
+                    $order->biaya_pengiriman +
+                    $order->biaya_pemasangan
             ]);
 
-            /* =====================
-             * DESAIN (TAMBAHAN, TIDAK MENGGANGGU FLOW LAMA)
-             * ===================== */
-            if ($hasCustomItem || (($validated['jasa_desain'] ?? '0') == '1')) {
+            /* ========== DESAIN ========== */
+            if ($hasDesign && $request->hasFile('file_desain')) {
 
-                $fileDesain = null;
-                if ($request->hasFile('file_desain')) {
-                    $fileDesain = $request->file('file_desain')
-                        ->store('desain/order', 'public');
-                }
+                $path = $request->file('file_desain')
+                    ->store('desain/order', 'public');
 
                 Design::create([
                     'order_id'  => $order->id,
                     'status'    => 'menunggu',
-                    'file_awal' => $fileDesain,
+                    'file_awal' => $path,
                 ]);
             }
 
-            /* =====================
-             * PRODUKSI (SPK) — TETAP ADA
-             * ===================== */
+            /* ========== PRODUKSI ========== */
             Production::create([
                 'order_id' => $order->id,
                 'status'   => 'menunggu',
                 'catatan'  => 'SPK otomatis dari order',
             ]);
 
-            /* =====================
-             * DELIVERY NOTE (FLOW LAMA TETAP)
-             * ===================== */
+            /* ========== DELIVERY / PICKUP ========== */
             if ($order->antar_barang) {
                 DeliveryNote::create([
                     'order_id' => $order->id,
                     'status'   => 'menunggu',
                 ]);
-            }
-
-            /* =====================
-             * PICKUP (TAMBAHAN, JIKA TIDAK ANTAR)
-             * ===================== */
-            if (!$order->antar_barang) {
+            } else {
                 Pickup::create([
                     'order_id' => $order->id,
                     'status'   => 'menunggu',
@@ -247,90 +196,53 @@ class OrderController extends Controller
      * ===================== */
     public function show(Order $order)
     {
-        $order->load([
-            'customer',
-            'items',
-            'production',
-            'deliveryNote',
-
-            // === TAMBAHAN ===
-            'design',
-            'pickup'
-        ]);
-
+        $order->load(['customer', 'items', 'design', 'production', 'deliveryNote', 'pickup']);
         return view('orders.show', compact('order'));
     }
 
-    // EDIT
-    public function edit(Order $order)
-    {
-        $order->load(['customer', 'design', 'items']);
-
-        return view('orders.edit', compact('order'));
-    }
-
     /* =====================
-     * UPDATE ORDER
+     * UPDATE
      * ===================== */
     public function update(Request $request, Order $order)
-{
-    $validated = $request->validate([
-        'alamat'         => 'required|string',
-        'payment_status' => 'required|in:belum_bayar,dp,lunas',
-        'deadline'       => 'nullable|date',
-        'catatan'        => 'nullable|string',
-        'jasa_desain'    => 'nullable|in:0,1',
-        'file_desain'    => 'nullable|file',
-    ]);
+    {
+        $validated = $request->validate([
+            'alamat'         => 'required|string',
+            'payment_status' => 'required|in:belum_bayar,dp,lunas',
+            'deadline'       => 'nullable|date',
+            'catatan'        => 'nullable|string',
+            'jasa_desain'    => 'nullable|in:0,1',
+            'file_desain'    => 'nullable|file|max:51200',
+        ]);
 
-    // UPDATE CUSTOMER (hanya alamat)
-    $order->customer->update([
-        'alamat' => $validated['alamat'],
-    ]);
+        $order->customer->update([
+            'alamat' => $validated['alamat'],
+        ]);
 
-    // UPDATE ORDER
-    $order->update([
-        'payment_status' => $validated['payment_status'],
-        'deadline'       => $validated['deadline'],
-        'catatan'        => $validated['catatan'] ?? null,
-    ]);
+        $order->update([
+            'payment_status' => $validated['payment_status'],
+            'deadline'       => $validated['deadline'],
+            'catatan'        => $validated['catatan'] ?? null,
+        ]);
 
-    // UPDATE DESAIN JIKA ADA FILE BARU
-    if ($validated['jasa_desain'] == '1') {
-        // Refresh relasi design
-        $order->refresh();
-        
-        if (!$order->design) {
-            // Buat design record baru jika belum ada
-            Design::create([
-                'order_id'  => $order->id,
-                'status'    => 'menunggu',
-                'file_awal' => null,
-            ]);
-            
-            // Load ulang relasi design
-            $order->load('design');
+        if (($validated['jasa_desain'] ?? '0') == '1' && $request->hasFile('file_desain')) {
+
+            $order->design()->updateOrCreate(
+                ['order_id' => $order->id],
+                [
+                    'status'    => 'menunggu',
+                    'file_awal' => $request->file('file_desain')
+                        ->store('desain/order', 'public'),
+                ]
+            );
         }
 
-        // Upload file desain jika ada
-        if ($request->hasFile('file_desain')) {
-            $fileDesain = $request->file('file_desain')
-                ->store('desain/order', 'public');
-
-            $order->design->update([
-                'file_awal' => $fileDesain,
-            ]);
-        }
+        return redirect()
+            ->route('orders.index')
+            ->with('success', 'Order berhasil diperbarui');
     }
 
-    return redirect()
-        ->route('orders.index')
-        ->with('success', 'Order berhasil diperbarui');
-}
-
-
     /* =====================
-     * HAPUS
+     * DELETE
      * ===================== */
     public function destroy(Order $order)
     {
@@ -344,12 +256,6 @@ class OrderController extends Controller
     /* =====================
      * INVOICE
      * ===================== */
-    public function invoice(Order $order)
-    {
-        $order->load(['customer', 'items']);
-        return view('orders.invoice', compact('order'));
-    }
-
     public function downloadInvoice(Order $order)
     {
         $order->load(['customer', 'items']);

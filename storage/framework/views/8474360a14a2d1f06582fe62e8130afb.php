@@ -104,8 +104,6 @@
 
 
 <div class="card shadow-sm">
-    <div class="card-body">
-        <div class="card mt-4">
     <div class="card-header fw-bold">
         Riwayat Produksi
     </div>
@@ -113,32 +111,36 @@
         <table class="table table-sm">
             <thead>
                 <tr>
-                    <th>SPK</th>
-                    <th>Customer</th>
-                    <th>Selesai</th>
-                    <th>PIC</th>
+                    <th>Nama</th>
+                    <th>No. Telp</th>
+                    <th>Alamat</th>
+                    <th>Tanggal Pesan</th>
+                    <th>Status Pembayaran</th>
+                    <th>Total Harga</th>
                 </tr>
             </thead>
+
             <tbody>
-                <?php $__empty_1 = true; $__currentLoopData = $productionHistory; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prod): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                    <tr>
-                        <td>#<?php echo e($prod->id); ?></td>
-                        <td><?php echo e($prod->order->customer->nama); ?></td>
-                        <td><?php echo e($prod->tanggal_selesai?->format('d M Y')); ?></td>
-                        <td><?php echo e($prod->tim_produksi); ?></td>
-                    </tr>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                    <tr>
-                        <td colspan="4" class="text-center text-muted">
-                            Belum ada riwayat produksi
-                        </td>
-                    </tr>
-                <?php endif; ?>
+            <?php $__empty_1 = true; $__currentLoopData = $productionHistory; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+            <tr>
+                <td><?php echo e($order->customer->nama); ?></td>
+                <td><?php echo e($order->customer->telepon); ?></td>
+                <td><?php echo e($order->customer->alamat); ?></td>
+                <td><?php echo e($order->tanggal_pemesanan->format('d M Y')); ?></td>
+                <td><?php echo e(strtoupper(str_replace('_', ' ', $order->payment_status))); ?></td>
+                <td>Rp <?php echo e(number_format($order->total_harga)); ?></td>
+            </tr>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+            <tr>
+                <td colspan="6" class="text-center text-muted">
+                    Belum ada riwayat produksi
+                </td>
+            </tr>
+            <?php endif; ?>
             </tbody>
+
         </table>
     </div>
-</div>
-
 </div>
 
 

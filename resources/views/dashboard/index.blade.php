@@ -103,11 +103,9 @@
 </div>
 
 {{-- ========================= --}}
-{{-- ORDER TERBARU --}}
+{{-- RIWAYAT PRODUKSI --}}
 {{-- ========================= --}}
 <div class="card shadow-sm">
-    <div class="card-body">
-        <div class="card mt-4">
     <div class="card-header fw-bold">
         Riwayat Produksi
     </div>
@@ -115,32 +113,36 @@
         <table class="table table-sm">
             <thead>
                 <tr>
-                    <th>SPK</th>
-                    <th>Customer</th>
-                    <th>Selesai</th>
-                    <th>PIC</th>
+                    <th>Nama</th>
+                    <th>No. Telp</th>
+                    <th>Alamat</th>
+                    <th>Tanggal Pesan</th>
+                    <th>Status Pembayaran</th>
+                    <th>Total Harga</th>
                 </tr>
             </thead>
+
             <tbody>
-                @forelse($productionHistory as $prod)
-                    <tr>
-                        <td>#{{ $prod->id }}</td>
-                        <td>{{ $prod->order->customer->nama }}</td>
-                        <td>{{ $prod->tanggal_selesai?->format('d M Y') }}</td>
-                        <td>{{ $prod->tim_produksi }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="text-center text-muted">
-                            Belum ada riwayat produksi
-                        </td>
-                    </tr>
-                @endforelse
+            @forelse($productionHistory as $order)
+            <tr>
+                <td>{{ $order->customer->nama }}</td>
+                <td>{{ $order->customer->telepon }}</td>
+                <td>{{ $order->customer->alamat }}</td>
+                <td>{{ $order->tanggal_pemesanan->format('d M Y') }}</td>
+                <td>{{ strtoupper(str_replace('_', ' ', $order->payment_status)) }}</td>
+                <td>Rp {{ number_format($order->total_harga) }}</td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="6" class="text-center text-muted">
+                    Belum ada riwayat produksi
+                </td>
+            </tr>
+            @endforelse
             </tbody>
+
         </table>
     </div>
-</div>
-
 </div>
 
 {{-- ========================= --}}

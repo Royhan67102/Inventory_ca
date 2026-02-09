@@ -28,10 +28,6 @@ return new class extends Migration {
             $table->dateTime('tanggal_mulai')->nullable();
             $table->dateTime('tanggal_selesai')->nullable();
 
-            // ================= KONTROL =================
-            $table->boolean('stok_dipotong')->default(false);
-            $table->boolean('status_lock')->default(false);
-
             // ================= BUKTI =================
             $table->string('bukti')->nullable();
             $table->text('catatan')->nullable();
@@ -48,3 +44,4 @@ return new class extends Migration {
         Schema::dropIfExists('productions');
     }
 };
+

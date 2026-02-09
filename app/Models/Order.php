@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Design;
 
+
 class Order extends Model
 {
     use HasFactory;
@@ -15,6 +16,7 @@ class Order extends Model
         'invoice_number',
         'tanggal_pemesanan',
         'deadline',
+        'tipe_order',
         'payment_status',
         'status',
 

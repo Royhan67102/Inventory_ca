@@ -14,8 +14,6 @@ class Production extends Model
         'tanggal_selesai',
         'catatan',
         'perlu_pengiriman',
-        'status_lock',
-        'stok_dipotong',
         'bukti',
     ];
 
@@ -23,8 +21,6 @@ class Production extends Model
         'tanggal_mulai'    => 'datetime',
         'tanggal_selesai'  => 'datetime',
         'perlu_pengiriman' => 'boolean',
-        'status_lock'      => 'boolean',
-        'stok_dipotong'    => 'boolean',
     ];
 
     /* ================= RELATION ================= */

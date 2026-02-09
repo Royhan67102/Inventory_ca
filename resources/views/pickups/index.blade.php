@@ -1,76 +1,82 @@
 @extends('layouts.app')
 
+@section('title','Pickup')
+@section('page-title','Pickup')
+
 @section('content')
-<div class="container">
-    <h3 class="mb-4">Daftar Pickup Order</h3>
+<div class="card">
+    <div class="card-body">
 
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
 
-    <div class="card">
-        <div class="card-body table-responsive">
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Kode Order</th>
-                        <th>Customer</th>
-                        <th>Status Pickup</th>
-                        <th>Bukti</th>
-                        <th>Catatan</th>
-                        <th width="120">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($pickups as $index => $pickup)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>#{{ $pickup->order->id }}</td>
-                            <td>{{ $pickup->order->customer->nama ?? '-' }}</td>
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
 
-                            <td>
-                                @if($pickup->status == 'menunggu')
-                                    <span class="badge bg-secondary">Menunggu</span>
-                                @elseif($pickup->status == 'siap')
-                                    <span class="badge bg-warning text-dark">Siap Diambil</span>
-                                @elseif($pickup->status == 'diambil')
-                                    <span class="badge bg-success">Sudah Diambil</span>
-                                @endif
-                            </td>
+        <table class="table table-bordered align-middle">
+            <thead class="text-center">
+                <tr>
+                    <th>#</th>
+                    <th>Invoice</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th width="180">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+            @forelse($pickups as $pickup)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $pickup->order->invoice_number ?? '-' }}</td>
+                    <td>{{ $pickup->order->customer->nama ?? '-' }}</td>
+                    <td class="text-center">
+                        <span class="badge
+                            {{ $pickup->status === 'selesai' ? 'bg-success' : 'bg-warning text-dark' }}">
+                            {{ ucfirst($pickup->status) }}
+                        </span>
+                    </td>
 
-                            <td>
-                                @if($pickup->bukti)
-                                    <a href="{{ asset('storage/'.$pickup->bukti) }}"
-                                       target="_blank">
-                                        Lihat Bukti
-                                    </a>
-                                @else
-                                    -
-                                @endif
-                            </td>
+                    {{-- AKSI --}}
+                    {{-- AKSI --}}
+                        <td class="text-center">
 
-                            <td>{{ $pickup->catatan ?? '-' }}</td>
+                            <a href="{{ route('pickup.show',$pickup->id) }}"
+                                class="btn btn-primary btn-sm">
+                                Detail
+                            </a>
 
-                            <td>
-                                <a href="{{ route('pickup.edit', $pickup->order->id) }}"
-                                   class="btn btn-sm btn-primary">
-                                    Update
+                            {{-- UPDATE --}}
+                            @if($pickup->status !== 'selesai')
+                                <a href="{{ route('pickup.edit',$pickup->id) }}"
+                                   class="btn btn-warning btn-sm">
+                                   Update
                                 </a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="text-center">
-                                Belum ada data pickup
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                            @else
+                                <button class="btn btn-secondary btn-sm" disabled>
+                                    Locked
+                                </button>
+                            @endif
+
+                            {{-- LIHAT ORDER --}}
+                            <a href="{{ route('orders.show',$pickup->order_id) }}"
+                               class="btn btn-info btn-sm">
+                               Order
+                            </a>
+
+                        </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="5" class="text-center">
+                        Belum ada pickup
+                    </td>
+                </tr>
+            @endforelse
+            </tbody>
+        </table>
+
     </div>
 </div>
 @endsection

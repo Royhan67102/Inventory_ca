@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
 use App\Models\Pickup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -14,101 +13,78 @@ class PickupController extends Controller
      * ===================== */
     public function index()
     {
-        $pickups = Pickup::with('order.customer')
-            ->latest()
-            ->get();
+        $pickups = Pickup::with([
+            'order.customer'
+        ])->latest()->get();
 
         return view('pickups.index', compact('pickups'));
     }
 
-    public function show(Order $order)
+    /* =====================
+     * DETAIL PICKUP
+     * ===================== */
+    public function show(Pickup $pickup)
     {
-        $pickup = $order->pickup;
+        $pickup->load([
+            'order.customer',
+            'order.items'
+        ]);
 
-        if (!$pickup) {
-            abort(404);
-        }
-
-        return view('pickups.show', compact('order', 'pickup'));
+        return view('pickups.show', compact('pickup'));
     }
 
     /* =====================
      * FORM EDIT PICKUP
      * ===================== */
-    public function edit(Order $order)
+    public function edit(Pickup $pickup)
     {
-        $pickup = $order->pickup;
-
-        if (!$pickup) {
-            abort(404, 'Data pickup tidak ditemukan');
+        if ($pickup->isSelesai()) {
+            return redirect()
+                ->route('pickups.index')
+                ->with('error', 'Pickup sudah selesai.');
         }
 
-        return view('pickups.edit', compact('order', 'pickup'));
+        return view('pickups.edit', compact('pickup'));
     }
 
     /* =====================
      * UPDATE PICKUP
      * ===================== */
-    public function update(Request $request, Order $order)
+    public function update(Request $request, Pickup $pickup)
     {
-        $pickup = $order->pickup;
-
-        if (!$pickup) {
-            abort(404, 'Data pickup tidak ditemukan');
+        if ($pickup->isSelesai()) {
+            return back()->with('error', 'Pickup sudah terkunci.');
         }
 
         $validated = $request->validate([
-            'status'  => 'required|in:menunggu,siap,diambil',
-            'bukti'   => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'catatan' => 'nullable|string|max:1000',
+            'status'  => 'required|in:menunggu,selesai',
+            'bukti'   => 'nullable|file|max:2048',
+            'catatan' => 'nullable|string',
         ]);
 
-        /* =====================
-         * UPLOAD BUKTI
-         * ===================== */
+        // upload bukti
         if ($request->hasFile('bukti')) {
+
             if ($pickup->bukti) {
                 Storage::disk('public')->delete($pickup->bukti);
             }
 
-            $pickup->bukti = $request
+            $validated['bukti'] = $request
                 ->file('bukti')
-                ->store('pickups', 'public');
+                ->store('pickup', 'public');
         }
 
-        /* =====================
-         * UPDATE PICKUP
-         * ===================== */
         $pickup->update([
-            'status'  => $validated['status'],
             'catatan' => $validated['catatan'] ?? null,
-            'bukti'   => $pickup->bukti,
         ]);
 
-        /* =====================
-         * AUTO FLOW ORDER
-         * ===================== */
-        if ($validated['status'] === 'diambil') {
-
-            if (!$pickup->bukti) {
-                return back()
-                    ->withInput()
-                    ->with('error', 'Bukti pickup wajib diupload.');
-            }
-
-            // order selesai
-            $order->update([
-                'status' => 'selesai',
-            ]);
-        } else {
-            // pastikan tetap di pickup
-            $order->update([
-                'status' => 'pickup',
-            ]);
+        // jika selesai → pakai business method
+        if ($validated['status'] === 'selesai') {
+            $pickup->tandaiSudahDiambil($validated['bukti'] ?? null);
         }
 
         return redirect()
-            ->route('pickups.index')
+            ->route('pickup.index')
             ->with('success', 'Pickup berhasil diperbarui.');
     }
 }

@@ -22,7 +22,7 @@
                     </tr>
                     <tr>
                         <th>Nama Customer</th>
-                        <td>{{ $design->order?->customer?->name ?? '-' }}</td>
+                        <td>{{ $design->order?->customer?->nama ?? '-' }}</td>
                     </tr>
                     <tr>
                         <th>Kategori</th>
@@ -92,3 +92,4 @@
     </div>
 </div>
 @endsection
+

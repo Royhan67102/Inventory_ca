@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Pickup;
 use App\Models\Production;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,50 +28,37 @@ class DashboardController extends Controller
         /* =========================
          * ORDER SELESAI (FINAL)
          * ========================= */
-        $completedOrders = Order::whereIn('payment_status', ['dp', 'lunas'])
-            ->where(function ($q) {
-                $q->whereHas('production', function ($p) {
-                    $p->where('status', 'selesai');
-                })
-                ->where(function ($q2) {
-                    $q2->whereHas('deliveryNote', function ($d) {
-                        $d->where('status', 'selesai');
-                    })
-                    ->orWhereHas('pickup', function ($p) {
-                        $p->where('status', 'diambil');
-                    });
-                });
-            });
+        $completedOrders = Order::where('status', 'selesai')
+            ->whereBetween('created_at', [$from, $to]);
 
         /* =========================
          * CARD PENJUALAN
          * ========================= */
         $today = (clone $completedOrders)
-            ->whereDate('orders.created_at', today())
+            ->whereDate('created_at', today())
             ->sum('total_harga');
 
         $week = (clone $completedOrders)
-            ->whereBetween('orders.created_at', [
+            ->whereBetween('created_at', [
                 now()->startOfWeek(CarbonInterface::MONDAY),
                 now()->endOfWeek(CarbonInterface::SUNDAY),
             ])
             ->sum('total_harga');
 
         $month = (clone $completedOrders)
-            ->whereMonth('orders.created_at', now()->month)
-            ->whereYear('orders.created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
             ->sum('total_harga');
 
         $year = (clone $completedOrders)
-            ->whereYear('orders.created_at', now()->year)
+            ->whereYear('created_at', now()->year)
             ->sum('total_harga');
 
         /* =========================
          * GRAFIK PENJUALAN
          * ========================= */
         $salesChart = (clone $completedOrders)
-            ->whereBetween('orders.created_at', [$from, $to])
-            ->selectRaw('DATE(orders.created_at) as tanggal, SUM(total_harga) as total')
+            ->selectRaw('DATE(created_at) as tanggal, SUM(total_harga) as total')
             ->groupBy('tanggal')
             ->orderBy('tanggal')
             ->get();
@@ -84,7 +72,7 @@ class DashboardController extends Controller
             ->pluck('total', 'payment_status');
 
         /* =========================
-         * STATUS PRODUKSI
+         * STATUS PRODUKSI (TETAP)
          * ========================= */
         $productionStatus = Production::whereBetween('created_at', [$from, $to])
             ->select('status', DB::raw('COUNT(*) as total'))
@@ -92,7 +80,7 @@ class DashboardController extends Controller
             ->pluck('total', 'status');
 
         /* =========================
-         * PRODUKSI AKTIF
+         * PRODUKSI AKTIF (TETAP)
          * ========================= */
         $activeProductions = Production::with(['order.customer'])
             ->whereIn('status', ['menunggu', 'proses'])
@@ -102,12 +90,17 @@ class DashboardController extends Controller
 
         /* =========================
          * RIWAYAT PRODUKSI
-         * ========================= */
-        $productionHistory = Production::with(['order.customer'])
-            ->where('status', 'selesai')
-            ->orderBy('tanggal_selesai', 'desc')
-            ->limit(10)
+         * =========================
+         * Order yang SUDAH SELESAI
+         */
+        $productionHistory = Order::with(['customer', 'production'])
+            ->whereHas('production', function ($q) {
+                $q->where('status', 'selesai');
+            })
+            ->latest()
+            ->limit(5)
             ->get();
+
 
         /* =========================
          * ORDER TERBARU

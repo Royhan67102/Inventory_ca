@@ -20,7 +20,7 @@
                     </tr>
                     <tr>
                         <th>Nama Customer</th>
-                        <td><?php echo e($design->order?->customer?->name ?? '-'); ?></td>
+                        <td><?php echo e($design->order?->customer?->nama ?? '-'); ?></td>
                     </tr>
                     <tr>
                         <th>Kategori</th>
@@ -91,5 +91,6 @@
     </div>
 </div>
 <?php $__env->stopSection(); ?>
+
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/designs/show.blade.php ENDPATH**/ ?>
