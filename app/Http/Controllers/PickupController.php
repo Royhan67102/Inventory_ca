@@ -62,29 +62,32 @@ class PickupController extends Controller
             'catatan' => 'nullable|string',
         ]);
 
-        // upload bukti
-        if ($request->hasFile('bukti')) {
+        $buktiPath = $pickup->bukti;
 
+        // upload bukti jika ada
+        if ($request->hasFile('bukti')) {
             if ($pickup->bukti) {
                 Storage::disk('public')->delete($pickup->bukti);
             }
-
-            $validated['bukti'] = $request
-                ->file('bukti')
-                ->store('pickup', 'public');
+            $buktiPath = $request->file('bukti')->store('pickup', 'public');
         }
 
+        // update catatan
         $pickup->update([
             'catatan' => $validated['catatan'] ?? null,
         ]);
 
-        // jika selesai → pakai business method
+        // update status + sinkron ke order
         if ($validated['status'] === 'selesai') {
-            $pickup->tandaiSudahDiambil($validated['bukti'] ?? null);
+            $pickup->tandaiSudahDiambil($buktiPath);
+        } else {
+            // jika status menunggu atau lain-lain
+            $pickup->update(['status' => $validated['status']]);
         }
 
         return redirect()
             ->route('pickup.index')
             ->with('success', 'Pickup berhasil diperbarui.');
     }
+
 }
