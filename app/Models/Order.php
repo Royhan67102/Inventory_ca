@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Design;
+use App\Models\DeliveryNote;
+use App\Models\Pickup;
+
 
 
 class Order extends Model
@@ -160,8 +163,69 @@ class Order extends Model
                 ]);
 
             } else {
-                $order->updateQuietly(['status' => 'produksi']);
+                // 🔥 LEMBARAN
+                if ($order->isDelivery()) {
+
+                    $order->updateQuietly(['status' => 'delivery']);
+
+                    DeliveryNote::create([
+                        'order_id' => $order->id,
+                        'status' => 'menunggu',
+                    ]);
+
+                } else {
+
+                    $order->updateQuietly(['status' => 'pickup']);
+
+                    Pickup::create([
+                        'order_id' => $order->id,
+                        'status' => 'menunggu',
+                    ]);
+                }
             }
         });
+
+        static::updated(function ($order) {
+
+            if ($order->wasChanged('antar_barang')) {
+
+                if ($order->antar_barang) {
+
+                    // Hapus pickup lama
+                    $order->pickup()?->delete();
+
+                    // Buat delivery jika belum ada
+                    if (!$order->deliveryNote) {
+                        DeliveryNote::create([
+                            'order_id' => $order->id,
+                            'status'   => 'menunggu',
+                        ]);
+                    }
+
+                    // Update status
+                    if ($order->status === 'pickup') {
+                        $order->updateQuietly(['status' => 'delivery']);
+                    }
+
+                } else {
+
+                    // Hapus delivery lama
+                    $order->deliveryNote()?->delete();
+
+                    // Buat pickup jika belum ada
+                    if (!$order->pickup) {
+                        Pickup::create([
+                            'order_id' => $order->id,
+                            'status'   => 'menunggu',
+                        ]);
+                    }
+
+                    if ($order->status === 'delivery') {
+                        $order->updateQuietly(['status' => 'pickup']);
+                    }
+                }
+            }
+        });
+
     }
 }

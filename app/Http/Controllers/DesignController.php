@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Design;
-use Illuminate\Http\Request;
-use Carbon\Carbon;
 use App\Models\Production;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Storage;
 
 class DesignController extends Controller
 {
@@ -17,18 +16,22 @@ class DesignController extends Controller
     public function index()
     {
         $designs = Design::with([
-        'order.customer'
-        ])
-        ->latest()
-        ->get();
+                'order.customer'
+            ])
+            ->whereIn('status', ['menunggu', 'proses']) // lebih aman
+            ->latest()
+            ->get();
 
-    return view('designs.index', compact('designs'));
+        return view('designs.index', compact('designs'));
     }
 
-
+    /* =====================
+     * DETAIL DESAIN
+     * ===================== */
     public function show(Design $design)
     {
-        $design->load('order.customer'); // pastikan customer tersedia
+        $design->load('order.customer');
+
         if (!$design->order) {
             abort(404, 'Order terkait desain tidak ditemukan');
         }
@@ -36,60 +39,111 @@ class DesignController extends Controller
         return view('designs.show', compact('design'));
     }
 
+    /* =====================
+     * FORM EDIT DESAIN
+     * ===================== */
     public function edit(Design $design)
     {
-        if (!$design->order) {
-            abort(404, 'Order terkait desain tidak ditemukan');
+        if ($design->status === 'selesai') {
+            return redirect()
+                ->route('designs.index')
+                ->with('error', 'Desain sudah selesai dan terkunci.');
         }
 
-        // load relasi order + customer agar nama customer muncul
-        $design->order->load('customer');
+        $design->load('order.customer');
 
         return view('designs.edit', compact('design'));
     }
 
-   public function update(Request $request, Design $design)
-{
-    $validated = $request->validate([
-        'designer'   => 'nullable|string|max:100',
-        'status'     => 'required|in:menunggu,proses,selesai',
-        'catatan'    => 'nullable|string',
-        'file_hasil' => 'nullable|file|max:10240',
-    ]);
-
-    DB::transaction(function () use ($request, $validated, $design) {
-
-        $data = [
-            'designer' => $validated['designer'] ?? null,
-            'status'   => $validated['status'],
-            'catatan'  => $validated['catatan'] ?? null,
-        ];
-
-        if ($request->hasFile('file_hasil')) {
-            $data['file_hasil'] = $request->file('file_hasil')
-                ->store('designs', 'public');
+    /* =====================
+     * UPDATE DESAIN
+     * ===================== */
+    public function update(Request $request, Design $design)
+    {
+        // 🔒 Jika sudah selesai, tidak bisa diubah
+        if ($design->status === 'selesai') {
+            return back()->with('error', 'Desain sudah selesai dan tidak dapat diubah.');
         }
 
-        // set tanggal selesai hanya jika pertama kali selesai
-        if ($validated['status'] === 'selesai' && !$design->tanggal_selesai) {
-            $data['tanggal_selesai'] = now();
-        }
+        $validated = $request->validate([
+            'designer'   => 'required|string|max:100',
+            'status'     => 'required|in:menunggu,proses,selesai',
+            'catatan'    => 'nullable|string',
+            'file_hasil' => 'required|file|max:10240',
+        ]);
 
-        $design->update($data);
+        DB::transaction(function () use ($request, $validated, $design) {
 
-        // ⬇️ kirim ke production
-        if ($validated['status'] === 'selesai') {
-            Production::firstOrCreate(
-                ['order_id' => $design->order_id],
-                ['status' => 'menunggu']
-            );
-        }
-    });
+            /* =====================
+             * VALIDASI TRANSISI STATUS
+             * ===================== */
 
-    return redirect()
-        ->route('designs.index')
-        ->with('success', 'Status desain berhasil diperbarui');
-}
+            // Tidak boleh lompat dari menunggu langsung ke selesai
+            $allowedTransitions = [
+                'menunggu' => ['proses', 'selesai'],
+                'proses'   => ['selesai'],
+            ];
 
+            if (
+                isset($allowedTransitions[$design->status]) &&
+                !in_array($validated['status'], $allowedTransitions[$design->status]) &&
+                $validated['status'] !== $design->status
+            ) {
+                return back()->with('error', 'Transisi status tidak valid.');
+            }
 
+            $data = [
+                'designer' => $validated['designer'] ?? null,
+                'status'   => $validated['status'],
+                'catatan'  => $validated['catatan'] ?? null,
+            ];
+
+            /* =====================
+             * HANDLE FILE
+             * ===================== */
+            if ($request->hasFile('file_hasil')) {
+
+                // hapus file lama jika ada
+                if ($design->file_hasil) {
+                    Storage::disk('public')->delete($design->file_hasil);
+                }
+
+                $data['file_hasil'] = $request->file('file_hasil')
+                    ->store('designs', 'public');
+            }
+
+            /* =====================
+             * TANGGAL SELESAI
+             * ===================== */
+            if (
+                $validated['status'] === 'selesai' &&
+                !$design->tanggal_selesai
+            ) {
+                $data['tanggal_selesai'] = now();
+            }
+
+            $design->update($data);
+
+            /* =====================
+             * KIRIM KE PRODUCTION
+             * ===================== */
+            if ($validated['status'] === 'selesai') {
+
+                // 1️⃣ Buat / pastikan ada production
+                Production::firstOrCreate(
+                    ['order_id' => $design->order_id],
+                    ['status' => 'menunggu']
+                );
+
+                // 2️⃣ Ubah status order ke produksi
+                $design->order()->update([
+                    'status' => 'produksi'
+                ]);
+            }
+        });
+
+        return redirect()
+            ->route('designs.index')
+            ->with('success', 'Status desain berhasil diperbarui.');
     }
+}

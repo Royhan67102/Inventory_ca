@@ -32,9 +32,6 @@ return new class extends Migration {
             $table->string('bukti')->nullable();
             $table->text('catatan')->nullable();
 
-            // ================= KIRIM ATAU AMBIL =================
-            $table->boolean('perlu_pengiriman')->default(true);
-
             $table->timestamps();
         });
     }

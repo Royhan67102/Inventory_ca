@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Production;
-use App\Models\DeliveryNote;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductionController extends Controller
 {
@@ -14,14 +14,15 @@ class ProductionController extends Controller
     public function index()
     {
         $productions = Production::with([
-            'order.customer',
-            'order.design'
-        ])
-        ->whereHas('order.design', function ($q) {
-            $q->where('status', 'selesai');
-        })
-        ->latest()
-        ->get();
+                'order.customer',
+                'order.design'
+            ])
+            ->whereHas('order.design', function ($q) {
+                $q->where('status', 'selesai');
+            })
+            ->whereIn('status', ['menunggu', 'proses']) // lebih aman
+            ->latest()
+            ->get();
 
         return view('productions.index', compact('productions'));
     }
@@ -44,6 +45,12 @@ class ProductionController extends Controller
      * ===================== */
     public function edit(Production $production)
     {
+        if ($production->isSelesai()) {
+            return redirect()
+                ->route('productions.index')
+                ->with('error', 'Produksi sudah selesai dan terkunci.');
+        }
+
         return view('productions.edit', compact('production'));
     }
 
@@ -52,56 +59,60 @@ class ProductionController extends Controller
      * ===================== */
     public function update(Request $request, Production $production)
     {
+        // 🔒 Jika sudah selesai, tidak bisa diubah
+        if ($production->isSelesai()) {
+            return back()->with('error', 'Produksi sudah selesai dan tidak dapat diubah.');
+        }
+
         $validated = $request->validate([
-            'tim_produksi' => 'nullable|string|max:255',
-            'status'       => 'required|in:menunggu,proses,selesai',
-            'catatan'      => 'nullable|string',
-            'bukti'        => 'nullable|file|max:10240',
-            'perlu_pengiriman' => 'nullable|boolean',
+            'tim_produksi'       => 'nullable|string|max:255',
+            'status'             => 'required|in:menunggu,proses,selesai',
+            'catatan'            => 'nullable|string',
+            'bukti'              => 'nullable|file|max:10240',
         ]);
 
-        if ($request->hasFile('bukti')) {
-            $path = $request->file('bukti')->store('productions', 'public');
-            $validated['bukti'] = $path;
+        /* =====================
+         * VALIDASI TRANSISI STATUS
+         * ===================== */
+
+        // Tidak boleh lompat dari menunggu langsung ke selesai
+        $allowedTransitions = [
+            'menunggu' => ['proses', 'selesai'],
+            'proses'   => ['selesai'],
+        ];
+
+        if (
+            isset($allowedTransitions[$production->status]) &&
+            !in_array($validated['status'], $allowedTransitions[$production->status]) &&
+            $validated['status'] !== $production->status
+        ) {
+            return back()->with('error', 'Transisi status tidak valid.');
         }
-
-        $validated['perlu_pengiriman'] = $request->has('perlu_pengiriman');
-
-        $production->update($validated);
 
         /* =====================
-        * JIKA PRODUKSI SELESAI
-        * ===================== */
-        if ($validated['status'] === 'selesai') {
+         * HANDLE FILE
+         * ===================== */
+        if ($request->hasFile('bukti')) {
 
-            if ($validated['perlu_pengiriman']) {
-
-                // Order masuk ke delivery
-                $production->order->update([
-                    'status' => 'delivery'
-                ]);
-
-                // Buat delivery note jika belum ada
-                DeliveryNote::firstOrCreate(
-                    ['order_id' => $production->order->id],
-                    [
-                        'status' => 'menunggu',
-                        'status_lock' => false
-                    ]
-                );
-
-            } else {
-
-                // Jika tidak perlu kirim → langsung pickup
-                $production->order->update([
-                    'status' => 'pickup'
-                ]);
+            // hapus bukti lama jika ada
+            if ($production->bukti) {
+                Storage::disk('public')->delete($production->bukti);
             }
+
+            $validated['bukti'] = $request->file('bukti')
+                ->store('productions', 'public');
         }
+
+        /* =====================
+         * UPDATE DATA
+         * ===================== */
+        $production->update($validated);
+
+        // ⚠️ Tidak perlu update order di sini
+        // Karena sudah ditangani di Model (booted updating)
 
         return redirect()
             ->route('productions.index')
-            ->with('success', 'Production berhasil diperbarui');
+            ->with('success', 'Production berhasil diperbarui.');
     }
-
 }

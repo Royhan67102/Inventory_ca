@@ -82,23 +82,6 @@
                                {{ $production->status === 'selesai' ? 'disabled' : '' }}>
                     </div>
 
-                    {{-- PERLU PENGIRIMAN --}}
-                    <div class="mb-3">
-                        <label class="form-label">Perlu Pengiriman?</label>
-                        <select name="perlu_pengiriman"
-                                class="form-select"
-                                {{ $production->status === 'selesai' ? 'disabled' : '' }}>
-                            <option value="1"
-                                {{ $production->perlu_pengiriman ? 'selected':'' }}>
-                                Ya
-                            </option>
-                            <option value="0"
-                                {{ !$production->perlu_pengiriman ? 'selected':'' }}>
-                                Tidak
-                            </option>
-                        </select>
-                    </div>
-
                     {{-- BUKTI FOTO --}}
                     <div class="mb-3">
                         <label class="form-label">Bukti Pengerjaan</label>

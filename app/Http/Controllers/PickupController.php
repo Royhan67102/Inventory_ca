@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pickup;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class PickupController extends Controller
@@ -14,8 +15,11 @@ class PickupController extends Controller
     public function index()
     {
         $pickups = Pickup::with([
-            'order.customer'
-        ])->latest()->get();
+                'order.customer'
+            ])
+            ->where('status', 'menunggu') // lebih tegas
+            ->latest()
+            ->get();
 
         return view('pickups.index', compact('pickups'));
     }
@@ -62,32 +66,48 @@ class PickupController extends Controller
             'catatan' => 'nullable|string',
         ]);
 
-        $buktiPath = $pickup->bukti;
+        DB::transaction(function () use ($request, $validated, $pickup) {
 
-        // upload bukti jika ada
-        if ($request->hasFile('bukti')) {
-            if ($pickup->bukti) {
-                Storage::disk('public')->delete($pickup->bukti);
+            // ❗ Cegah status turun dari selesai ke menunggu
+            if (
+                $pickup->status === 'selesai' &&
+                $validated['status'] === 'menunggu'
+            ) {
+                throw new \Exception('Status tidak dapat dikembalikan.');
             }
-            $buktiPath = $request->file('bukti')->store('pickup', 'public');
-        }
 
-        // update catatan
-        $pickup->update([
-            'catatan' => $validated['catatan'] ?? null,
-        ]);
+            $data = [
+                'status'  => $validated['status'],
+                'catatan' => $validated['catatan'] ?? null,
+            ];
 
-        // update status + sinkron ke order
-        if ($validated['status'] === 'selesai') {
-            $pickup->tandaiSudahDiambil($buktiPath);
-        } else {
-            // jika status menunggu atau lain-lain
-            $pickup->update(['status' => $validated['status']]);
-        }
+            // Upload bukti jika ada
+            if ($request->hasFile('bukti')) {
+
+                if ($pickup->bukti) {
+                    Storage::disk('public')->delete($pickup->bukti);
+                }
+
+                $data['bukti'] = $request->file('bukti')
+                    ->store('pickup', 'public');
+            }
+
+            $pickup->update($data);
+
+            /* =====================
+             * JIKA SELESAI
+             * ===================== */
+            if ($validated['status'] === 'selesai') {
+
+                // Sync ke order
+                $pickup->order()->update([
+                    'status' => 'selesai'
+                ]);
+            }
+        });
 
         return redirect()
             ->route('pickup.index')
             ->with('success', 'Pickup berhasil diperbarui.');
     }
-
 }

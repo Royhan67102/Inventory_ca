@@ -82,23 +82,6 @@
 
                     
                     <div class="mb-3">
-                        <label class="form-label">Perlu Pengiriman?</label>
-                        <select name="perlu_pengiriman"
-                                class="form-select"
-                                <?php echo e($production->status === 'selesai' ? 'disabled' : ''); ?>>
-                            <option value="1"
-                                <?php echo e($production->perlu_pengiriman ? 'selected':''); ?>>
-                                Ya
-                            </option>
-                            <option value="0"
-                                <?php echo e(!$production->perlu_pengiriman ? 'selected':''); ?>>
-                                Tidak
-                            </option>
-                        </select>
-                    </div>
-
-                    
-                    <div class="mb-3">
                         <label class="form-label">Bukti Pengerjaan</label>
 
                         <?php if($production->bukti): ?>

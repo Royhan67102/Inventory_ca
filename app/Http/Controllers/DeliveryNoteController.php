@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\DeliveryNote;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class DeliveryNoteController extends Controller
 {
@@ -13,12 +15,14 @@ class DeliveryNoteController extends Controller
     public function index()
     {
         $deliveries = DeliveryNote::with([
-            'order.customer'
-        ])->latest()->get();
+                'order.customer'
+            ])
+            ->where('status', '!=', 'selesai')
+            ->latest()
+            ->get();
 
         return view('delivery.index', compact('deliveries'));
     }
-
 
     /* =====================
      * DETAIL DELIVERY
@@ -38,7 +42,6 @@ class DeliveryNoteController extends Controller
      * ===================== */
     public function edit(DeliveryNote $delivery)
     {
-        // kalau sudah selesai → tidak bisa diedit
         if ($delivery->status === 'selesai') {
             return redirect()
                 ->route('delivery.index')
@@ -60,8 +63,8 @@ class DeliveryNoteController extends Controller
         }
 
         $validated = $request->validate([
-            'nama_pengirim'      => 'nullable|string|max:255',
-            'driver'             => 'nullable|string|max:255',
+            'nama_pengirim'      => 'required|string|max:255',
+            'driver'             => 'required|string|max:255',
             'status'             => 'required|in:menunggu,dikirim,selesai',
             'jam_berangkat'      => 'nullable',
             'jam_sampai_tujuan'  => 'nullable',
@@ -69,28 +72,50 @@ class DeliveryNoteController extends Controller
             'bukti_foto'         => 'nullable|file|image|max:10240',
         ]);
 
-        if ($request->hasFile('bukti_foto')) {
-            $validated['bukti_foto'] =
-                $request->file('bukti_foto')->store('deliveries', 'public');
-        }
+        DB::transaction(function () use ($request, $validated, $delivery) {
 
-        $delivery->update($validated);
+            $allowedTransitions = [
+                'menunggu' => ['dikirim', 'selesai'],
+                'dikirim'  => ['selesai'],
+            ];
 
-        /* =====================
-         * JIKA DELIVERY SELESAI
-         * ===================== */
-        if ($validated['status'] === 'selesai') {
 
-            // Order pindah ke pickup
-            $delivery->order->update([
-                'status' => 'pickup'
-            ]);
+            if (
+                isset($allowedTransitions[$delivery->status]) &&
+                !in_array($validated['status'], $allowedTransitions[$delivery->status]) &&
+                $validated['status'] !== $delivery->status
+            ) {
+                throw new \Exception('Transisi status tidak valid.');
+            }
 
-            // lock delivery
-            $delivery->updateQuietly([
-                'status_lock' => true
-            ]);
-        }
+            $data = $validated;
+
+            if ($request->hasFile('bukti_foto')) {
+
+                if ($delivery->bukti_foto) {
+                    Storage::disk('public')->delete($delivery->bukti_foto);
+                }
+
+                $data['bukti_foto'] =
+                    $request->file('bukti_foto')
+                        ->store('deliveries', 'public');
+            }
+
+            $delivery->update($data);
+
+            /* =====================
+            * JIKA DELIVERY SELESAI
+            * ===================== */
+            if (
+                $validated['status'] === 'selesai' &&
+                $delivery->order &&
+                $delivery->order->status !== 'selesai'
+            ) {
+                $delivery->order->updateQuietly([
+                    'status' => 'selesai'
+                ]);
+            }
+        });
 
         return redirect()
             ->route('delivery.index')

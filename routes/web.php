@@ -30,6 +30,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ================= DASHBOARD =================
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // ================= EXPORT PRODUKSI EXCEL =================
+    Route::get('/dashboard/export-produksi-excel', [DashboardController::class, 'exportProduksiExcel'])
+        ->name('dashboard.exportProduksiExcel');
+
     // ================= PROFILE =================
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

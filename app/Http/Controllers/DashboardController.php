@@ -8,7 +8,9 @@ use App\Models\Production;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use Carbon\CarbonInterface;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DashboardController extends Controller
 {
@@ -17,13 +19,21 @@ class DashboardController extends Controller
         /* =========================
          * RANGE TANGGAL
          * ========================= */
+        $firstCompletedOrder = Order::where('status', 'selesai')
+            ->orderBy('created_at', 'asc')
+            ->first();
+
+        $defaultFrom = $firstCompletedOrder
+            ? Carbon::parse($firstCompletedOrder->created_at)->startOfDay()
+            : Carbon::now()->startOfMonth();
+
         $from = $request->filled('from')
             ? Carbon::parse($request->from)->startOfDay()
-            : now()->subDays(30)->startOfDay();
+            : $defaultFrom;
 
         $to = $request->filled('to')
             ? Carbon::parse($request->to)->endOfDay()
-            : now()->endOfDay();
+            : Carbon::now()->endOfDay();
 
         /* =========================
          * ORDER SELESAI (FINAL)
@@ -35,23 +45,23 @@ class DashboardController extends Controller
          * CARD PENJUALAN
          * ========================= */
         $today = (clone $completedOrders)
-            ->whereDate('created_at', today())
+            ->whereDate('created_at', Carbon::now())
             ->sum('total_harga');
 
         $week = (clone $completedOrders)
             ->whereBetween('created_at', [
-                now()->startOfWeek(CarbonInterface::MONDAY),
-                now()->endOfWeek(CarbonInterface::SUNDAY),
+                Carbon::now()->startOfWeek(),
+                Carbon::now()->endOfWeek()
             ])
             ->sum('total_harga');
 
         $month = (clone $completedOrders)
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
             ->sum('total_harga');
 
         $year = (clone $completedOrders)
-            ->whereYear('created_at', now()->year)
+            ->whereYear('created_at', Carbon::now()->year)
             ->sum('total_harga');
 
         /* =========================
@@ -101,7 +111,6 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-
         /* =========================
          * ORDER TERBARU
          * ========================= */
@@ -124,5 +133,50 @@ class DashboardController extends Controller
             'from',
             'to'
         ));
+    }
+
+    public function exportProduksiExcel(Request $request)
+    {
+        $productions = Order::with(['customer', 'production'])
+            ->whereHas('production', function ($q) {
+                $q->where('status', 'selesai');
+            })
+            ->latest()
+            ->get();
+
+        // Buat Spreadsheet baru
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header Excel
+        $sheet->fromArray([
+            ['Invoice', 'Customer', 'No. Telp', 'Tanggal Pesan', 'Total Harga', 'Status Produksi']
+        ], NULL, 'A1');
+
+        // Data rows
+        $rowNumber = 2;
+        foreach ($productions as $order) {
+            $sheet->setCellValue("A{$rowNumber}", $order->invoice ?? '-');
+            $sheet->setCellValue("B{$rowNumber}", $order->customer->nama ?? '-');
+            $sheet->setCellValue("C{$rowNumber}", $order->customer->no_telp ?? '-');
+            $sheet->setCellValue("D{$rowNumber}", Carbon::parse($order->created_at)->format('d-m-Y'));
+            $sheet->setCellValue("E{$rowNumber}", $order->total_harga ?? 0);
+            $sheet->setCellValue("F{$rowNumber}", $order->production->status ?? '-');
+            $rowNumber++;
+        }
+
+        // Download Excel
+        $writer = new Xlsx($spreadsheet);
+
+        $fileName = 'riwayat_produksi.xlsx';
+        $response = new StreamedResponse(function() use ($writer) {
+            $writer->save('php://output');
+        });
+
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment;filename="'.$fileName.'"');
+        $response->headers->set('Cache-Control', 'max-age=0');
+
+        return $response;
     }
 }

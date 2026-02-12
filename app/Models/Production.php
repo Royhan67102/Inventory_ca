@@ -13,14 +13,12 @@ class Production extends Model
         'tanggal_mulai',
         'tanggal_selesai',
         'catatan',
-        'perlu_pengiriman',
         'bukti',
     ];
 
     protected $casts = [
-        'tanggal_mulai'    => 'datetime',
-        'tanggal_selesai'  => 'datetime',
-        'perlu_pengiriman' => 'boolean',
+        'tanggal_mulai'   => 'datetime',
+        'tanggal_selesai' => 'datetime',
     ];
 
     /* ================= RELATION ================= */
@@ -41,13 +39,13 @@ class Production extends Model
 
     protected static function booted()
     {
+        /* =====================
+         * SAAT PRODUCTION DIBUAT
+         * ===================== */
         static::creating(function ($production) {
 
             $production->status ??= 'menunggu';
-            $production->status_lock ??= false;
-            $production->stok_dipotong ??= false;
 
-            // sync ke order
             if ($production->order) {
                 $production->order->updateQuietly([
                     'status' => 'produksi'
@@ -55,9 +53,12 @@ class Production extends Model
             }
         });
 
+        /* =====================
+         * SAAT PRODUCTION DIUPDATE
+         * ===================== */
         static::updating(function ($production) {
 
-            // set tanggal mulai otomatis
+            // otomatis isi tanggal mulai
             if ($production->isDirty('status') && $production->status === 'proses') {
                 $production->tanggal_mulai ??= now();
             }
@@ -73,25 +74,28 @@ class Production extends Model
                     return;
                 }
 
-                // ⬇️ tentukan lanjut ke mana
-                if ($production->perlu_pengiriman) {
+                /* =====================
+                 * CEK DARI ORDER
+                 * ===================== */
 
+                if ($order->antar_barang) {
+
+                    // lanjut ke delivery
                     $order->updateQuietly([
                         'status' => 'delivery'
                     ]);
 
-                    // auto buat delivery jika belum ada
                     $order->deliveryNote()->firstOrCreate([
                         'order_id' => $order->id
                     ]);
 
                 } else {
 
+                    // lanjut ke pickup
                     $order->updateQuietly([
                         'status' => 'pickup'
                     ]);
 
-                    // auto buat pickup jika belum ada
                     $order->pickup()->firstOrCreate([
                         'order_id' => $order->id
                     ]);

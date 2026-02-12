@@ -16,8 +16,9 @@ return new class extends Migration {
                   ->cascadeOnDelete();
 
             // STATUS PICKUP
-            $table->enum('status', ['menunggu', 'siap', 'selesai'])
-                  ->default('menunggu');
+            $table->enum('status', ['menunggu', 'selesai'])
+            ->default('menunggu');
+
 
             // FOTO / BUKTI PICKUP
             $table->string('bukti')->nullable();

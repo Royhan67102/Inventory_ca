@@ -106,8 +106,12 @@
 {{-- RIWAYAT PRODUKSI --}}
 {{-- ========================= --}}
 <div class="card shadow-sm">
-    <div class="card-header fw-bold">
-        Riwayat Produksi
+    <div class="card-header d-flex justify-content-between align-items-center fw-bold">
+        <span>Riwayat Produksi</span>
+        {{-- Tombol Download Excel --}}
+        <a href="{{ route('dashboard.exportProduksiExcel') }}" class="btn btn-sm btn-success">
+            <i class="bi bi-download"></i> Download Excel
+        </a>
     </div>
     <div class="card-body">
         <table class="table table-sm">
