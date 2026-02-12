@@ -89,19 +89,31 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="#">
+                    <a class="nav-link {{ request()->routeIs('profile.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
+                        href="{{ route('profile.index') }}">
                         <i class="material-symbols-rounded opacity-5">person</i>
                         <span class="nav-link-text ms-1">Profile</span>
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link text-dark" href="{{ route('logout') }}">
-                        <i class="material-symbols-rounded opacity-5">logout</i>
-                        <span class="nav-link-text ms-1">Logout</span>
-                    </a>
-                </li>
 
+                <li class="nav-item">
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="button"
+                            class="nav-link text-dark btn btn-link d-flex align-items-center text-start"
+                            onclick="confirmLogout()">
+                            <i class="material-symbols-rounded opacity-5">logout</i>
+                            <span class="nav-link-text ms-1">Logout</span>
+                        </button>
+                    </form>
+                </li>
             </ul>
         </div>
     </aside>
+
+
+
+
+
+

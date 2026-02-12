@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\DeliveryNoteController;
 use App\Http\Controllers\PickupController;
 use App\Http\Controllers\DesignController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,23 +31,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ================= DASHBOARD =================
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ================= EXPORT PRODUKSI EXCEL =================
     Route::get('/dashboard/export-produksi-excel', [DashboardController::class, 'exportProduksiExcel'])
         ->name('dashboard.exportProduksiExcel');
 
     // ================= PROFILE =================
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // ================= ORDER =================
-    Route::prefix('orders')->name('orders.')->group(function () {
-        Route::get('{order}/invoice', [OrderController::class, 'invoice'])->name('invoice');
-        Route::get('{order}/invoice/download', [OrderController::class, 'downloadInvoice'])->name('invoice.download');
-        Route::resource('/', OrderController::class)->parameters(['' => 'order']);
-        Route::resource('orders', OrderController::class);
+    //================== LOGOUT =================
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+        ->middleware('auth')
+        ->name('logout');
 
-    });
+
+    // ================= ORDER =================
+    Route::resource('orders', OrderController::class);
+
+    Route::get('orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
+    Route::get('orders/{order}/invoice/download', [OrderController::class, 'downloadInvoice'])->name('orders.invoice.download');
 
     // ================= ACRYLIC STOCK =================
     Route::resource('acrylic-stocks', AcrylicStockController::class);
@@ -64,13 +68,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('delivery', DeliveryNoteController::class)
         ->only(['index', 'show', 'edit', 'update']);
 
+    // ================= PICKUP =================
     Route::resource('pickup', PickupController::class)
-    ->only(['index', 'show', 'update', 'edit']);
+        ->only(['index', 'show', 'edit', 'update']);
 
     // ================= DESIGN =================
     Route::resource('designs', DesignController::class)
-    ->only(['index', 'show', 'edit', 'update']); // jangan ganti parameter
-    });
-
+        ->only(['index', 'show', 'edit', 'update']);
+});
 
 require __DIR__.'/auth.php';

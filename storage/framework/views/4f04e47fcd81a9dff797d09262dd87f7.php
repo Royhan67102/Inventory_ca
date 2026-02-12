@@ -89,20 +89,32 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="#">
+                    <a class="nav-link <?php echo e(request()->routeIs('profile.*') ? 'active bg-gradient-dark text-white' : 'text-dark'); ?>"
+                        href="<?php echo e(route('profile.index')); ?>">
                         <i class="material-symbols-rounded opacity-5">person</i>
                         <span class="nav-link-text ms-1">Profile</span>
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link text-dark" href="<?php echo e(route('logout')); ?>">
-                        <i class="material-symbols-rounded opacity-5">logout</i>
-                        <span class="nav-link-text ms-1">Logout</span>
-                    </a>
-                </li>
 
+                <li class="nav-item">
+                    <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST">
+                        <?php echo csrf_field(); ?>
+                        <button type="button"
+                            class="nav-link text-dark btn btn-link d-flex align-items-center text-start"
+                            onclick="confirmLogout()">
+                            <i class="material-symbols-rounded opacity-5">logout</i>
+                            <span class="nav-link-text ms-1">Logout</span>
+                        </button>
+                    </form>
+                </li>
             </ul>
         </div>
     </aside>
+
+
+
+
+
+
 <?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/layouts/partials/sidebar.blade.php ENDPATH**/ ?>

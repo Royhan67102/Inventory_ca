@@ -1,9 +1,7 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Edit Profile'); ?>
+<?php $__env->startSection('page-title', 'Edit Profile'); ?>
 
-@section('title', 'Edit Profile')
-@section('page-title', 'Edit Profile')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <div class="container-fluid py-4">
     <div class="row">
@@ -13,30 +11,31 @@
             <div class="card card-profile">
                 <div class="card-body text-center">
 
-                    {{-- Foto Profile --}}
-                    @if($user->photo)
-                        <img src="{{ asset('storage/' . $user->photo) }}"
+                    
+                    <?php if($user->photo): ?>
+                        <img src="<?php echo e(asset('storage/' . $user->photo)); ?>"
                              class="rounded-circle img-fluid mb-3"
                              width="120">
-                    @else
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}"
+                    <?php else: ?>
+                        <img src="https://ui-avatars.com/api/?name=<?php echo e(urlencode($user->name)); ?>"
                              class="rounded-circle img-fluid mb-3"
                              width="120">
-                    @endif
+                    <?php endif; ?>
 
-                    <h5 class="mb-0">{{ $user->name }}</h5>
+                    <h5 class="mb-0"><?php echo e($user->name); ?></h5>
                     <p class="text-sm text-muted text-capitalize">
-                        {{ $user->role }}
+                        <?php echo e($user->role); ?>
+
                     </p>
 
                     <hr>
 
-                    <a href="{{ route('profile.index') }}"
+                    <a href="<?php echo e(route('profile.index')); ?>"
                         class="btn btn-outline-dark btn-sm w-100 mb-2">
                         Personal Information
                     </a>
 
-                    <a href="{{ route('profile.edit') }}"
+                    <a href="<?php echo e(route('profile.edit')); ?>"
                         class="btn btn-dark btn-sm w-100">
                         Edit Profile
                     </a>
@@ -53,17 +52,18 @@
 
                 <div class="card-body">
 
-                    @if(session('success'))
+                    <?php if(session('success')): ?>
                         <div class="alert alert-success">
-                            {{ session('success') }}
+                            <?php echo e(session('success')); ?>
+
                         </div>
-                    @endif
+                    <?php endif; ?>
 
                     <form method="POST"
-                          action="{{ route('profile.update') }}"
+                          action="<?php echo e(route('profile.update')); ?>"
                           enctype="multipart/form-data">
-                        @csrf
-                        @method('PATCH')
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('PATCH'); ?>
 
                         <div class="row">
 
@@ -72,14 +72,29 @@
                                 <label>Name</label>
                                 <input type="text"
                                        name="name"
-                                       class="form-control @error('name') is-invalid @enderror"
-                                       value="{{ old('name', $user->name) }}">
+                                       class="form-control <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                       value="<?php echo e(old('name', $user->name)); ?>">
 
-                                @error('name')
+                                <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                     <div class="invalid-feedback">
-                                        {{ $message }}
+                                        <?php echo e($message); ?>
+
                                     </div>
-                                @enderror
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             </div>
 
                             <!-- Email -->
@@ -87,14 +102,29 @@
                                 <label>Email</label>
                                 <input type="email"
                                        name="email"
-                                       class="form-control @error('email') is-invalid @enderror"
-                                       value="{{ old('email', $user->email) }}">
+                                       class="form-control <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                       value="<?php echo e(old('email', $user->email)); ?>">
 
-                                @error('email')
+                                <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                     <div class="invalid-feedback">
-                                        {{ $message }}
+                                        <?php echo e($message); ?>
+
                                     </div>
-                                @enderror
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             </div>
 
                             <!-- Phone -->
@@ -103,7 +133,7 @@
                                 <input type="text"
                                        name="phone"
                                        class="form-control"
-                                       value="{{ old('phone', $user->phone) }}">
+                                       value="<?php echo e(old('phone', $user->phone)); ?>">
                             </div>
 
                             <!-- Birthday -->
@@ -112,7 +142,7 @@
                                 <input type="date"
                                        name="birthday"
                                        class="form-control"
-                                       value="{{ old('birthday', $user->birthday?->format('Y-m-d')) }}">
+                                       value="<?php echo e(old('birthday', $user->birthday?->format('Y-m-d'))); ?>">
                             </div>
 
                             <!-- Employee Number -->
@@ -121,7 +151,7 @@
                                 <input type="text"
                                        name="employee_number"
                                        class="form-control"
-                                       value="{{ old('employee_number', $user->employee_number) }}">
+                                       value="<?php echo e(old('employee_number', $user->employee_number)); ?>">
                             </div>
 
                             <!-- Photo -->
@@ -135,7 +165,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end">
-                            <a href="{{ route('profile.index') }}"
+                            <a href="<?php echo e(route('profile.index')); ?>"
                                 class="btn btn-light me-2">
                                 Cancel
                             </a>
@@ -154,4 +184,6 @@
     </div>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/profile/edit.blade.php ENDPATH**/ ?>
