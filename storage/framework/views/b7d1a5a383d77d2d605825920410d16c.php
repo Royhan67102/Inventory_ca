@@ -19,7 +19,7 @@
 
         
         <div class="relative h-60 md:h-auto">
-            <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
+            <img src="<?php echo e(asset('assets/img/ca4.jpeg')); ?>"
                  class="w-full h-full object-cover"
                  alt="Login Image">
         </div>

@@ -23,10 +23,6 @@
                 <a href="<?php echo e(url('/dashboard')); ?>" class="text-white">Dashboard</a>
             <?php else: ?>
                 <a href="<?php echo e(route('login')); ?>" class="text-white hover:underline">Login</a>
-                <a href="<?php echo e(route('register')); ?>"
-                   class="bg-white text-indigo-700 px-5 py-2 rounded-xl font-semibold hover:bg-gray-200 transition">
-                    Register
-                </a>
             <?php endif; ?>
         </div>
     </div>

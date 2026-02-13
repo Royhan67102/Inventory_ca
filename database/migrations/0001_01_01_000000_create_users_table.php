@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->date('birthday')->nullable();
             $table->string('employee_number')->nullable();
-            $table->string('role')->default('staff');
+            $table->string('role');
             $table->string('photo')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

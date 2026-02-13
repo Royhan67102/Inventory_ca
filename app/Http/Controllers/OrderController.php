@@ -276,7 +276,7 @@ class OrderController extends Controller
             ->route('orders.index')
             ->with('success', 'Order berhasil dihapus');
     }
-
+    
     /* =====================
      * INVOICE VIEW
      * ===================== */

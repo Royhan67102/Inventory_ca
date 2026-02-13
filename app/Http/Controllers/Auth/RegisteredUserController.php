@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
+
 
 class RegisteredUserController extends Controller
 {
@@ -31,20 +33,30 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'role' => ['required', 'in:admin,tim_desain,tim_produksi,driver,logistik,staff'],
+            'password' => ['nullable', 'confirmed', Rules\Password::defaults()], // password optional
         ]);
+
+        // kalau password kosong, buat random
+        $password = $request->password ?? Str::random(10);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'role' => $request->role,
+            'password' => Hash::make($password),
         ]);
+
+        // opsional: kirim password random ke email user kalau mereka tidak isi password
+        // if(!$request->password){
+        //     Mail::to($request->email)->send(new \App\Mail\SendPasswordMail($password));
+        // }
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('dashboard'));
     }
 }

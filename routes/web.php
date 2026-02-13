@@ -17,6 +17,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 | PUBLIC ROUTES
 |--------------------------------------------------------------------------
 */
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -26,55 +27,106 @@ Route::get('/', function () {
 | AUTHENTICATED ROUTES
 |--------------------------------------------------------------------------
 */
+
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // ================= DASHBOARD =================
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN ONLY
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('role:admin')->group(function () {
 
-    Route::get('/dashboard/export-produksi-excel', [DashboardController::class, 'exportProduksiExcel'])
-        ->name('dashboard.exportProduksiExcel');
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('dashboard');
 
-    // ================= PROFILE =================
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        Route::get('/dashboard/export-produksi-excel', [DashboardController::class, 'exportProduksiExcel'])
+            ->name('dashboard.exportProduksiExcel');
 
-    //================== LOGOUT =================
+        // Orders
+        Route::resource('orders', OrderController::class);
+
+        Route::get('orders/{order}/invoice', [OrderController::class, 'invoice'])
+            ->name('orders.invoice');
+
+        Route::get('orders/{order}/invoice/download', [OrderController::class, 'downloadInvoice'])
+            ->name('orders.invoice.download');
+
+        // Acrylic Stocks
+        Route::resource('acrylic-stocks', AcrylicStockController::class);
+
+        // Inventory
+        Route::resource('inventories', InventoryController::class);
+
+        Route::post('/inventories/{id}/update-stock', [InventoryController::class, 'updateStock'])
+            ->name('inventories.updateStock');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | PRODUCTION (Admin + Tim Produksi)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('role:admin,tim_produksi')->group(function () {
+        Route::resource('productions', ProductionController::class)
+            ->only(['index', 'show', 'edit', 'update']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | DELIVERY (Admin + Driver)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('role:admin,driver')->group(function () {
+        Route::resource('delivery', DeliveryNoteController::class)
+            ->only(['index', 'show', 'edit', 'update']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | PICKUP (Admin + Logistik)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('role:admin,logistik')->group(function () {
+        Route::resource('pickup', PickupController::class)
+            ->only(['index', 'show', 'edit', 'update']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | DESIGN (Admin + Tim Desain)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('role:admin,tim_desain')->group(function () {
+        Route::resource('designs', DesignController::class)
+            ->only(['index', 'show', 'edit', 'update']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | PROFILE (Semua Role)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/profile', [ProfileController::class, 'index'])
+        ->name('profile.index');
+
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOGOUT
+    |--------------------------------------------------------------------------
+    */
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-        ->middleware('auth')
         ->name('logout');
-
-
-    // ================= ORDER =================
-    Route::resource('orders', OrderController::class);
-
-    Route::get('orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
-    Route::get('orders/{order}/invoice/download', [OrderController::class, 'downloadInvoice'])->name('orders.invoice.download');
-
-    // ================= ACRYLIC STOCK =================
-    Route::resource('acrylic-stocks', AcrylicStockController::class);
-
-    // ================= INVENTORY =================
-    Route::resource('inventories', InventoryController::class);
-    Route::post('/inventories/{id}/update-stock', [InventoryController::class, 'updateStock'])
-        ->name('inventories.updateStock');
-
-    // ================= PRODUCTION =================
-    Route::resource('productions', ProductionController::class)
-        ->only(['index', 'show', 'edit', 'update']);
-
-    // ================= DELIVERY / SURAT JALAN =================
-    Route::resource('delivery', DeliveryNoteController::class)
-        ->only(['index', 'show', 'edit', 'update']);
-
-    // ================= PICKUP =================
-    Route::resource('pickup', PickupController::class)
-        ->only(['index', 'show', 'edit', 'update']);
-
-    // ================= DESIGN =================
-    Route::resource('designs', DesignController::class)
-        ->only(['index', 'show', 'edit', 'update']);
 });
 
 require __DIR__.'/auth.php';
