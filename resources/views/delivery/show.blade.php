@@ -41,7 +41,10 @@
         </table>
 
         <a href="{{ route('delivery.index') }}"
-           class="btn btn-secondary mt-3">Kembali</a>
+           class="btn btn-secondary mt-3">
+           Kembali
+        </a>
+
     </div>
 </div>
 @endsection

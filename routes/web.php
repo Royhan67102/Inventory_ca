@@ -81,6 +81,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:admin,driver')->group(function () {
         Route::resource('delivery', DeliveryNoteController::class)
             ->only(['index', 'show', 'edit', 'update']);
+
+        Route::get('/delivery/{delivery}/surat-jalan-preview',
+            [DeliveryNoteController::class, 'previewSuratJalan']
+        )->name('delivery.suratjln.preview');
+
+        Route::get('delivery/{delivery}/surat-jalan',
+            [DeliveryNoteController::class, 'suratJalan']
+        )->name('delivery.suratjln');
     });
 
     /*

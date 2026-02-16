@@ -68,6 +68,7 @@ class DesignController extends Controller
         $validated = $request->validate([
             'designer'   => 'required|string|max:100',
             'status'     => 'required|in:menunggu,proses,selesai',
+            'deadline'   => 'nullable|date_format:d/m/Y',
             'catatan'    => 'nullable|string',
             'file_hasil' => 'required|file|max:10240',
         ]);
@@ -97,6 +98,16 @@ class DesignController extends Controller
                 'status'   => $validated['status'],
                 'catatan'  => $validated['catatan'] ?? null,
             ];
+
+            /* =====================
+            * FORMAT DEADLINE
+            * ===================== */
+            if ($request->deadline) {
+                $data['deadline'] = \Carbon\Carbon::createFromFormat(
+                    'd/m/Y',
+                    $request->deadline
+                )->format('Y-m-d');
+            }
 
             /* =====================
              * HANDLE FILE

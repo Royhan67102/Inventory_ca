@@ -79,7 +79,7 @@ class DeliveryNote extends Model
         static::updating(function ($delivery) {
 
             // ketika status berubah jadi dikirim
-            if ($delivery->isDirty('status') && $delivery->status === 'dikirim') {
+            if ($delivery->isDirty('status') && $delivery->status === 'proses') {
                 $delivery->tanggal_kirim ??= now();
             }
         });

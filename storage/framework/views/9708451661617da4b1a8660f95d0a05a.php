@@ -1,116 +1,114 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Edit Desain'); ?>
+<?php $__env->startSection('page-title', 'Edit Desain'); ?>
 
-@section('title', 'Edit Desain')
-@section('page-title', 'Edit Desain')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
-                <h5>Edit Desain - Order #{{ $design->order->id ?? '-' }}</h5>
+                <h5>Edit Desain - Order #<?php echo e($design->order->id ?? '-'); ?></h5>
             </div>
             <div class="card-body">
 
-                @if(session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
+                <?php if(session('success')): ?>
+                    <div class="alert alert-success"><?php echo e(session('success')); ?></div>
+                <?php endif; ?>
 
-                <form action="{{ route('designs.update', $design->id) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
+                <form action="<?php echo e(route('designs.update', $design->id)); ?>" method="POST" enctype="multipart/form-data">
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('PUT'); ?>
 
-                    {{-- Designer --}}
+                    
                     <div class="mb-3">
                         <label class="form-label">Designer</label>
                         <input type="text" name="designer" class="form-control"
-                               value="{{ old('designer', $design->designer) }}">
+                               value="<?php echo e(old('designer', $design->designer)); ?>">
                     </div>
 
-                    {{-- Status --}}
+                    
                     <div class="mb-3">
                         <label class="form-label">Status Desain</label>
                         <select name="status" class="form-select" required>
-                            <option value="menunggu" {{ $design->status == 'menunggu' ? 'selected' : '' }}>Menunggu</option>
-                            <option value="proses" {{ $design->status == 'proses' ? 'selected' : '' }}>Proses</option>
-                            <option value="selesai" {{ $design->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                            <option value="menunggu" <?php echo e($design->status == 'menunggu' ? 'selected' : ''); ?>>Menunggu</option>
+                            <option value="proses" <?php echo e($design->status == 'proses' ? 'selected' : ''); ?>>Proses</option>
+                            <option value="selesai" <?php echo e($design->status == 'selesai' ? 'selected' : ''); ?>>Selesai</option>
                         </select>
                     </div>
 
-                    {{-- Deadline --}}
+                    
                     <div class="mb-3">
                         <label class="form-label">Deadline</label>
                         <input
                             type="text"
                             name="deadline"
                             class="form-control"
-                            value="{{ old(
+                            value="<?php echo e(old(
                                 'deadline',
                                 optional($design->deadline ?? $design->order?->deadline)->format('d/m/Y')
-                            ) }}"
+                            )); ?>"
                         >
                     </div>
 
 
-                    {{-- Catatan --}}
+                    
                     <div class="mb-3">
                         <label class="form-label">Catatan</label>
-                        <textarea name="catatan" rows="3" class="form-control">{{ old('catatan', $design->catatan) }}</textarea>
+                        <textarea name="catatan" rows="3" class="form-control"><?php echo e(old('catatan', $design->catatan)); ?></textarea>
                     </div>
 
-                    {{-- File Awal (VIEW ONLY) --}}
-                    @if($design->file_awal)
+                    
+                    <?php if($design->file_awal): ?>
                         <div class="mb-3">
                             <label class="form-label">File Awal</label><br>
-                            <a href="{{ asset('storage/'.$design->file_awal) }}" target="_blank">
+                            <a href="<?php echo e(asset('storage/'.$design->file_awal)); ?>" target="_blank">
                                 Lihat File Awal
                             </a>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
-                    {{-- File Hasil --}}
+                    
                     <div class="mb-3">
                         <label class="form-label">Upload File Hasil</label>
                         <input type="file" name="file_hasil" class="form-control"
                                accept=".jpg,.jpeg,.png,.pdf,.ai,.psd">
 
-                        @if($design->file_hasil)
+                        <?php if($design->file_hasil): ?>
                             <small class="text-muted">
                                 File saat ini:
-                                <a href="{{ asset('storage/'.$design->file_hasil) }}" target="_blank">
+                                <a href="<?php echo e(asset('storage/'.$design->file_hasil)); ?>" target="_blank">
                                     Lihat File
                                 </a>
                             </small>
-                        @endif
+                        <?php endif; ?>
                     </div>
 
-                    {{-- Bukti Pengerjaan --}}
+                    
                     <div class="mb-3">
                         <label class="form-label">Bukti Pengerjaan</label>
                         <input type="file" name="bukti_pengerjaan" class="form-control"
                                accept=".jpg,.jpeg,.png,.pdf">
 
-                        @if($design->bukti_pengerjaan)
+                        <?php if($design->bukti_pengerjaan): ?>
                             <small class="text-muted">
                                 File saat ini:
-                                <a href="{{ asset('storage/'.$design->bukti_pengerjaan) }}" target="_blank">
+                                <a href="<?php echo e(asset('storage/'.$design->bukti_pengerjaan)); ?>" target="_blank">
                                     Lihat Bukti
                                 </a>
                             </small>
-                        @endif
+                        <?php endif; ?>
                     </div>
 
-                    {{-- Tanggal Selesai (READ ONLY) --}}
-                    @if($design->tanggal_selesai)
+                    
+                    <?php if($design->tanggal_selesai): ?>
                         <div class="mb-3">
                             <label class="form-label">Tanggal Selesai</label>
                             <input type="text" class="form-control" readonly
-                                   value="{{ $design->tanggal_selesai }}">
+                                   value="<?php echo e($design->tanggal_selesai); ?>">
                         </div>
-                    @endif
+                    <?php endif; ?>
 
                     <div class="d-flex justify-content-between">
-                        <a href="{{ route('designs.index') }}" class="btn btn-secondary">Kembali</a>
+                        <a href="<?php echo e(route('designs.index')); ?>" class="btn btn-secondary">Kembali</a>
                         <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                     </div>
 
@@ -120,4 +118,6 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/designs/edit.blade.php ENDPATH**/ ?>

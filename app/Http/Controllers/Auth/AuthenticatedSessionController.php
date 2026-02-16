@@ -24,6 +24,23 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
 {
+    // 🔹 VALIDASI RECAPTCHA
+    $request->validate([
+        'g-recaptcha-response' => ['required'],
+    ]);
+
+    // 🔹 VERIFIKASI KE GOOGLE
+    $response = \Illuminate\Support\Facades\Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+        'secret' => env('RECAPTCHA_SECRET_KEY'),
+        'response' => $request->input('g-recaptcha-response'),
+        'remoteip' => $request->ip(),
+    ]);
+
+    if (! $response->json('success')) {
+        return back()->withErrors(['g-recaptcha-response' => 'Captcha gagal, coba lagi.']);
+    }
+
+    // 🔹 AUTENTIKASI BAWAAN BREEZE
     $request->authenticate();
 
     $request->session()->regenerate();
@@ -31,7 +48,6 @@ class AuthenticatedSessionController extends Controller
     $user = Auth::user();
 
     switch ($user->role) {
-
         case 'admin':
             return redirect()->route('dashboard');
 

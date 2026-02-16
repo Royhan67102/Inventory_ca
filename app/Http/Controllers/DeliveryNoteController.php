@@ -6,6 +6,8 @@ use App\Models\DeliveryNote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class DeliveryNoteController extends Controller
 {
@@ -65,7 +67,7 @@ class DeliveryNoteController extends Controller
         $validated = $request->validate([
             'nama_pengirim'      => 'required|string|max:255',
             'driver'             => 'required|string|max:255',
-            'status'             => 'required|in:menunggu,dikirim,selesai',
+            'status'             => 'required|in:menunggu,proses,selesai',
             'jam_berangkat'      => 'nullable',
             'jam_sampai_tujuan'  => 'nullable',
             'jam_kembali'        => 'nullable',
@@ -75,8 +77,8 @@ class DeliveryNoteController extends Controller
         DB::transaction(function () use ($request, $validated, $delivery) {
 
             $allowedTransitions = [
-                'menunggu' => ['dikirim', 'selesai'],
-                'dikirim'  => ['selesai'],
+                'menunggu' => ['proses'],
+                'proses'  => ['selesai'],
             ];
 
 
@@ -121,4 +123,26 @@ class DeliveryNoteController extends Controller
             ->route('delivery.index')
             ->with('success', 'Delivery berhasil diperbarui');
     }
+
+    public function previewSuratJalan(DeliveryNote $delivery)
+    {
+        $delivery->load('order.customer');
+
+        return view('delivery.preview-suratjln', compact('delivery'));
+    }
+
+    public function suratJalan(DeliveryNote $delivery)
+    {
+        $delivery->load('order.customer');
+
+        $pdf = Pdf::loadView(
+            'delivery.suratjln',
+            compact('delivery')
+        )->setPaper('A4', 'portrait');
+
+        return $pdf->download(
+            'suratjln-' . $delivery->order->invoice_number . '.pdf'
+        );
+    }
+
 }

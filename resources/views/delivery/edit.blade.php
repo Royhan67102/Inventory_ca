@@ -26,7 +26,7 @@
                 <label>Status</label>
                 <select name="status" class="form-control">
                     <option value="menunggu" @selected($delivery->status=='menunggu')>Menunggu</option>
-                    <option value="dikirim" @selected($delivery->status=='dikirim')>Dikirim</option>
+                    <option value="proses" @selected($delivery->status=='proses')>Proses</option>
                     <option value="selesai" @selected($delivery->status=='selesai')>Selesai</option>
                 </select>
             </div>

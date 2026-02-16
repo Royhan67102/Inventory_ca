@@ -7,7 +7,7 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 </head>
 
 <body class="min-h-screen bg-gray-100">
@@ -32,6 +32,7 @@
             </h1>
             <p class="text-gray-500 mb-8">Welcome back</p>
 
+            {{-- Status session (misal logout sukses atau email verifikasi dikirim) --}}
             <x-auth-session-status class="mb-4" :status="session('status')" />
 
             <form method="POST" action="{{ route('login') }}" class="space-y-5">
@@ -60,7 +61,7 @@
                     <x-input-error :messages="$errors->get('password')" class="mt-2" />
                 </div>
 
-                {{-- Remember & Forgot --}}
+                {{-- Remember me & Forgot password --}}
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm gap-2">
                     <label class="flex items-center">
                         <input type="checkbox" name="remember"
@@ -74,6 +75,14 @@
                             Forgot password?
                         </a>
                     @endif
+                </div>
+
+                {{-- Google reCAPTCHA --}}
+                <div class="my-4">
+                    <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
+                    @error('g-recaptcha-response')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 {{-- Login Button --}}
@@ -108,6 +117,9 @@
     </div>
 
 </div>
+
+{{-- Load Google reCAPTCHA script di bawah --}}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 </body>
 </html>

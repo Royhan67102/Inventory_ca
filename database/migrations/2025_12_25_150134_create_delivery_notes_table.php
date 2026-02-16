@@ -34,8 +34,7 @@ return new class extends Migration
             // ================= STATUS =================
             $table->enum('status', [
                 'menunggu',
-                'berangkat',
-                'sampai',
+                'proses',
                 'selesai'
             ])->default('menunggu');
 

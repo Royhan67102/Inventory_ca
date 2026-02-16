@@ -49,6 +49,12 @@
                             <?php endif; ?>
 
                             
+                            <a href="<?php echo e(route('delivery.suratjln.preview',$delivery->id)); ?>"
+                               class="btn btn-success btn-sm">
+                               Surat Jalan
+                            </a>
+
+                            
                             <a href="<?php echo e(route('orders.show',$delivery->order_id)); ?>"
                                class="btn btn-info btn-sm">
                                Order

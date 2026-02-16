@@ -17,10 +17,14 @@ class ProductionController extends Controller
                 'order.customer',
                 'order.design'
             ])
-            ->whereHas('order.design', function ($q) {
-                $q->where('status', 'selesai');
+            ->where(function ($query) {
+
+                $query->whereHas('order.design', function ($q) {
+                    $q->where('status', 'selesai');
+                })
+                ->orWhereDoesntHave('order.design'); // 🔥 TAMBAHKAN INI
             })
-            ->whereIn('status', ['menunggu', 'proses']) // lebih aman
+            ->whereIn('status', ['menunggu', 'proses'])
             ->latest()
             ->get();
 
@@ -67,6 +71,8 @@ class ProductionController extends Controller
         $validated = $request->validate([
             'tim_produksi'       => 'nullable|string|max:255',
             'status'             => 'required|in:menunggu,proses,selesai',
+            'tanggal_mulai'      => 'nullable|date',
+            'tanggal_selesai'   => 'nullable|date|after_or_equal:tanggal_mulai',
             'catatan'            => 'nullable|string',
             'bukti'              => 'nullable|file|max:10240',
         ]);
@@ -106,7 +112,9 @@ class ProductionController extends Controller
         /* =====================
          * UPDATE DATA
          * ===================== */
-        $production->update($validated);
+        $data = $validated;
+
+        $production->update($data);
 
         // ⚠️ Tidak perlu update order di sini
         // Karena sudah ditangani di Model (booted updating)

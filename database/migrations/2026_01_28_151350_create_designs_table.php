@@ -22,6 +22,8 @@ return new class extends Migration
                 'selesai'
             ])->default('menunggu');
 
+            $table->date('deadline')->nullable();
+            
             $table->text('catatan')->nullable();
 
             // ================= FILE =================

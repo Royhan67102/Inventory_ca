@@ -49,6 +49,12 @@
                                 </button>
                             @endif
 
+                            {{-- SURAT JALAN --}}
+                            <a href="{{ route('delivery.suratjln.preview',$delivery->id) }}"
+                               class="btn btn-success btn-sm">
+                               Surat Jalan
+                            </a>
+
                             {{-- LIHAT ORDER --}}
                             <a href="{{ route('orders.show',$delivery->order_id) }}"
                                class="btn btn-info btn-sm">
