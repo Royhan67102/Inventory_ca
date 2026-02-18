@@ -62,7 +62,7 @@ class OrderController extends Controller
         $validated = $request->validate([
             'nama'     => 'required|string|max:100',
             'alamat'   => 'required|string',
-            'telepon'  => 'required|string|max:20',
+            'telepon'  => 'required|numeric',
 
             'tanggal_pemesanan' => 'required|date',
             'deadline'          => 'nullable|date',

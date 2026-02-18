@@ -31,7 +31,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">Telepon</label>
-                    <input type="text" name="telepon" class="form-control border rounded-2" required>
+                    <input type="number" name="telepon" class="form-control border rounded-2" required>
                 </div>
             </div>
         </div>
