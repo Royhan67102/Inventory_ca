@@ -1,6 +1,11 @@
 <?php $__env->startSection('title', 'Preview Surat Jalan'); ?>
 
 <?php $__env->startSection('content'); ?>
+<div style="text-align: right; margin-bottom: 20px;">
+    <a href="<?php echo e(route('delivery.index')); ?>" class="btn btn-secondary btn-sm">
+        ← Kembali
+    </a>
+</div>
 
 <div class="container d-flex justify-content-center">
 

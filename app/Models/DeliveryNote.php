@@ -68,8 +68,10 @@ class DeliveryNote extends Model
             // auto tanggal kirim
             $delivery->tanggal_kirim ??= now();
 
-            // sync status ke order
-            if ($delivery->order) {
+            // sync status ke order hanya jika order memang berada di tahap pickup
+            // sehingga pembuatan record DeliveryNote saat order masih di desain/produksi
+            // tidak akan mengubah status proses yang sedang berjalan.
+            if ($delivery->order && $delivery->order->status === 'pickup') {
                 $delivery->order->updateQuietly([
                     'status' => 'delivery'
                 ]);

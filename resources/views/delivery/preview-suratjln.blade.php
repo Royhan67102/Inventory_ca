@@ -3,6 +3,11 @@
 @section('title', 'Preview Surat Jalan')
 
 @section('content')
+<div style="text-align: right; margin-bottom: 20px;">
+    <a href="{{ route('delivery.index') }}" class="btn btn-secondary btn-sm">
+        ← Kembali
+    </a>
+</div>
 
 <div class="container d-flex justify-content-center">
 

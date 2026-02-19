@@ -6,6 +6,7 @@ use App\Models\DeliveryNote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 
@@ -68,50 +69,60 @@ class DeliveryNoteController extends Controller
             'nama_pengirim'      => 'required|string|max:255',
             'driver'             => 'required|string|max:255',
             'status'             => 'required|in:menunggu,proses,selesai',
-            'jam_berangkat'      => 'nullable',
-            'jam_sampai_tujuan'  => 'nullable',
-            'jam_kembali'        => 'nullable',
+            'jam_berangkat'      => 'nullable|string',
+            'jam_sampai_tujuan'  => 'nullable|string',
+            'jam_kembali'        => 'nullable|string',
             'bukti_foto'         => 'nullable|file|image|max:10240',
         ]);
 
-        DB::transaction(function () use ($request, $validated, $delivery) {
+        try {
+            DB::transaction(function () use ($request, $validated, $delivery) {
 
-            $allowedTransitions = [
-                'menunggu' => ['proses'],
-                'proses'  => ['selesai'],
-            ];
+                // Validasi transisi status - hanya jika status benar-benar berubah
+                $newStatus = $validated['status'];
+                $currentStatus = $delivery->status;
 
+                if ($newStatus !== $currentStatus) {
+                    // Transisi yang diperbolehkan (izinkan langsung ke 'selesai')
+                    $allowedTransitions = [
+                        'menunggu' => ['proses', 'selesai'],
+                        'proses'   => ['selesai'],
+                    ];
 
-            if (
-                isset($allowedTransitions[$delivery->status]) &&
-                !in_array($validated['status'], $allowedTransitions[$delivery->status]) &&
-                $validated['status'] !== $delivery->status
-            ) {
-                throw new \Exception('Transisi status tidak valid.');
-            }
-
-            $data = $validated;
-
-            if ($request->hasFile('bukti_foto')) {
-
-                if ($delivery->bukti_foto) {
-                    Storage::disk('public')->delete($delivery->bukti_foto);
+                    // Jika transisi tidak valid, lempar exception
+                    if (!isset($allowedTransitions[$currentStatus]) || !in_array($newStatus, $allowedTransitions[$currentStatus])) {
+                        throw new \Exception('Transisi status tidak valid: dari ' . ucfirst($currentStatus) . ' ke ' . ucfirst($newStatus) . '. Diizinkan: ' . (isset($allowedTransitions[$currentStatus]) ? implode(', ', $allowedTransitions[$currentStatus]) : 'tidak ada'));
+                    }
                 }
 
-                $data['bukti_foto'] =
-                    $request->file('bukti_foto')
-                        ->store('deliveries', 'public');
-            }
+                $data = $validated;
 
-            $delivery->update($data);
+                // Handle file upload
+                if ($request->hasFile('bukti_foto')) {
+                    // Hapus foto lama jika ada
+                    if ($delivery->bukti_foto) {
+                        Storage::disk('public')->delete($delivery->bukti_foto);
+                    }
 
-            // ✅ Model event handler di DeliveryNote.php akan otomatis:
-            // - Mengupdate status order ke 'selesai' ketika delivery status = 'selesai'
-        });
+                    $data['bukti_foto'] =
+                        $request->file('bukti_foto')
+                            ->store('deliveries', 'public');
+                }
 
-        return redirect()
-            ->route('delivery.index')
-            ->with('success', 'Delivery berhasil diperbarui');
+                // Update delivery - model event handler akan otomatis update order status
+                $delivery->update($data);
+
+            });
+
+            return redirect()
+                ->route('delivery.index')
+                ->with('success', 'Delivery berhasil diperbarui!');
+
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', $e->getMessage());
+        }
     }
 
     public function previewSuratJalan(DeliveryNote $delivery)
