@@ -116,9 +116,15 @@
                             Invoice
                         </a>
 
-                        <a href="<?php echo e(route('orders.edit', $order)); ?>" class="btn btn-primary btn-sm">
-                            Edit
-                        </a>
+                        <?php if(in_array($order->status, ['desain', 'produksi'])): ?>
+                            <a href="<?php echo e(route('orders.edit', $order)); ?>" class="btn btn-primary btn-sm">
+                                Edit
+                            </a>
+                        <?php else: ?>
+                            <button type="button" class="btn btn-primary btn-sm" disabled>
+                                Edit
+                            </button>
+                        <?php endif; ?>
 
                         <button
                             type="button"

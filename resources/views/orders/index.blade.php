@@ -113,9 +113,15 @@
                             Invoice
                         </a>
 
-                        <a href="{{ route('orders.edit', $order) }}" class="btn btn-primary btn-sm">
-                            Edit
-                        </a>
+                        @if(in_array($order->status, ['desain', 'produksi']))
+                            <a href="{{ route('orders.edit', $order) }}" class="btn btn-primary btn-sm">
+                                Edit
+                            </a>
+                        @else
+                            <button type="button" class="btn btn-primary btn-sm" disabled>
+                                Edit
+                            </button>
+                        @endif
 
                         <button
                             type="button"

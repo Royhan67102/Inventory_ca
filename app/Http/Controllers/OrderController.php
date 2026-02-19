@@ -42,6 +42,11 @@ class OrderController extends Controller
 
     public function edit(Order $order)
     {
+        // Prevent edit jika sudah masuk tahap pickup atau delivery
+        if (in_array($order->status, ['pickup', 'delivery', 'selesai'])) {
+            return back()->with('error', 'Order tidak dapat diubah pada tahap ' . ucfirst($order->status) . '.');
+        }
+
         $order->load([
             'customer',
             'items',
@@ -236,8 +241,9 @@ class OrderController extends Controller
      * ===================== */
     public function update(Request $request, Order $order)
     {
-        if ($order->status === 'selesai') {
-            return back()->with('error', 'Order sudah selesai dan tidak dapat diubah.');
+        // Prevent update jika sudah masuk tahap pickup atau delivery
+        if (in_array($order->status, ['pickup', 'delivery', 'selesai'])) {
+            return back()->with('error', 'Order tidak dapat diubah pada tahap ' . ucfirst($order->status) . '.');
         }
 
         $validated = $request->validate([
@@ -324,66 +330,72 @@ class OrderController extends Controller
                     ($validated['biaya_pemasangan'] ?? 0)
             ]);
 
-           /* ================= FLOW STATUS CUSTOM ================= */
-            if ($validated['tipe_order'] === 'custom') {
+           /* ================= FLOW STATUS ONLY UPDATE IF AT DESIGN STAGE ================= */
+            // Hanya update flow status ketika masih di tahap desain
+            // Jika sudah di tahap produksi atau lebih lanjut, jangan ubah statusnya lagi
+            if ($order->status === 'desain') {
+                
+                if ($validated['tipe_order'] === 'custom') {
 
-                if ($validated['jasa_desain'] == 1) {
+                    if ($validated['jasa_desain'] == 1) {
 
-                    // Harus masuk tahap DESAIN dulu
-                    $order->update([
-                        'status' => 'desain'
-                    ]);
+                        // Tetap di tahap DESAIN
+                        $order->update([
+                            'status' => 'desain'
+                        ]);
 
-                    // 🔥 TAMBAHAN (sinkron data)
-                    $order->design()->firstOrCreate([
-                        'order_id' => $order->id
-                    ]);
+                        // 🔥 TAMBAHAN (sinkron data)
+                        $order->design()->firstOrCreate([
+                            'order_id' => $order->id
+                        ]);
 
-                    $order->production()->delete();
+                        $order->production()->delete();
 
-                    // Pastikan tidak ada delivery / pickup
-                    $order->deliveryNote()->delete();
-                    $order->pickup()->delete();
+                        // Pastikan tidak ada delivery / pickup
+                        $order->deliveryNote()->delete();
+                        $order->pickup()->delete();
 
-                } else {
+                    } else {
 
-                    // Kalau tidak pakai jasa desain → langsung PRODUKSI
+                        // Kalau tidak pakai jasa desain → langsung PRODUKSI
+                        $order->update([
+                            'status' => 'produksi'
+                        ]);
+
+                        // 🔥 TAMBAHAN (sinkron data)
+                        $order->design()->delete();
+
+                        $order->production()->firstOrCreate([
+                            'order_id' => $order->id
+                        ]);
+
+                        // Hapus delivery & pickup juga
+                        $order->deliveryNote()->delete();
+                        $order->pickup()->delete();
+                    }
+                }
+
+                /* ================= LEMBARAN ================= */
+                if ($validated['tipe_order'] === 'lembaran') {
+
+                    $order->design()->delete();
+
+                    // Tipe lembaran harus masuk produksi
                     $order->update([
                         'status' => 'produksi'
                     ]);
 
-                    // 🔥 TAMBAHAN (sinkron data)
-                    $order->design()->delete();
-
+                    // 🔥 Buat Production jika belum ada
                     $order->production()->firstOrCreate([
                         'order_id' => $order->id
                     ]);
 
-                    // Hapus delivery & pickup juga
+                    // Hapus delivery & pickup (akan dibuat otomatis saat production selesai)
                     $order->deliveryNote()->delete();
                     $order->pickup()->delete();
                 }
             }
-
-            /* ================= LEMBARAN ================= */
-            if ($validated['tipe_order'] === 'lembaran') {
-
-                $order->design()->delete();
-
-                // Tipe lembaran harus masuk produksi
-                $order->update([
-                    'status' => 'produksi'
-                ]);
-
-                // 🔥 Buat Production jika belum ada
-                $order->production()->firstOrCreate([
-                    'order_id' => $order->id
-                ]);
-
-                // Hapus delivery & pickup (akan dibuat otomatis saat production selesai)
-                $order->deliveryNote()->delete();
-                $order->pickup()->delete();
-            }
+            // Jika sudah di tahap produksi/selanjutnya, jangan ubah status, cukup update data items saja
 
             /* ================= UPDATE FILE DESAIN ================= */
             if ($request->hasFile('file_desain')) {
