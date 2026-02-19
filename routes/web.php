@@ -28,7 +28,7 @@ Route::get('/', function () {
             'tim_desain' => redirect()->route('designs.index'),
             'tim_produksi' => redirect()->route('productions.index'),
             'driver' => redirect()->route('delivery.index'),
-            'logistik' => redirect()->route('pickup.index'),
+            'logistik' => redirect()->route('acrylic-stocks.index'),
             default => redirect()->route('login'),
         };
     }
@@ -68,11 +68,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('orders/{order}/invoice/download', [OrderController::class, 'downloadInvoice'])
             ->name('orders.invoice.download');
+    });
 
-        // Acrylic Stocks
+    /*
+    |--------------------------------------------------------------------------
+    | ACRYLIC STOCKS (Admin + Logistik)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('role:admin,logistik')->group(function () {
         Route::resource('acrylic-stocks', AcrylicStockController::class);
+    });
 
-        // Inventory
+    /*
+    |--------------------------------------------------------------------------
+    | INVENTORY (Admin + Logistik)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('role:admin,logistik')->group(function () {
         Route::resource('inventories', InventoryController::class);
 
         Route::post('/inventories/{id}/update-stock', [InventoryController::class, 'updateStock'])
@@ -109,10 +121,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | PICKUP (Admin + Logistik)
+    | PICKUP (Admin + Driver + Logistik)
     |--------------------------------------------------------------------------
     */
-    Route::middleware('role:admin,logistik')->group(function () {
+    Route::middleware('role:admin,driver,logistik')->group(function () {
         Route::resource('pickup', PickupController::class)
             ->only(['index', 'show', 'edit', 'update']);
     });

@@ -48,7 +48,6 @@
                 </li>
                 <?php endif; ?>
 
-
                 
                 <?php if(in_array($role, ['admin','tim_produksi'])): ?>
                 <li class="nav-item">
@@ -59,7 +58,6 @@
                     </a>
                 </li>
                 <?php endif; ?>
-
 
                 
                 <?php if(in_array($role, ['admin','driver'])): ?>
@@ -72,9 +70,8 @@
                 </li>
                 <?php endif; ?>
 
-
                 
-                <?php if(in_array($role, ['admin','logistik'])): ?>
+                <?php if(in_array($role, ['admin','driver','logistik'])): ?>
                 <li class="nav-item">
                     <a class="nav-link <?php echo e(request()->routeIs('pickup.*') ? 'active bg-gradient-dark text-white' : 'text-dark'); ?>"
                         href="<?php echo e(route('pickup.index')); ?>">
@@ -84,6 +81,51 @@
                 </li>
                 <?php endif; ?>
 
+                
+                <?php if(in_array($role, ['admin','logistik'])): ?>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo e(request()->routeIs('acrylic-stocks.*') ? 'active bg-gradient-dark text-white' : 'text-dark'); ?>"
+                        href="<?php echo e(route('acrylic-stocks.index')); ?>">
+                        <i class="material-symbols-rounded opacity-5">package_2</i>
+                        <span class="nav-link-text ms-1">Acrylic Stocks</span>
+                    </a>
+                </li>
+                <?php endif; ?>
+
+                
+                <?php if(in_array($role, ['admin','logistik'])): ?>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo e(request()->routeIs('inventories.*') ? 'active bg-gradient-dark text-white' : 'text-dark'); ?>"
+                        href="<?php echo e(route('inventories.index')); ?>">
+                        <i class="material-symbols-rounded opacity-5">inventory</i>
+                        <span class="nav-link-text ms-1">Inventory</span>
+                    </a>
+                </li>
+                <?php endif; ?>
+
+            <?php elseif($role === 'driver'): ?>
+
+                
+                <li class="nav-item">
+                    <a class="nav-link <?php echo e(request()->routeIs('delivery.*') ? 'active bg-gradient-dark text-white' : 'text-dark'); ?>"
+                        href="<?php echo e(route('delivery.index')); ?>">
+                        <i class="material-symbols-rounded opacity-5">local_shipping</i>
+                        <span class="nav-link-text ms-1">Pengiriman</span>
+                    </a>
+                </li>
+
+                
+                <li class="nav-item">
+                    <a class="nav-link <?php echo e(request()->routeIs('pickup.*') ? 'active bg-gradient-dark text-white' : 'text-dark'); ?>"
+                        href="<?php echo e(route('pickup.index')); ?>">
+                        <i class="material-symbols-rounded opacity-5">move_to_inbox</i>
+                        <span class="nav-link-text ms-1">Pickup</span>
+                    </a>
+                </li>
+
+            <?php elseif($role === 'logistik'): ?>
+
+                
                 <li class="nav-item">
                     <a class="nav-link <?php echo e(request()->routeIs('acrylic-stocks.*') ? 'active bg-gradient-dark text-white' : 'text-dark'); ?>"
                         href="<?php echo e(route('acrylic-stocks.index')); ?>">
@@ -92,11 +134,43 @@
                     </a>
                 </li>
 
+                
                 <li class="nav-item">
                     <a class="nav-link <?php echo e(request()->routeIs('inventories.*') ? 'active bg-gradient-dark text-white' : 'text-dark'); ?>"
                         href="<?php echo e(route('inventories.index')); ?>">
                         <i class="material-symbols-rounded opacity-5">inventory</i>
                         <span class="nav-link-text ms-1">Inventory</span>
+                    </a>
+                </li>
+
+                
+                <li class="nav-item">
+                    <a class="nav-link <?php echo e(request()->routeIs('pickup.*') ? 'active bg-gradient-dark text-white' : 'text-dark'); ?>"
+                        href="<?php echo e(route('pickup.index')); ?>">
+                        <i class="material-symbols-rounded opacity-5">move_to_inbox</i>
+                        <span class="nav-link-text ms-1">Pickup</span>
+                    </a>
+                </li>
+
+            <?php elseif($role === 'tim_desain'): ?>
+
+                
+                <li class="nav-item">
+                    <a class="nav-link <?php echo e(request()->routeIs('designs.*') ? 'active bg-gradient-dark text-white' : 'text-dark'); ?>"
+                        href="<?php echo e(route('designs.index')); ?>">
+                        <i class="material-symbols-rounded opacity-5">draw</i>
+                        <span class="nav-link-text ms-1">Desain</span>
+                    </a>
+                </li>
+
+            <?php elseif($role === 'tim_produksi'): ?>
+
+                
+                <li class="nav-item">
+                    <a class="nav-link <?php echo e(request()->routeIs('productions.*') ? 'active bg-gradient-dark text-white' : 'text-dark'); ?>"
+                        href="<?php echo e(route('productions.index')); ?>">
+                        <i class="material-symbols-rounded opacity-5">factory</i>
+                        <span class="nav-link-text ms-1">Produksi</span>
                     </a>
                 </li>
 

@@ -48,7 +48,6 @@
                 </li>
                 @endif
 
-
                 {{-- ================= PRODUKSI ================= --}}
                 @if(in_array($role, ['admin','tim_produksi']))
                 <li class="nav-item">
@@ -59,7 +58,6 @@
                     </a>
                 </li>
                 @endif
-
 
                 {{-- ================= DELIVERY ================= --}}
                 @if(in_array($role, ['admin','driver']))
@@ -72,9 +70,8 @@
                 </li>
                 @endif
 
-
                 {{-- ================= PICKUP ================= --}}
-                @if(in_array($role, ['admin','logistik']))
+                @if(in_array($role, ['admin','driver','logistik']))
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('pickup.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
                         href="{{ route('pickup.index') }}">
@@ -84,6 +81,51 @@
                 </li>
                 @endif
 
+                {{-- ================= ACRYLIC STOCKS ================= --}}
+                @if(in_array($role, ['admin','logistik']))
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('acrylic-stocks.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
+                        href="{{ route('acrylic-stocks.index') }}">
+                        <i class="material-symbols-rounded opacity-5">package_2</i>
+                        <span class="nav-link-text ms-1">Acrylic Stocks</span>
+                    </a>
+                </li>
+                @endif
+
+                {{-- ================= INVENTORIES ================= --}}
+                @if(in_array($role, ['admin','logistik']))
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('inventories.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
+                        href="{{ route('inventories.index') }}">
+                        <i class="material-symbols-rounded opacity-5">inventory</i>
+                        <span class="nav-link-text ms-1">Inventory</span>
+                    </a>
+                </li>
+                @endif
+
+            @elseif($role === 'driver')
+
+                {{-- ================= DELIVERY (DRIVER) ================= --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('delivery.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
+                        href="{{ route('delivery.index') }}">
+                        <i class="material-symbols-rounded opacity-5">local_shipping</i>
+                        <span class="nav-link-text ms-1">Pengiriman</span>
+                    </a>
+                </li>
+
+                {{-- ================= PICKUP (DRIVER) ================= --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('pickup.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
+                        href="{{ route('pickup.index') }}">
+                        <i class="material-symbols-rounded opacity-5">move_to_inbox</i>
+                        <span class="nav-link-text ms-1">Pickup</span>
+                    </a>
+                </li>
+
+            @elseif($role === 'logistik')
+
+                {{-- ================= ACRYLIC STOCKS (LOGISTIK) ================= --}}
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('acrylic-stocks.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
                         href="{{ route('acrylic-stocks.index') }}">
@@ -92,11 +134,43 @@
                     </a>
                 </li>
 
+                {{-- ================= INVENTORIES (LOGISTIK) ================= --}}
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('inventories.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
                         href="{{ route('inventories.index') }}">
                         <i class="material-symbols-rounded opacity-5">inventory</i>
                         <span class="nav-link-text ms-1">Inventory</span>
+                    </a>
+                </li>
+
+                {{-- ================= PICKUP ================= --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('pickup.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
+                        href="{{ route('pickup.index') }}">
+                        <i class="material-symbols-rounded opacity-5">move_to_inbox</i>
+                        <span class="nav-link-text ms-1">Pickup</span>
+                    </a>
+                </li>
+
+            @elseif($role === 'tim_desain')
+
+                {{-- ================= DESIGN (TIM DESAIN) ================= --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('designs.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
+                        href="{{ route('designs.index') }}">
+                        <i class="material-symbols-rounded opacity-5">draw</i>
+                        <span class="nav-link-text ms-1">Desain</span>
+                    </a>
+                </li>
+
+            @elseif($role === 'tim_produksi')
+
+                {{-- ================= PRODUKSI (TIM PRODUKSI) ================= --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('productions.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
+                        href="{{ route('productions.index') }}">
+                        <i class="material-symbols-rounded opacity-5">factory</i>
+                        <span class="nav-link-text ms-1">Produksi</span>
                     </a>
                 </li>
 

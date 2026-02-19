@@ -23,7 +23,7 @@ class AuthenticatedSessionController extends Controller
             'tim_desain' => redirect()->route('designs.index'),
             'tim_produksi' => redirect()->route('productions.index'),
             'driver' => redirect()->route('delivery.index'),
-            'logistik' => redirect()->route('pickup.index'),
+            'logistik' => redirect()->route('acrylic-stocks.index'),
             default => redirect()->route('login'),
         };
     }
@@ -74,7 +74,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('delivery.index');
 
         case 'logistik':
-            return redirect()->route('pickup.index');
+            return redirect()->route('acrylic-stocks.index');
 
         default:
                 return redirect()->route('login');
