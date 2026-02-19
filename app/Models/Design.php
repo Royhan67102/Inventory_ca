@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Production;
 
 class Design extends Model
 {
@@ -65,10 +66,22 @@ class Design extends Model
 
                 $design->tanggal_selesai ??= now();
 
-                // ⬇️ otomatis lanjut ke produksi
-                $design->order?->updateQuietly([
+                $order = $design->order;
+
+                if (!$order) {
+                    return;
+                }
+
+                // ⬇️ WAJIB PINDAH KE PRODUKSI TERLEBIH DAHULU
+                $order->updateQuietly([
                     'status' => 'produksi'
                 ]);
+
+                // Buat Production record jika belum ada
+                Production::firstOrCreate(
+                    ['order_id' => $order->id],
+                    ['status' => 'menunggu']
+                );
             }
         });
 

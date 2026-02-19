@@ -105,18 +105,8 @@ class DeliveryNoteController extends Controller
 
             $delivery->update($data);
 
-            /* =====================
-            * JIKA DELIVERY SELESAI
-            * ===================== */
-            if (
-                $validated['status'] === 'selesai' &&
-                $delivery->order &&
-                $delivery->order->status !== 'selesai'
-            ) {
-                $delivery->order->updateQuietly([
-                    'status' => 'selesai'
-                ]);
-            }
+            // ✅ Model event handler di DeliveryNote.php akan otomatis:
+            // - Mengupdate status order ke 'selesai' ketika delivery status = 'selesai'
         });
 
         return redirect()

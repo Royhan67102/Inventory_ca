@@ -94,16 +94,8 @@ class PickupController extends Controller
 
             $pickup->update($data);
 
-            /* =====================
-             * JIKA SELESAI
-             * ===================== */
-            if ($validated['status'] === 'selesai') {
-
-                // Sync ke order
-                $pickup->order()->update([
-                    'status' => 'selesai'
-                ]);
-            }
+            // ✅ Model event handler di Pickup.php akan otomatis:
+            // - Mengupdate status order ke 'selesai' ketika pickup status = 'selesai'
         });
 
         return redirect()

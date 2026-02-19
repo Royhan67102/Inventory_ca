@@ -19,8 +19,24 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+
+    if (auth()->check()) {
+        $user = auth()->user();
+
+        return match ($user->role) {
+            'admin' => redirect()->route('dashboard'),
+            'tim_desain' => redirect()->route('designs.index'),
+            'tim_produksi' => redirect()->route('productions.index'),
+            'driver' => redirect()->route('delivery.index'),
+            'logistik' => redirect()->route('pickup.index'),
+            default => redirect()->route('login'),
+        };
+    }
+
+    return redirect()->route('login');
+
 });
+
 
 /*
 |--------------------------------------------------------------------------

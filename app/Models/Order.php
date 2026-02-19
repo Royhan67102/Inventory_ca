@@ -150,41 +150,6 @@ class Order extends Model
             $order->total_harga      ??= 0;
         });
 
-        static::created(function ($order) {
-
-            if ($order->isCustom()) {
-
-                $order->updateQuietly(['status' => 'desain']);
-
-                // otomatis buat desain
-                Design::create([
-                    'order_id' => $order->id,
-                    'status' => 'menunggu',
-                ]);
-
-            } else {
-                // 🔥 LEMBARAN
-                if ($order->isDelivery()) {
-
-                    $order->updateQuietly(['status' => 'delivery']);
-
-                    DeliveryNote::create([
-                        'order_id' => $order->id,
-                        'status' => 'menunggu',
-                    ]);
-
-                } else {
-
-                    $order->updateQuietly(['status' => 'pickup']);
-
-                    Pickup::create([
-                        'order_id' => $order->id,
-                        'status' => 'menunggu',
-                    ]);
-                }
-            }
-        });
-
         static::updated(function ($order) {
 
             if ($order->wasChanged('antar_barang')) {

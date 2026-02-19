@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Pickup;
+use App\Models\DeliveryNote;
 
 class Production extends Model
 {
@@ -89,6 +91,9 @@ class Production extends Model
                         'order_id' => $order->id
                     ]);
 
+                    // Hapus pickup jika ada
+                    $order->pickup()->delete();
+
                 } else {
 
                     // lanjut ke pickup
@@ -99,6 +104,9 @@ class Production extends Model
                     $order->pickup()->firstOrCreate([
                         'order_id' => $order->id
                     ]);
+
+                    // Hapus delivery jika ada
+                    $order->deliveryNote()->delete();
                 }
             }
         });

@@ -37,35 +37,30 @@
                             {{ ucfirst($pickup->status) }}
                         </span>
                     </td>
+                    <td class="text-center">
+                        <a href="{{ route('pickup.show',$pickup->id) }}"
+                            class="btn btn-primary btn-sm">
+                            Detail
+                        </a>
 
-                    {{-- AKSI --}}
-                    {{-- AKSI --}}
-                        <td class="text-center">
-
-                            <a href="{{ route('pickup.show',$pickup->id) }}"
-                                class="btn btn-primary btn-sm">
-                                Detail
+                        {{-- UPDATE --}}
+                        @if($pickup->status !== 'selesai')
+                            <a href="{{ route('pickup.edit',$pickup->id) }}"
+                               class="btn btn-warning btn-sm">
+                               Update
                             </a>
+                        @else
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                Locked
+                            </button>
+                        @endif
 
-                            {{-- UPDATE --}}
-                            @if($pickup->status !== 'selesai')
-                                <a href="{{ route('pickup.edit',$pickup->id) }}"
-                                   class="btn btn-warning btn-sm">
-                                   Update
-                                </a>
-                            @else
-                                <button class="btn btn-secondary btn-sm" disabled>
-                                    Locked
-                                </button>
-                            @endif
-
-                            {{-- LIHAT ORDER --}}
-                            <a href="{{ route('orders.show',$pickup->order_id) }}"
-                               class="btn btn-info btn-sm">
-                               Order
-                            </a>
-
-                        </td>
+                        {{-- LIHAT ORDER --}}
+                        <a href="{{ route('orders.show',$pickup->order_id) }}"
+                           class="btn btn-info btn-sm">
+                           Order
+                        </a>
+                    </td>
                 </tr>
             @empty
                 <tr>

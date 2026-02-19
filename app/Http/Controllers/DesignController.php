@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Design;
-use App\Models\Production;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -135,22 +134,9 @@ class DesignController extends Controller
 
             $design->update($data);
 
-            /* =====================
-             * KIRIM KE PRODUCTION
-             * ===================== */
-            if ($validated['status'] === 'selesai') {
-
-                // 1️⃣ Buat / pastikan ada production
-                Production::firstOrCreate(
-                    ['order_id' => $design->order_id],
-                    ['status' => 'menunggu']
-                );
-
-                // 2️⃣ Ubah status order ke produksi
-                $design->order()->update([
-                    'status' => 'produksi'
-                ]);
-            }
+            // ✅ Model event handler di Design.php akan otomatis:
+            // - Membuat Production
+            // - Mengupdate status order ke 'produksi'
         });
 
         return redirect()

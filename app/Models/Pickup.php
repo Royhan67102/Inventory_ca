@@ -59,5 +59,18 @@ class Pickup extends Model
                 ]);
             }
         });
+
+        static::updating(function ($pickup) {
+
+            // ketika pickup dinyatakan selesai
+            if ($pickup->isDirty('status') && $pickup->status === 'selesai') {
+
+                // update order status ke selesai
+                $pickup->order?->updateQuietly([
+                    'status'   => 'selesai',
+                    'catatan' => 'Barang sudah diambil customer',
+                ]);
+            }
+        });
     }
 }

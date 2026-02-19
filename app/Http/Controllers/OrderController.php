@@ -96,19 +96,13 @@ class OrderController extends Controller
             ]);
 
             /* ================= STATUS AWAL ================= */
-            if ($validated['tipe_order'] === 'custom') {
-
-                if (($validated['jasa_desain'] ?? '0') == '1') {
-                    $status = 'desain';
-                } else {
-                    $status = 'produksi';
-                }
-
+            // Status ditentukan berdasarkan jasa desain
+            if ($validated['tipe_order'] === 'custom' && ($validated['jasa_desain'] ?? '0') == '1') {
+                // Custom dengan jasa desain → langsung ke desain
+                $status = 'desain';
             } else {
-
-                $status = $validated['antar_barang'] == 1
-                    ? 'delivery'
-                    : 'pickup';
+                // Custom tanpa jasa desain, atau tipe lembaran → langsung ke produksi
+                $status = 'produksi';
             }
 
             /* ================= ORDER ================= */
@@ -167,20 +161,50 @@ class OrderController extends Controller
                     $order->biaya_pemasangan
             ]);
 
-            /* ================= DESIGN (CUSTOM) ================= */
+            /* ================= DESIGN (CUSTOM DENGAN JASA DESAIN) ================= */
             if (
                 $validated['tipe_order'] === 'custom' &&
-                ($validated['jasa_desain'] ?? '0') == '1' &&
-                $request->hasFile('file_desain')
+                ($validated['jasa_desain'] ?? '0') == '1'
             ) {
-
-                $path = $request->file('file_desain')
-                    ->store('desain/order', 'public');
+                // Buat Design record
+                $filePath = null;
+                if ($request->hasFile('file_desain')) {
+                    $filePath = $request->file('file_desain')
+                        ->store('desain/order', 'public');
+                }
 
                 Design::create([
                     'order_id'  => $order->id,
                     'status'    => 'menunggu',
-                    'file_awal' => $path,
+                    'file_awal' => $filePath,
+                ]);
+            }
+
+            /* ================= PRODUCTION (CUSTOM TANPA JASA DESAIN) ================= */
+            if (
+                $validated['tipe_order'] === 'custom' &&
+                ($validated['jasa_desain'] ?? '0') == '0'
+            ) {
+                // Langsung buat Production record
+                Production::create([
+                    'order_id' => $order->id,
+                    'status'   => 'menunggu',
+                ]);
+            }
+
+            /* ================= PRODUCTION ================= */
+            // Semua order harus melewati produksi (kecuali yang pakai desain, itu nanti otomatis)
+            if ($validated['tipe_order'] === 'custom' && ($validated['jasa_desain'] ?? '0') == '0') {
+                // Custom tanpa jasa desain → langsung buat Production
+                Production::create([
+                    'order_id' => $order->id,
+                    'status'   => 'menunggu',
+                ]);
+            } else if ($validated['tipe_order'] === 'lembaran') {
+                // Tipe lembaran → langsung buat Production
+                Production::create([
+                    'order_id' => $order->id,
+                    'status'   => 'menunggu',
                 ]);
             }
         });
@@ -345,32 +369,20 @@ class OrderController extends Controller
             if ($validated['tipe_order'] === 'lembaran') {
 
                 $order->design()->delete();
-                $order->production()->delete();
 
-                $statusAkhir = $validated['antar_barang'] == 1
-                    ? 'delivery'
-                    : 'pickup';
-
+                // Tipe lembaran harus masuk produksi
                 $order->update([
-                    'status' => $statusAkhir
+                    'status' => 'produksi'
                 ]);
 
-                if ($statusAkhir === 'delivery') {
+                // 🔥 Buat Production jika belum ada
+                $order->production()->firstOrCreate([
+                    'order_id' => $order->id
+                ]);
 
-                    $order->deliveryNote()->firstOrCreate([
-                        'order_id' => $order->id
-                    ]);
-
-                    $order->pickup()->delete();
-
-                } else {
-
-                    $order->pickup()->firstOrCreate([
-                        'order_id' => $order->id
-                    ]);
-
-                    $order->deliveryNote()->delete();
-                }
+                // Hapus delivery & pickup (akan dibuat otomatis saat production selesai)
+                $order->deliveryNote()->delete();
+                $order->pickup()->delete();
             }
 
             /* ================= UPDATE FILE DESAIN ================= */

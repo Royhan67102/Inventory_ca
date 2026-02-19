@@ -28,7 +28,7 @@
         <div class="flex flex-col justify-center p-8 md:p-12">
 
             <h1 class="text-3xl md:text-4xl font-bold mb-2">
-                Hi Designer 👋
+                Hi Cahaya Fams 👋
             </h1>
             <p class="text-gray-500 mb-8">Welcome back</p>
 

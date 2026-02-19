@@ -82,6 +82,16 @@ class DeliveryNote extends Model
             if ($delivery->isDirty('status') && $delivery->status === 'proses') {
                 $delivery->tanggal_kirim ??= now();
             }
+
+            // ketika pengiriman dinyatakan selesai
+            if ($delivery->isDirty('status') && $delivery->status === 'selesai') {
+
+                // update order status ke selesai
+                $delivery->order?->updateQuietly([
+                    'status'   => 'selesai',
+                    'catatan' => 'Pengiriman selesai',
+                ]);
+            }
         });
     }
 }
