@@ -27,7 +27,7 @@ class OrderController extends Controller
             'deliveryNote',
             'design',
             'pickup'
-        ])->latest()->get();
+        ])->where('status', '!=', 'selesai')->latest()->get();
 
         return view('orders.index', compact('orders'));
     }
