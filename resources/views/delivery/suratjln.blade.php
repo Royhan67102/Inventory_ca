@@ -4,29 +4,119 @@
 
 @section('content')
 
-<div class="container d-flex justify-content-center">
+<style>
 
-    <div id="printArea" style="
+/* ===== WRAPPER ===== */
+.surat-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* ===== DOKUMEN ===== */
+.surat-area {
+    position: relative;
+    width: 100%;
+    max-width: 210mm;
+    min-height: 297mm;
+    background: white;
+    padding: 25mm;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    font-family: sans-serif;
+    font-size: 12px;
+}
+
+/* ===== TABLE SAFE ===== */
+.surat-area table {
+    width: 100%;
+}
+
+/* ===== WATERMARK ===== */
+.watermark {
+    position:absolute;
+    top:40%;
+    left:20%;
+    font-size:70px;
+    color:rgba(0,0,0,0.05);
+    transform: rotate(-30deg);
+    z-index:0;
+}
+
+/* ===== TABLE BORDER ===== */
+.surat-area th,
+.surat-area td {
+    border: 1px solid black;
+    padding: 8px;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+
+    .surat-area {
+        padding: 20px;
+        font-size: 11px;
+    }
+
+    .surat-area img {
+        height: 60px !important;
+    }
+
+    .watermark {
+        font-size: 40px;
+        left: 10%;
+        top: 45%;
+    }
+
+    h2 {
+        font-size: 18px !important;
+    }
+
+    h3 {
+        font-size: 16px !important;
+    }
+}
+
+/* ===== SMALL PHONE ===== */
+@media (max-width: 480px) {
+
+    .surat-area {
+        padding: 15px;
+        font-size: 10px;
+    }
+
+    .watermark {
+        font-size: 30px;
+    }
+}
+
+/* ===== PRINT MODE ===== */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #printArea, #printArea * {
+        visibility: visible;
+    }
+
+    #printArea {
+        position: absolute;
+        left: 0;
+        top: 0;
         width: 210mm;
         min-height: 297mm;
-        background: white;
-        padding: 25mm;
-        box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        font-family: sans-serif;
-        font-size: 12px;
-        position: relative;
-    ">
+        box-shadow: none;
+    }
+}
+
+</style>
+
+<div class="surat-wrapper">
+
+    <div id="printArea" class="surat-area">
 
         {{-- ================= WATERMARK ================= --}}
-        <div style="
-            position:absolute;
-            top:40%;
-            left:20%;
-            font-size:70px;
-            color:rgba(0,0,0,0.05);
-            transform: rotate(-30deg);
-            z-index:0;
-        ">
+        <div class="watermark">
             SURAT JALAN
         </div>
 

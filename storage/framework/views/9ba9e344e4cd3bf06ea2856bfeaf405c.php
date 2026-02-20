@@ -2,6 +2,73 @@
 <?php $__env->startSection('page-title', 'Update Delivery'); ?>
 
 <?php $__env->startSection('content'); ?>
+<style>
+/* Card Form */
+.form-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* Title */
+.form-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+/* Label */
+.form-label {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+/* Input Styling */
+.form-control {
+    border: 1px solid #d1d5db !important;
+    border-radius: 10px !important;
+    padding: 10px 12px;
+    transition: all 0.2s ease;
+}
+
+/* Focus */
+.form-control:focus {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 2px rgba(13,110,253,0.15) !important;
+}
+
+/* File Input */
+input[type="file"].form-control {
+    padding: 8px;
+}
+
+/* Responsive Button */
+.form-action {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .form-card {
+        padding: 18px;
+    }
+
+    .form-action {
+        justify-content: center;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}
+</style>
+
 
 
 <?php if($errors->any()): ?>
@@ -24,25 +91,22 @@
     </div>
 <?php endif; ?>
 
-<div class="card">
-    <div class="card-header">
-        <h5>Update Delivery</h5>
-    </div>
+<div class="form-card">
+<div class="form-title">Update Delivery</div>
 
-    <div class="card-body">
-        <form action="<?php echo e(route('delivery.update',$delivery->id)); ?>"
-              method="POST" enctype="multipart/form-data">
-            <?php echo csrf_field(); ?>
-            <?php echo method_field('PUT'); ?>
+<form action="<?php echo e(route('delivery.update',$delivery->id)); ?>"
+      method="POST" enctype="multipart/form-data">
+    <?php echo csrf_field(); ?>
+    <?php echo method_field('PUT'); ?>
 
-            
-            <div class="mb-3">
-                <label for="nama_pengirim" class="form-label">Nama Pengirim</label>
-                <input type="text" 
-                       id="nama_pengirim"
-                       name="nama_pengirim"
-                       value="<?php echo e(old('nama_pengirim',$delivery->nama_pengirim)); ?>"
-                       class="form-control <?php $__errorArgs = ['nama_pengirim'];
+    <div class="row">
+
+        <div class="col-lg-6 col-md-6 col-12 mb-3">
+            <label class="form-label">Nama Pembeli</label>
+            <input type="text"
+                   name="nama_pengirim"
+                   value="<?php echo e(old('nama_pengirim',$delivery->nama_pengirim)); ?>"
+                   class="form-control <?php $__errorArgs = ['nama_pengirim'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -50,27 +114,25 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                       required>
-                <?php $__errorArgs = ['nama_pengirim'];
+                   required>
+            <?php $__errorArgs = ['nama_pengirim'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                    <div class="invalid-feedback"><?php echo e($message); ?></div>
-                <?php unset($message);
+                <div class="invalid-feedback"><?php echo e($message); ?></div>
+            <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
-            </div>
+        </div>
 
-            
-            <div class="mb-3">
-                <label for="driver" class="form-label">Driver</label>
-                <input type="text" 
-                       id="driver"
-                       name="driver"
-                       value="<?php echo e(old('driver',$delivery->driver)); ?>"
-                       class="form-control <?php $__errorArgs = ['driver'];
+        <div class="col-lg-6 col-md-6 col-12 mb-3">
+            <label class="form-label">Driver</label>
+            <input type="text"
+                   name="driver"
+                   value="<?php echo e(old('driver',$delivery->driver)); ?>"
+                   class="form-control <?php $__errorArgs = ['driver'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -78,23 +140,22 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                       required>
-                <?php $__errorArgs = ['driver'];
+                   required>
+            <?php $__errorArgs = ['driver'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                    <div class="invalid-feedback"><?php echo e($message); ?></div>
-                <?php unset($message);
+                <div class="invalid-feedback"><?php echo e($message); ?></div>
+            <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
-            </div>
+        </div>
 
-            
-            <div class="mb-3">
-                <label for="status" class="form-label">Status</label>
-                <select id="status" name="status" class="form-control <?php $__errorArgs = ['status'];
+        <div class="col-lg-6 col-md-6 col-12 mb-3">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-control <?php $__errorArgs = ['status'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -102,85 +163,34 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>" required>
-                    <option value="">-- Pilih Status --</option>
-                    <option value="menunggu" <?php if($delivery->status=='menunggu'): echo 'selected'; endif; ?>>Menunggu</option>
-                    <option value="proses" <?php if($delivery->status=='proses'): echo 'selected'; endif; ?>>Proses</option>
-                    <option value="selesai" <?php if($delivery->status=='selesai'): echo 'selected'; endif; ?>>Selesai</option>
-                </select>
-                <?php $__errorArgs = ['status'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                    <div class="invalid-feedback"><?php echo e($message); ?></div>
-                <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-            </div>
+                <option value="">-- Pilih Status --</option>
+                <option value="menunggu" <?php if($delivery->status=='menunggu'): echo 'selected'; endif; ?>>Menunggu</option>
+                <option value="proses" <?php if($delivery->status=='proses'): echo 'selected'; endif; ?>>Proses</option>
+                <option value="selesai" <?php if($delivery->status=='selesai'): echo 'selected'; endif; ?>>Selesai</option>
+            </select>
+        </div>
 
-            
-            <div class="mb-3">
-                <label for="jam_berangkat" class="form-label">Jam Berangkat</label>
-                <input type="time" 
-                       id="jam_berangkat"
-                       name="jam_berangkat"
-                       value="<?php echo e(old('jam_berangkat',$delivery->jam_berangkat)); ?>"
-                       class="form-control <?php $__errorArgs = ['jam_berangkat'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>">
-                <?php $__errorArgs = ['jam_berangkat'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                    <div class="invalid-feedback"><?php echo e($message); ?></div>
-                <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-            </div>
+        <div class="col-lg-3 col-md-6 col-12 mb-3">
+            <label class="form-label">Jam Berangkat</label>
+            <input type="time"
+                   name="jam_berangkat"
+                   value="<?php echo e(old('jam_berangkat',$delivery->jam_berangkat)); ?>"
+                   class="form-control">
+        </div>
 
-            
-            <div class="mb-3">
-                <label for="jam_sampai_tujuan" class="form-label">Jam Sampai Tujuan</label>
-                <input type="time" 
-                       id="jam_sampai_tujuan"
-                       name="jam_sampai_tujuan"
-                       value="<?php echo e(old('jam_sampai_tujuan',$delivery->jam_sampai_tujuan)); ?>"
-                       class="form-control <?php $__errorArgs = ['jam_sampai_tujuan'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>">
-                <?php $__errorArgs = ['jam_sampai_tujuan'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                    <div class="invalid-feedback"><?php echo e($message); ?></div>
-                <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-            </div>
+        <div class="col-lg-3 col-md-6 col-12 mb-3">
+            <label class="form-label">Jam Sampai</label>
+            <input type="time"
+                   name="jam_sampai_tujuan"
+                   value="<?php echo e(old('jam_sampai_tujuan',$delivery->jam_sampai_tujuan)); ?>"
+                   class="form-control">
+        </div>
 
-
-            
-            <div class="mb-3">
-                <label for="bukti_foto" class="form-label">Bukti Foto</label>
-                <input type="file" 
-                       id="bukti_foto"
-                       name="bukti_foto" 
-                       class="form-control <?php $__errorArgs = ['bukti_foto'];
+        <div class="col-12 mb-3">
+            <label class="form-label">Bukti Foto</label>
+            <input type="file"
+                   name="bukti_foto"
+                   class="form-control <?php $__errorArgs = ['bukti_foto'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -188,29 +198,27 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                       accept="image/*">
-                <?php if($delivery->bukti_foto): ?>
-                    <small class="d-block mt-2 text-muted">Foto saat ini: <a href="<?php echo e(asset('storage/'.$delivery->bukti_foto)); ?>" target="_blank">Lihat</a></small>
-                <?php endif; ?>
-                <?php $__errorArgs = ['bukti_foto'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                    <div class="invalid-feedback"><?php echo e($message); ?></div>
-                <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-            </div>
+                   accept="image/*">
 
-            
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary">Simpan</button>
-                <a href="<?php echo e(route('delivery.index')); ?>" class="btn btn-secondary">Batal</a>
-            </div>
-        </form>
+            <?php if($delivery->bukti_foto): ?>
+                <small class="d-block mt-2 text-muted">
+                    Foto saat ini:
+                    <a href="<?php echo e(asset('storage/'.$delivery->bukti_foto)); ?>" target="_blank">
+                        Lihat
+                    </a>
+                </small>
+            <?php endif; ?>
+        </div>
+
     </div>
+
+    <div class="form-action mt-4">
+        <button type="submit" class="btn btn-primary">Simpan</button>
+        <a href="<?php echo e(route('delivery.index')); ?>" class="btn btn-outline-secondary">Batal</a>
+    </div>
+</form>
+</div>
+
 </div>
 <?php $__env->stopSection(); ?>
 

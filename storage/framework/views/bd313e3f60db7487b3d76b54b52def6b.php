@@ -1,9 +1,7 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Detail Delivery'); ?>
+<?php $__env->startSection('page-title', 'Detail Delivery'); ?>
 
-@section('title', 'Detail Delivery')
-@section('page-title', 'Detail Delivery')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <style>
 /* Card Responsive */
@@ -73,7 +71,8 @@
 
     <div class="card-header bg-light">
         <h5 class="mb-0">
-            Delivery - Invoice {{ $delivery->order->invoice_number }}
+            Delivery - Invoice <?php echo e($delivery->order->invoice_number); ?>
+
         </h5>
     </div>
 
@@ -82,24 +81,25 @@
         <table class="delivery-table">
             <tr>
                 <th>Customer</th>
-                <td>{{ $delivery->order->customer->nama ?? '-' }}</td>
+                <td><?php echo e($delivery->order->customer->nama ?? '-'); ?></td>
             </tr>
 
             <tr>
                 <th>Driver</th>
-                <td>{{ $delivery->driver ?? '-' }}</td>
+                <td><?php echo e($delivery->driver ?? '-'); ?></td>
             </tr>
 
             <tr>
                 <th>Tanggal Kirim</th>
-                <td>{{ optional($delivery->tanggal_kirim)->format('d/m/Y') }}</td>
+                <td><?php echo e(optional($delivery->tanggal_kirim)->format('d/m/Y')); ?></td>
             </tr>
 
             <tr>
                 <th>Status</th>
                 <td>
                     <span class="badge bg-info">
-                        {{ ucfirst($delivery->status) }}
+                        <?php echo e(ucfirst($delivery->status)); ?>
+
                     </span>
                 </td>
             </tr>
@@ -107,21 +107,21 @@
             <tr>
                 <th>Bukti Foto</th>
                 <td>
-                    @if($delivery->bukti_foto)
-                        <a href="{{ asset('storage/'.$delivery->bukti_foto) }}" target="_blank">
-                            <img src="{{ asset('storage/'.$delivery->bukti_foto) }}"
+                    <?php if($delivery->bukti_foto): ?>
+                        <a href="<?php echo e(asset('storage/'.$delivery->bukti_foto)); ?>" target="_blank">
+                            <img src="<?php echo e(asset('storage/'.$delivery->bukti_foto)); ?>"
                                  class="delivery-img"
                                  alt="Bukti Foto">
                         </a>
-                    @else
+                    <?php else: ?>
                         -
-                    @endif
+                    <?php endif; ?>
                 </td>
             </tr>
         </table>
 
         <div class="mt-3 text-end">
-            <a href="{{ route('delivery.index') }}"
+            <a href="<?php echo e(route('delivery.index')); ?>"
                class="btn btn-secondary">
                Kembali
             </a>
@@ -130,4 +130,5 @@
     </div>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/delivery/show.blade.php ENDPATH**/ ?>

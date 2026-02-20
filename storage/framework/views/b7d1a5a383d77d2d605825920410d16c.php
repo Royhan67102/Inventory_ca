@@ -126,12 +126,7 @@
                         Remember me
                     </label>
 
-                    <?php if(Route::has('password.request')): ?>
-                        <a href="<?php echo e(route('password.request')); ?>"
-                           class="text-red-500 hover:underline">
-                            Forgot password?
-                        </a>
-                    <?php endif; ?>
+                    
                 </div>
 
                 
@@ -157,25 +152,7 @@ unset($__errorArgs, $__bag); ?>
                 </button>
             </form>
 
-            
-            <div class="mt-10 text-center">
-                <p class="text-gray-400 text-sm mb-4">Or connect with</p>
 
-                <div class="flex justify-center space-x-6 text-xl text-gray-500">
-                    <a href="#" class="hover:text-blue-600">
-                        <i class="fab fa-facebook"></i>
-                    </a>
-                    <a href="#" class="hover:text-sky-500">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="hover:text-pink-500">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="#" class="hover:text-blue-700">
-                        <i class="fab fa-linkedin"></i>
-                    </a>
-                </div>
-            </div>
 
         </div>
     </div>

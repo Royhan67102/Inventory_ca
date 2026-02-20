@@ -1,5 +1,91 @@
 <?php $__env->startSection('title', 'Preview Surat Jalan'); ?>
 
+<style>
+/* ===== CONTAINER ===== */
+.print-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* ===== DOCUMENT ===== */
+.print-area {
+    position: relative;
+    width: 100%;
+    max-width: 210mm;
+    min-height: 297mm;
+    background: white;
+    padding: 25mm;
+    box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    font-family: sans-serif;
+    font-size: 12px;
+}
+
+/* ===== TABLE FIX ===== */
+.print-area table {
+    width: 100%;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+    .print-area {
+        padding: 20px;
+        font-size: 11px;
+    }
+
+    .print-area img {
+        height: 60px !important;
+    }
+
+    .watermark {
+        font-size: 40px !important;
+        left: 10% !important;
+        top: 45% !important;
+    }
+
+    .print-area h2 {
+        font-size: 18px !important;
+    }
+
+    .print-area h3 {
+        font-size: 16px !important;
+    }
+}
+
+/* ===== SMALL PHONE ===== */
+@media (max-width: 480px) {
+    .print-area {
+        padding: 15px;
+        font-size: 10px;
+    }
+
+    .watermark {
+        font-size: 30px !important;
+    }
+}
+
+/* ===== PRINT MODE ===== */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #printArea, #printArea * {
+        visibility: visible;
+    }
+
+    #printArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 210mm;
+        min-height: 297mm;
+        box-shadow: none;
+    }
+}
+</style>
+
+
 <?php $__env->startSection('content'); ?>
 <div style="text-align: right; margin-bottom: 20px;">
     <a href="<?php echo e(route('delivery.index')); ?>" class="btn btn-secondary btn-sm">
@@ -7,31 +93,22 @@
     </a>
 </div>
 
-<div class="container d-flex justify-content-center">
+<div class="print-wrapper">
 
-    <div id="printArea" style="
-        position: relative;
-        width: 210mm;
-        min-height: 297mm;
-        background: white;
-        padding: 25mm;
-        box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        font-family: sans-serif;
-        font-size: 12px;
-    ">
+    <div id="printArea" class="print-area">
 
         
-        <div style="
-            position:absolute;
-            top:40%;
-            left:20%;
-            font-size:70px;
-            color:rgba(0,0,0,0.05);
-            transform: rotate(-30deg);
-            z-index:0;
-        ">
-            SURAT JALAN
-        </div>
+       <div class="watermark" style="
+    position:absolute;
+    top:40%;
+    left:20%;
+    font-size:70px;
+    color:rgba(0,0,0,0.05);
+    transform: rotate(-30deg);
+    z-index:0;
+">
+    SURAT JALAN
+</div>
 
         
         <table style="width:100%; border-bottom:2px solid black; padding-bottom:10px;">
