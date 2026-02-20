@@ -28,7 +28,7 @@
         <div class="flex flex-col justify-center p-8 md:p-12">
 
             <h1 class="text-3xl md:text-4xl font-bold mb-2">
-                Hi! Cahaya Fams 👋
+                Hi Designer 👋
             </h1>
             <p class="text-gray-500 mb-8">Welcome back</p>
 
@@ -136,7 +136,7 @@
 
                 
                 <div class="my-4">
-                    <div class="g-recaptcha" data-sitekey="<?php echo e(config('services.recaptcha.site_key')); ?>"></div>
+                    <div class="g-recaptcha" data-sitekey="<?php echo e(env('RECAPTCHA_SITE_KEY')); ?>"></div>
                     <?php $__errorArgs = ['g-recaptcha-response'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -186,5 +186,4 @@ unset($__errorArgs, $__bag); ?>
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 </body>
-</html>
-<?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/auth/login.blade.php ENDPATH**/ ?>
+</html><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/auth/login.blade.php ENDPATH**/ ?>

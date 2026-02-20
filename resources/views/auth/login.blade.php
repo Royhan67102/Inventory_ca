@@ -28,7 +28,7 @@
         <div class="flex flex-col justify-center p-8 md:p-12">
 
             <h1 class="text-3xl md:text-4xl font-bold mb-2">
-                Hi! Cahaya Fams 👋
+                Hi Designer 👋
             </h1>
             <p class="text-gray-500 mb-8">Welcome back</p>
 
@@ -79,7 +79,7 @@
 
                 {{-- Google reCAPTCHA --}}
                 <div class="my-4">
-                    <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                    <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
                     @error('g-recaptcha-response')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
