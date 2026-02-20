@@ -1,9 +1,7 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Edit Inventory'); ?>
+<?php $__env->startSection('page-title', 'Edit Inventory'); ?>
 
-@section('title', 'Edit Inventory')
-@section('page-title', 'Edit Inventory')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <style>
 .form-box {
@@ -28,9 +26,9 @@
 <div class="card shadow-sm">
 <div class="card-body">
 
-<form action="{{ route('inventories.update', $inventory->id) }}" method="POST">
-@csrf
-@method('PUT')
+<form action="<?php echo e(route('inventories.update', $inventory->id)); ?>" method="POST">
+<?php echo csrf_field(); ?>
+<?php echo method_field('PUT'); ?>
 
 <div class="row">
 
@@ -41,7 +39,7 @@
             type="text"
             name="nama_barang"
             class="form-control border"
-            value="{{ old('nama_barang', $inventory->nama_barang) }}"
+            value="<?php echo e(old('nama_barang', $inventory->nama_barang)); ?>"
             required>
     </div>
 </div>
@@ -53,7 +51,7 @@
             type="text"
             name="jenis_barang"
             class="form-control border"
-            value="{{ old('jenis_barang', $inventory->jenis_barang) }}"
+            value="<?php echo e(old('jenis_barang', $inventory->jenis_barang)); ?>"
             required>
     </div>
 </div>
@@ -65,7 +63,7 @@
             type="text"
             name="pic_barang"
             class="form-control border"
-            value="{{ old('pic_barang', $inventory->pic_barang) }}">
+            value="<?php echo e(old('pic_barang', $inventory->pic_barang)); ?>">
     </div>
 </div>
 
@@ -76,7 +74,7 @@
             type="text"
             name="kondisi"
             class="form-control border"
-            value="{{ old('kondisi', $inventory->kondisi) }}">
+            value="<?php echo e(old('kondisi', $inventory->kondisi)); ?>">
     </div>
 </div>
 
@@ -86,7 +84,7 @@
         <input
             type="text"
             class="form-control border bg-light"
-            value="{{ $inventory->jumlah }}">
+            value="<?php echo e($inventory->jumlah); ?>">
     </div>
 </div>
 
@@ -96,14 +94,14 @@
         <textarea
             name="deskripsi"
             class="form-control border"
-            rows="3">{{ old('deskripsi', $inventory->deskripsi) }}</textarea>
+            rows="3"><?php echo e(old('deskripsi', $inventory->deskripsi)); ?></textarea>
     </div>
 </div>
 
 </div>
 
 <div class="d-flex flex-wrap justify-content-between gap-2 mt-3">
-    <a href="{{ route('inventories.index') }}" class="btn btn-secondary">
+    <a href="<?php echo e(route('inventories.index')); ?>" class="btn btn-secondary">
         Kembali
     </a>
 
@@ -117,4 +115,5 @@
 </div>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/inventories/edit.blade.php ENDPATH**/ ?>
