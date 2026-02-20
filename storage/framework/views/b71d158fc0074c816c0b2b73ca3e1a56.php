@@ -1,7 +1,5 @@
-@extends('layouts.app')
-
-@section('title', 'Tambah Stok Acrylic')
-@section('page-title', 'Tambah Stok Acrylic')
+<?php $__env->startSection('title', 'Tambah Stok Acrylic'); ?>
+<?php $__env->startSection('page-title', 'Tambah Stok Acrylic'); ?>
 
 <style>
 /* Card Form */
@@ -70,10 +68,10 @@
 }
 </style>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="form-card">
-<form action="{{ route('acrylic-stocks.store') }}" method="POST" id="acrylicForm">
-    @csrf
+<form action="<?php echo e(route('acrylic-stocks.store')); ?>" method="POST" id="acrylicForm">
+    <?php echo csrf_field(); ?>
 
     <input type="hidden" name="luas_total">
     <input type="hidden" name="luas_tersedia">
@@ -131,7 +129,7 @@
 
     <div class="form-action mt-4">
         <button class="btn btn-success">Simpan</button>
-        <a href="{{ route('acrylic-stocks.index') }}" class="btn btn-outline-secondary">Batal</a>
+        <a href="<?php echo e(route('acrylic-stocks.index')); ?>" class="btn btn-outline-secondary">Batal</a>
     </div>
 </form>
 </div>
@@ -158,4 +156,6 @@ function hitungLuas() {
 [panjang, lebar, jumlah].forEach(el => el.addEventListener('input', hitungLuas));
 hitungLuas();
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/acrylicstocks/create.blade.php ENDPATH**/ ?>

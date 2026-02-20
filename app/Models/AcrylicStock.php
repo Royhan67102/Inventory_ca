@@ -10,6 +10,7 @@ class AcrylicStock extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'kode_stok',
         'merk',
         'warna',
         'jenis',
@@ -19,6 +20,7 @@ class AcrylicStock extends Model
         'luas_total',
         'luas_tersedia',
         'jumlah_lembar',
+        'harga_lembar',
     ];
 
     protected $casts = [

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('merk');
             $table->string('warna')->nullable();
 
-            $table->enum('jenis', ['lembar', 'habis'])->default('lembar');
+            $table->enum('jenis', ['lembar', 'sisa'])->default('lembar');
 
             $table->decimal('panjang', 10, 2);
             $table->decimal('lebar', 10, 2);
