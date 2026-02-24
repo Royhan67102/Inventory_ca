@@ -70,6 +70,8 @@
         <form action="<?php echo e(route('pickup.update',$pickup->id)); ?>"
         method="POST"
         enctype="multipart/form-data">
+            <?php echo csrf_field(); ?>
+            <?php echo method_field('PUT'); ?>
 
             <div class="form-group-custom">
                 <label>Status</label>
@@ -78,7 +80,8 @@
                         <?php echo e($pickup->status == 'menunggu' ? 'selected' : ''); ?>>
                         Menunggu
                     </option>
-                    <option value="selesai">
+                    <option value="selesai"
+                        <?php echo e($pickup->status == 'selesai' ? 'selected' : ''); ?>>
                         Selesai
                     </option>
                 </select>

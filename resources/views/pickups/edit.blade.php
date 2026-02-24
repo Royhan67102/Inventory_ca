@@ -72,6 +72,8 @@
         <form action="{{ route('pickup.update',$pickup->id) }}"
         method="POST"
         enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
 
             <div class="form-group-custom">
                 <label>Status</label>
@@ -80,7 +82,8 @@
                         {{ $pickup->status == 'menunggu' ? 'selected' : '' }}>
                         Menunggu
                     </option>
-                    <option value="selesai">
+                    <option value="selesai"
+                        {{ $pickup->status == 'selesai' ? 'selected' : '' }}>
                         Selesai
                     </option>
                 </select>
