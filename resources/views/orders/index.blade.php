@@ -5,6 +5,70 @@
 
 @section('content')
 
+<style>
+
+/* CARD */
+.order-card {
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+}
+
+/* TABLE */
+.table {
+    border: 1px solid #dee2e6;
+}
+
+.table th,
+.table td {
+    border: 1px solid #dee2e6 !important;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+/* HEADER */
+.table thead th {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+/* BADGE */
+.badge {
+    font-size: 12px;
+    padding: 6px 10px;
+}
+
+/* AKSI BUTTON WRAP */
+.aksi-btn {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+    .card-body {
+        padding: 14px;
+    }
+
+    .table {
+        font-size: 13px;
+    }
+
+    .aksi-btn {
+        flex-direction: column;
+    }
+
+    .table td {
+        white-space: normal;
+    }
+
+}
+
+</style>
+
+
 <!-- DELETE MODAL -->
 <div class="modal fade" id="deleteModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
@@ -37,24 +101,25 @@
   </div>
 </div>
 
-<div class="card shadow-sm">
+<div class="card shadow-sm order-card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0">Daftar Order</h6>
         <a href="{{ route('orders.create') }}" class="btn btn-primary btn-sm">+ Order Baru</a>
     </div>
 
-    <div class="card-body table-responsive">
+    <div class="card-body">
+        <div class="table-responsive">
         <table class="table table-bordered align-middle">
             <thead class="table-light text-center">
                 <tr>
-                    <th>Kode</th>
-                    <th>Tanggal</th>
-                    <th>Customer</th>
-                    <th>Total</th>
-                    <th>Pembayaran</th>
-                    <th>Status</th>
-                    <th>Catatan</th>
-                    <th>Aksi</th>
+                    <th style="min-width:100px">Kode</th>
+                    <th style="min-width:110px">Tanggal</th>
+                    <th style="min-width:150px">Customer</th>
+                    <th style="min-width:120px">Total</th>
+                    <th style="min-width:120px">Pembayaran</th>
+                    <th style="min-width:120px">Status</th>
+                    <th style="min-width:150px">Catatan</th>
+                    <th style="min-width:170px">Aksi</th>
                 </tr>
             </thead>
 
@@ -83,6 +148,7 @@
 
                     {{-- PEMBAYARAN --}}
                     <td class="text-center">
+                        <div class="aksi-btn">
                         <span class="badge bg-{{
                             $order->payment_status == 'lunas' ? 'success' :
                             ($order->payment_status == 'dp' ? 'warning' : 'secondary')
@@ -131,6 +197,7 @@
                             data-id="{{ $order->id }}">
                             Hapus
                         </button>
+                    </div>
                     </td>
                 </tr>
             @empty
@@ -142,6 +209,7 @@
             @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 

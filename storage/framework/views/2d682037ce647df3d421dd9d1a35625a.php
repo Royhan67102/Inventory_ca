@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Invoice {{ $order->invoice->invoice_number ?? 'INV-'.$order->id }}</title>
+    <title>Invoice <?php echo e($order->invoice->invoice_number ?? 'INV-'.$order->id); ?></title>
     <style>
 
 body {
@@ -86,8 +86,8 @@ th {
 
 <h3 class="invoice-title">INVOICE</h3>
 
-<p><strong>Nama Pemesan:</strong> {{ $order->customer->nama }}</p>
-<p><strong>Tanggal:</strong> {{ $order->tanggal_pemesanan?->format('d M Y') }}</p>
+<p><strong>Nama Pemesan:</strong> <?php echo e($order->customer->nama); ?></p>
+<p><strong>Tanggal:</strong> <?php echo e($order->tanggal_pemesanan?->format('d M Y')); ?></p>
 
 <div class="table-responsive">
 <table>
@@ -101,23 +101,23 @@ th {
         </tr>
     </thead>
     <tbody>
-        @foreach($order->items as $item)
+        <?php $__currentLoopData = $order->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <tr>
-            <td>{{ $item->product_name }}</td>
-            <td>{{ $item->panjang_cm }} x {{ $item->lebar_cm }}</td>
-            <td>{{ $item->qty }}</td>
-            <td>Rp {{ number_format($item->harga_per_m2,0,',','.') }}</td>
-            <td>Rp {{ number_format($item->subtotal,0,',','.') }}</td>
+            <td><?php echo e($item->product_name); ?></td>
+            <td><?php echo e($item->panjang_cm); ?> x <?php echo e($item->lebar_cm); ?></td>
+            <td><?php echo e($item->qty); ?></td>
+            <td>Rp <?php echo e(number_format($item->harga_per_m2,0,',','.')); ?></td>
+            <td>Rp <?php echo e(number_format($item->subtotal,0,',','.')); ?></td>
         </tr>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </tbody>
 </table>
 
 <br>
 
-<p><strong>Total:</strong> Rp {{ number_format($order->invoice->total_harga ?? $order->total_harga,0,',','.') }}</p>
-<p><strong>DP:</strong> Rp {{ number_format($order->invoice->dp ?? 0,0,',','.') }}</p>
-<p><strong>Sisa Pembayaran:</strong> Rp {{ number_format($order->invoice->sisa_pembayaran ?? ($order->total_harga - ($order->invoice->dp ?? 0)),0,',','.') }}</p>
+<p><strong>Total:</strong> Rp <?php echo e(number_format($order->invoice->total_harga ?? $order->total_harga,0,',','.')); ?></p>
+<p><strong>DP:</strong> Rp <?php echo e(number_format($order->invoice->dp ?? 0,0,',','.')); ?></p>
+<p><strong>Sisa Pembayaran:</strong> Rp <?php echo e(number_format($order->invoice->sisa_pembayaran ?? ($order->total_harga - ($order->invoice->dp ?? 0)),0,',','.')); ?></p>
 
 <br>
 
@@ -144,3 +144,4 @@ Segala bentuk kesalahan transfer bukan tanggung jawab kami.
 </body>
 </div>
 </html>
+<?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/orders/invoice-pdf.blade.php ENDPATH**/ ?>

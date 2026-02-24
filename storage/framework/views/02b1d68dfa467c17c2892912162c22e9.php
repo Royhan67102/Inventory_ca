@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 <head>
     <?php echo $__env->make('layouts.partials.head', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </head>

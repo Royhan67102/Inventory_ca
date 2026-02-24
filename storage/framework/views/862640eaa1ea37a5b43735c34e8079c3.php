@@ -1,6 +1,74 @@
 <?php $__env->startSection('title', 'Tambah Order'); ?>
 <?php $__env->startSection('page-title', 'Tambah Order'); ?>
 
+<style>
+
+/* CARD STYLE */
+.order-card {
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+}
+
+/* INPUT STYLE */
+.form-control,
+.form-select {
+    border: 1px solid #ced4da !important;
+    border-radius: 8px;
+    padding: 10px;
+    transition: 0.2s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.15rem rgba(13,110,253,.15);
+}
+
+/* TABLE */
+.table-responsive {
+    overflow-x: auto;
+}
+
+#tableItemOrder th,
+#tableItemOrder td {
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+#tableItemOrder input {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+}
+
+/* GRAND TOTAL */
+#grandTotalText {
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+    .card-body {
+        padding: 16px;
+    }
+
+    h6 {
+        font-size: 14px;
+    }
+
+    .form-label {
+        font-size: 13px;
+    }
+
+    #tableItemOrder input {
+        min-width: 80px;
+    }
+
+}
+
+</style>
+
 <?php $__env->startSection('content'); ?>
 <form action="<?php echo e(route('orders.store')); ?>" method="POST" enctype="multipart/form-data">
 <?php echo csrf_field(); ?>
@@ -12,10 +80,10 @@
 </div>
 
 
-<div class="row">
+<div class="row g-3">
     
     <div class="col-md-4">
-        <div class="card mb-4">
+        <div class="card mb-4 order-card shadow-sm">
             <div class="card-body">
                 <h6 class="fw-bold">Data Customer</h6>
 
@@ -131,7 +199,8 @@
     <div class="card-body">
         <h6 class="fw-bold">Item Order</h6>
 
-        <table class="table table-bordered" id="tableItemOrder">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="tableItemOrder">
             <thead class="text-center">
                 <tr>
                     <th style="width:30px"></th>
@@ -154,9 +223,9 @@
                             <i class="bi bi-x"></i>
                         </button>
                     </td>
-                    <td><input name="merk[]" class="form-control form-control-sm"></td>
-                    <td><input name="ketebalan[]" class="form-control form-control-sm"></td>
-                    <td><input name="warna[]" class="form-control form-control-sm"></td>
+                    <td><input name="merk[]" class="form-control form-control-sm text-center"></td>
+                    <td><input name="ketebalan[]" class="form-control form-control-sm text-center"></td>
+                    <td><input name="warna[]" class="form-control form-control-sm text-center"></td>
 
                     <td>
                         <input type="number" name="panjang_cm[]"

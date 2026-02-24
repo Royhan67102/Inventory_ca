@@ -79,6 +79,7 @@ class InventoryController extends Controller
         $request->validate([
             'nama_barang' => 'required|string',
             'jenis_barang' => 'required|string',
+            'jumlah' => 'nullable|integer|min:0',
             'pic_barang' => 'nullable|string',
             'kondisi' => 'nullable|string',
             'deskripsi' => 'nullable|string',
@@ -88,6 +89,7 @@ class InventoryController extends Controller
         $inventory->update($request->only([
             'nama_barang',
             'jenis_barang',
+            'jumlah',
             'pic_barang',
             'kondisi',
             'deskripsi'

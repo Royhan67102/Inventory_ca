@@ -3,15 +3,91 @@
 @section('title', 'Edit Order')
 @section('page-title', 'Edit Order')
 
+<style>
+
+/* CARD */
+.order-card {
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+}
+
+/* INPUT */
+.form-control,
+.form-select {
+    border: 1px solid #ced4da !important;
+    border-radius: 8px;
+    padding: 10px;
+    transition: 0.2s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.15rem rgba(13,110,253,.15);
+}
+
+/* TABLE */
+.table-responsive {
+    overflow-x: auto;
+}
+
+#tableItemOrder th,
+#tableItemOrder td {
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+#tableItemOrder input {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+}
+
+/* IMAGE PREVIEW */
+.img-preview {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 6px;
+}
+
+/* GRAND TOTAL */
+#grandTotalText {
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+    .card-body {
+        padding: 16px;
+    }
+
+    h6 {
+        font-size: 14px;
+    }
+
+    .form-label {
+        font-size: 13px;
+    }
+
+    #tableItemOrder input {
+        min-width: 80px;
+    }
+
+}
+
+</style>
+
+
 @section('content')
 <form action="{{ route('orders.update', $order->id) }}" method="POST" enctype="multipart/form-data">
 @csrf
 @method('PUT')
 
-<div class="row">
+<div class="row g-3">
     {{-- ================= CUSTOMER ================= --}}
     <div class="col-md-4">
-        <div class="card mb-4">
+        <div class="card mb-4 order-card shadow-sm">
             <div class="card-body">
                 <h6 class="fw-bold">Data Customer</h6>
 
@@ -122,8 +198,7 @@
                             @if(Str::endsWith($order->design->file_awal, ['jpg','jpeg','png','gif','webp']))
                                 <div class="mt-2">
                                     <img src="{{ asset('storage/'.$order->design->file_awal) }}"
-                                         class="img-fluid rounded"
-                                         style="max-height:200px; max-width:100%;">
+                                            class="img-fluid img-preview"
                                 </div>
                             @endif
                         </div>
@@ -192,7 +267,8 @@
     <div class="card-body">
         <h6 class="fw-bold">Item Order</h6>
 
-        <table class="table table-bordered" id="tableItemOrder">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="tableItemOrder">
             <thead class="text-center">
                 <tr>
                     <th style="width:40px"></th>
@@ -215,9 +291,9 @@
                             ×
                         </button>
                     </td>
-                    <td><input name="merk[]" class="form-control form-control-sm" value="{{ $item->merk }}"></td>
-                    <td><input name="ketebalan[]" class="form-control form-control-sm" value="{{ $item->ketebalan }}"></td>
-                    <td><input name="warna[]" class="form-control form-control-sm" value="{{ $item->warna }}"></td>
+                    <td><input name="merk[]" class="form-control form-control-sm text-center" value="{{ $item->merk }}"></td>
+                    <td><input name="ketebalan[]" class="form-control form-control-sm text-center" value="{{ $item->ketebalan }}"></td>
+                    <td><input name="warna[]" class="form-control form-control-sm text-center" value="{{ $item->warna }}"></td>
                     <td><input name="panjang_cm[]" class="form-control form-control-sm panjang" value="{{ $item->panjang_cm }}"></td>
                     <td><input name="lebar_cm[]" class="form-control form-control-sm lebar" value="{{ $item->lebar_cm }}"></td>
                     <td><input name="luas[]" class="form-control form-control-sm luas" readonly></td>
@@ -228,6 +304,7 @@
             @endforeach
             </tbody>
         </table>
+        </div>
         <button type="button" id="addRow" class="btn btn-primary btn-sm">
             + Tambah Item
         </button>

@@ -84,9 +84,11 @@
     <div class="form-box">
         <label class="form-label">Stok Saat Ini</label>
         <input
-            type="text"
-            class="form-control border bg-light"
-            value="{{ $inventory->jumlah }}">
+            type="number"
+            name="jumlah"
+            class="form-control border"
+            value="{{ old('jumlah', $inventory->jumlah) }}"
+            min="0">
     </div>
 </div>
 

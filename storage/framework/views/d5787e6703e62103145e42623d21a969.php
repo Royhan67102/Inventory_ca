@@ -1,9 +1,7 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Detail Inventory'); ?>
+<?php $__env->startSection('page-title', 'Detail Inventory'); ?>
 
-@section('title', 'Detail Inventory')
-@section('page-title', 'Detail Inventory')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <style>
 /* Card Styling */
@@ -46,41 +44,42 @@
 }
 </style>
 
-{{-- Tombol Kembali --}}
+
 <div class="mb-3">
-    <a href="{{ route('inventories.index') }}" class="btn btn-secondary">
+    <a href="<?php echo e(route('inventories.index')); ?>" class="btn btn-secondary">
         ← Kembali ke Data Inventory
     </a>
 </div>
 
 <div class="row g-3">
 
-    {{-- LEFT SIDE --}}
+    
     <div class="col-lg-4 col-md-5">
 
-        {{-- Informasi Barang --}}
+        
         <div class="card shadow-sm inventory-card mb-3">
             <div class="card-body inventory-info">
                 <h6 class="mb-3">Informasi Barang</h6>
-                <p><b>Nama:</b> {{ $inventory->nama_barang }}</p>
-                <p><b>Jenis:</b> {{ $inventory->jenis_barang }}</p>
+                <p><b>Nama:</b> <?php echo e($inventory->nama_barang); ?></p>
+                <p><b>Jenis:</b> <?php echo e($inventory->jenis_barang); ?></p>
                 <p>
                     <b>Stok:</b>
                     <span class="badge bg-success stock-badge">
-                        {{ $inventory->jumlah }}
+                        <?php echo e($inventory->jumlah); ?>
+
                     </span>
                 </p>
-                <p><b>Kondisi:</b> {{ $inventory->kondisi ?? '-' }}</p>
+                <p><b>Kondisi:</b> <?php echo e($inventory->kondisi ?? '-'); ?></p>
             </div>
         </div>
 
-        {{-- Update Stok --}}
+        
         <div class="card shadow-sm inventory-card">
             <div class="card-body">
                 <h6 class="mb-3">Update Stok</h6>
 
-                <form method="POST" action="{{ route('inventories.updateStock', $inventory->id) }}">
-                    @csrf
+                <form method="POST" action="<?php echo e(route('inventories.updateStock', $inventory->id)); ?>">
+                    <?php echo csrf_field(); ?>
 
                     <div class="mb-2">
                         <select name="tipe" class="form-select">
@@ -113,7 +112,7 @@
 
     </div>
 
-    {{-- RIGHT SIDE --}}
+    
     <div class="col-lg-8 col-md-7">
 
         <div class="card shadow-sm inventory-card">
@@ -131,24 +130,25 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($inventory->histories as $row)
+                            <?php $__empty_1 = true; $__currentLoopData = $inventory->histories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                             <tr>
-                                <td>{{ $row->tanggal }}</td>
+                                <td><?php echo e($row->tanggal); ?></td>
                                 <td>
-                                    <span class="badge bg-{{ $row->tipe == 'masuk' ? 'success' : 'danger' }}">
-                                        {{ strtoupper($row->tipe) }}
+                                    <span class="badge bg-<?php echo e($row->tipe == 'masuk' ? 'success' : 'danger'); ?>">
+                                        <?php echo e(strtoupper($row->tipe)); ?>
+
                                     </span>
                                 </td>
-                                <td>{{ $row->jumlah }}</td>
-                                <td>{{ $row->keterangan ?? '-' }}</td>
+                                <td><?php echo e($row->jumlah); ?></td>
+                                <td><?php echo e($row->keterangan ?? '-'); ?></td>
                             </tr>
-                            @empty
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                             <tr>
                                 <td colspan="4" class="text-center">
                                     Belum ada riwayat stok
                                 </td>
                             </tr>
-                            @endforelse
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -160,4 +160,5 @@
 
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/inventories/show.blade.php ENDPATH**/ ?>

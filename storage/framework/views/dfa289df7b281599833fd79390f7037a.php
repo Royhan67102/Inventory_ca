@@ -6,7 +6,7 @@
     <div class="card-body">
 
         
-        <div class="d-flex justify-content-between mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between mb-4 gap-3">
             <div>
                 <p><strong>Nama Pemesan</strong> : <?php echo e($order->customer->nama); ?></p>
                 <p><strong>Nama Penerima</strong> : Cahaya Akrilik</p>
@@ -20,7 +20,8 @@
         </div>
 
         
-        <table class="table table-bordered">
+        <div class="table-responsive">
+            <table class="table table-bordered">
             <thead class="table-light text-center">
                 <tr>
                     <th width="5%">No</th>
@@ -61,12 +62,14 @@
 </tbody>
 
         </table>
+        </div>
 
         
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <p class="fw-bold">TOTAL SISA PEMBAYARAN</p>
-            </div>
+        <div class="row mt-3 align-items-start">
+    <div class="col-12 col-md-6 mb-2 mb-md-0">
+        <p class="fw-bold">TOTAL SISA PEMBAYARAN</p>
+    </div>
+    <div class="col-12 col-md-6 text-md-end text-start">
             <div class="col-md-6 text-end">
                 <p><strong>TOTAL :</strong> Rp <?php echo e(number_format($order->total_harga,0,',','.')); ?></p>
                 <p><strong>DP :</strong> Rp 0</p>

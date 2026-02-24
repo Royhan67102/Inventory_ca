@@ -3,12 +3,36 @@
 @section('title', 'Invoice')
 @section('page-title', 'Invoice')
 
+<style>
+    @media (max-width: 576px) {
+
+    h4 {
+        font-size: 18px;
+    }
+
+    table th, 
+    table td {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    p {
+        margin-bottom: 6px;
+    }
+
+}
+</style>
+
 @section('content')
 <div class="card shadow-sm">
     <div class="card-body">
 
         {{-- HEADER --}}
-        <div class="d-flex justify-content-between mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between mb-4 gap-3">
             <div>
                 <p><strong>Nama Pemesan</strong> : {{ $order->customer->nama }}</p>
                 <p><strong>Nama Penerima</strong> : Cahaya Akrilik</p>
@@ -22,7 +46,8 @@
         </div>
 
         {{-- TABLE ITEM --}}
-        <table class="table table-bordered">
+        <div class="table-responsive">
+            <table class="table table-bordered">
             <thead class="table-light text-center">
                 <tr>
                     <th width="5%">No</th>
@@ -63,12 +88,14 @@
 </tbody>
 
         </table>
+        </div>
 
         {{-- TOTAL --}}
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <p class="fw-bold">TOTAL SISA PEMBAYARAN</p>
-            </div>
+        <div class="row mt-3 align-items-start">
+    <div class="col-12 col-md-6 mb-2 mb-md-0">
+        <p class="fw-bold">TOTAL SISA PEMBAYARAN</p>
+    </div>
+    <div class="col-12 col-md-6 text-md-end text-start">
             <div class="col-md-6 text-end">
                 <p><strong>TOTAL :</strong> Rp {{ number_format($order->total_harga,0,',','.') }}</p>
                 <p><strong>DP :</strong> Rp 0</p>
@@ -82,8 +109,8 @@
         </p>
 
         {{-- TTD --}}
-        <div class="row mt-5">
-            <div class="col text-end">
+       <div class="row mt-5">
+            <div class="col-12 text-md-end text-start">
                 <p>Penerima</p>
                 <br><br>
                 <p><strong>Mahmud</strong></p>
@@ -91,11 +118,11 @@
         </div>
 
         {{-- ACTION --}}
-        <div class="mt-4 d-flex gap-2">
-            <a href="{{ route('orders.invoice.download', $order) }}" class="btn btn-success">
+        <div class="mt-4 d-flex flex-column flex-md-row gap-2">
+            <a href="{{ route('orders.invoice.download', $order) }}" class="btn btn-success w-100 w-md-auto" class="btn btn-success">
                 Download PDF
             </a>
-            <button onclick="window.print()" class="btn btn-secondary">
+            <button onclick="window.print()" class="btn btn-secondary w-100 w-md-auto">
                 Print
             </button>
         </div>

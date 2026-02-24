@@ -9,6 +9,31 @@ use Illuminate\Support\Facades\Storage;
 @endphp
 
 <div class="container-fluid">
+    <style>
+.detail-box {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #fafafa;
+}
+
+.detail-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 2px;
+}
+
+.detail-value {
+    font-weight: 500;
+    word-break: break-word;
+}
+
+@media (max-width: 768px) {
+    .detail-box {
+        padding: 8px 10px;
+    }
+}
+</style>
 
 {{-- ================= HEADER ================= --}}
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -27,19 +52,19 @@ use Illuminate\Support\Facades\Storage;
             <div class="card-body">
                 <h6 class="fw-bold">Data Customer</h6>
 
-                <div class="mb-2">
-                    <label class="text-muted small">Nama</label>
-                    <div>{{ $order->customer->nama }}</div>
+                <div class="detail-box mb-2">
+                    <div class="detail-label">Nama</div>
+                    <div class="detail-value">{{ $order->customer->nama }}</div>
                 </div>
 
-                <div class="mb-2">
-                    <label class="text-muted small">Alamat</label>
-                    <div>{{ $order->customer->alamat }}</div>
-                </div>
+                <div class="detail-box mb-2">
+                <div class="detail-label">Alamat</div>
+                <div class="detail-value">{{ $order->customer->alamat }}</div>
+            </div>
 
-                <div>
-                    <label class="text-muted small">Telepon</label>
-                    <div>{{ $order->customer->telepon }}</div>
+                <div class="detail-box">
+                    <div class="detail-label">Telepon</div>
+                    <div class="detail-value">{{ $order->customer->telepon }}</div>
                 </div>
             </div>
         </div>
@@ -51,43 +76,50 @@ use Illuminate\Support\Facades\Storage;
             <div class="card-body">
                 <h6 class="fw-bold">Informasi Order</h6>
 
-                <div class="row mb-3">
-                    <div class="col">
-                        <label class="text-muted small">Tanggal Pemesanan</label>
-                        <div>{{ $order->tanggal_pemesanan->format('d M Y') }}</div>
-                    </div>
-                    <div class="col">
-                        <label class="text-muted small">Deadline</label>
-                        <div>{{ $order->deadline ? $order->deadline->format('d M Y') : '-' }}</div>
-                    </div>
+                <div class="col-12 col-md-6">
+    <div class="detail-box">
+        <div class="detail-label">Tanggal Pemesanan</div>
+        <div class="detail-value">
+            {{ $order->tanggal_pemesanan->format('d M Y') }}
+        </div>
+    </div>
+</div>
+                    <div class="col-12 col-md-6">
+    <div class="detail-box">
+        <div class="detail-label">Deadline</div>
+        <div class="detail-value">
+            {{ $order->deadline ? $order->deadline->format('d M Y') : '-' }}
+        </div>
+    </div>
+</div>
+
+                <div class="detail-box mb-2">
+            <div class="detail-label">Status Pembayaran</div>
+            <div class="detail-value">
+                <span class="badge bg-warning text-dark">
+                    {{ strtoupper(str_replace('_', ' ', $order->payment_status)) }}
+                </span>
+            </div>
+</div>
+
+                <div class="detail-box mb-2">
+                <div class="detail-label">Tipe Order</div>
+                <div class="detail-value">
+                    <span class="badge bg-secondary">
+                        {{ strtoupper($order->tipe_order) }}
+                    </span>
                 </div>
+            </div>
 
-                <div class="mb-2">
-                    <label class="text-muted small">Status Pembayaran</label>
-                    <div>
-                        <span class="badge bg-warning text-dark">
-                            {{ strtoupper(str_replace('_', ' ', $order->payment_status)) }}
-                        </span>
-                    </div>
+
+                <div class="detail-box mb-3">
+                <div class="detail-label">Status Order</div>
+                <div class="detail-value">
+                    <span class="badge bg-info">
+                        {{ strtoupper($order->status) }}
+                    </span>
                 </div>
-
-                <div class="mb-2">
-                    <label class="text-muted small">Tipe Order</label>
-                    <div>
-                        <span class="badge bg-secondary">
-                            {{ strtoupper($order->tipe_order) }}
-                        </span>
-                    </div>
-                </div>
-
-
-                <div class="mb-2">
-                    <label class="text-muted small">Status Order</label>
-                    <div>
-                        <span class="badge bg-info">
-                            {{ strtoupper($order->status) }}
-                        </span>
-                    </div>
+            </div>>
                 </div>
 
                 <hr>
@@ -136,16 +168,19 @@ use Illuminate\Support\Facades\Storage;
                 <hr>
 
                 {{-- ================= JASA TAMBAHAN ================= --}}
-                <div class="row">
-                    <div class="col">
-                        <label class="text-muted small">Antar Barang</label>
-                        <div>
+                <div class="row g-2">
+                    <div class="col-12 col-md-6">
+                    <div class="detail-box">
+                        <div class="detail-label">Antar Barang</div>
+                        <div class="detail-value">
                             {{ $order->antar_barang ? 'Ya' : 'Tidak' }}
+                            @if($order->antar_barang)
+                                <br>
+                                <small>Biaya: Rp{{ number_format($order->biaya_pengiriman,0,',','.') }}</small>
+                            @endif
                         </div>
-                        @if($order->antar_barang)
-                            <small>Biaya: Rp{{ number_format($order->biaya_pengiriman,0,',','.') }}</small>
-                        @endif
                     </div>
+                </div>
 
                     <div class="col">
                         <label class="text-muted small">Jasa Pemasangan</label>
@@ -159,12 +194,12 @@ use Illuminate\Support\Facades\Storage;
                 </div>
 
                 @if(!empty($order->catatan))
-                <hr>
-                    <div>
-                        <label class="text-muted small">Catatan</label>
-                        <div>{{ $order->catatan }}</div>
+                    <hr>
+                    <div class="detail-box">
+                        <div class="detail-label">Catatan</div>
+                        <div class="detail-value">{{ $order->catatan }}</div>
                     </div>
-                @endif
+                    @endif
 
             </div>
         </div>
@@ -177,7 +212,8 @@ use Illuminate\Support\Facades\Storage;
         <h6 class="fw-bold">Item Order</h6>
 
         <div class="table-responsive">
-            <table class="table table-bordered">
+            <div class="table-responsive rounded border">
+            <table class="table table-sm table-bordered align-middle">
                 <thead class="text-center">
                     <tr>
                         <th>Merk</th>
@@ -221,13 +257,15 @@ use Illuminate\Support\Facades\Storage;
 </div>
 
 {{-- ================= TOTAL ================= --}}
-<div class="text-end mb-5">
-    <h5>
+<div class="text-md-end text-start mb-5">
+    <div class="detail-box d-inline-block">
         Grand Total :
         <strong class="text-success">
             Rp{{ number_format($order->total_harga,0,',','.') }}
         </strong>
-    </h5>
+    </div>
+</div>
+    
 </div>
 
 </div>
