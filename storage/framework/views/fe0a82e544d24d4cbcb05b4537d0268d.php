@@ -1,19 +1,79 @@
 <?php $__env->startSection('title','Update Pickup'); ?>
 <?php $__env->startSection('page-title','Update Pickup'); ?>
 
+<style>
+    /* =========================
+   FORM WRAPPER
+========================= */
+.pickup-form {
+    max-width: 600px;
+}
+
+/* =========================
+   FORM GROUP
+========================= */
+.form-group-custom {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+/* =========================
+   LABEL
+========================= */
+.form-group-custom label {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+/* =========================
+   INPUT BORDER STYLE
+========================= */
+.form-control-custom {
+    border: 1.5px solid #dcdcdc;
+    border-radius: 8px;
+    padding: 10px 12px;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+/* Focus Effect */
+.form-control-custom:focus {
+    outline: none;
+    border-color: #198754;
+    box-shadow: 0 0 0 2px rgba(25,135,84,0.15);
+}
+
+/* =========================
+   MOBILE OPTIMIZATION
+========================= */
+@media (max-width: 576px) {
+
+    .card-body {
+        padding: 16px;
+    }
+
+    .form-control-custom {
+        font-size: 14px;
+        padding: 9px 10px;
+    }
+
+    label {
+        font-size: 14px;
+    }
+
+}
+</style>
 <?php $__env->startSection('content'); ?>
 <div class="card">
-    <div class="card-body">
-
+    <div class="pickup-form">
         <form action="<?php echo e(route('pickup.update',$pickup->id)); ?>"
-              method="POST"
-              enctype="multipart/form-data">
-            <?php echo csrf_field(); ?>
-            <?php echo method_field('PUT'); ?>
+        method="POST"
+        enctype="multipart/form-data">
 
-            <div class="mb-3">
-                <label class="form-label">Status</label>
-                <select name="status" class="form-select" required>
+            <div class="form-group-custom">
+                <label>Status</label>
+                <select name="status" class="form-control-custom" required>
                     <option value="menunggu"
                         <?php echo e($pickup->status == 'menunggu' ? 'selected' : ''); ?>>
                         Menunggu
@@ -24,26 +84,29 @@
                 </select>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Bukti (opsional)</label>
-                <input type="file" name="bukti" class="form-control">
-            </div>
 
-            <div class="mb-3">
-                <label class="form-label">Catatan</label>
+           <div class="form-group-custom">
+            <label>Bukti (opsional)</label>
+            <input type="file" name="bukti" class="form-control-custom">
+        </div>
+
+            <div class="form-group-custom">
+                <label>Catatan</label>
                 <textarea name="catatan"
-                          class="form-control"
-                          rows="3"><?php echo e(old('catatan',$pickup->catatan)); ?></textarea>
+                        rows="3"
+                        class="form-control-custom"><?php echo e(old('catatan',$pickup->catatan)); ?></textarea>
             </div>
 
-            <button class="btn btn-success">
-                Simpan
-            </button>
+            <div class="d-flex flex-column flex-md-row gap-2 mt-3">
+                <button class="btn btn-success w-100 w-md-auto">
+                    Simpan
+                </button>
 
-            <a href="<?php echo e(route('pickup.index')); ?>"
-               class="btn btn-secondary">
-               Batal
-            </a>
+                <a href="<?php echo e(route('pickup.index')); ?>"
+                class="btn btn-secondary w-100 w-md-auto">
+                Batal
+                </a>
+            </div>
 
         </form>
 

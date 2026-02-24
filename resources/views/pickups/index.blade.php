@@ -3,6 +3,64 @@
 @section('title','Pickup')
 @section('page-title','Pickup')
 
+<style>
+    /* =========================
+   TABLE RESPONSIVE WRAPPER
+========================= */
+.card-body {
+    overflow-x: auto;
+}
+
+/* =========================
+   TABLE IMPROVEMENT
+========================= */
+.table {
+    min-width: 600px;
+}
+
+/* Supaya isi tabel tetap enak dilihat */
+.table td,
+.table th {
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+/* =========================
+   BUTTON RESPONSIVE
+========================= */
+.table .btn {
+    margin: 2px;
+}
+
+/* =========================
+   MOBILE VIEW
+========================= */
+@media (max-width: 768px) {
+
+    .table {
+        font-size: 14px;
+    }
+
+    .table td,
+    .table th {
+        padding: 10px 6px;
+    }
+
+    /* Tombol jadi stack */
+    .table td .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 4px;
+    }
+
+    /* Badge tetap center */
+    .table .badge {
+        display: inline-block;
+        width: 100%;
+    }
+
+}
+</style>
 @section('content')
 <div class="card">
     <div class="card-body">
