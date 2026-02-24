@@ -3,6 +3,138 @@
 @section('title','Detail Production')
 @section('page-title','Detail Production')
 
+<style>
+    /* =========================
+   CARD
+========================= */
+
+.card {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+.card-header {
+    background: #f8f9fa;
+    font-weight: 600;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.card-body {
+    padding: 24px;
+}
+
+/* =========================
+   TABLE DETAIL
+========================= */
+
+.table-borderless tr {
+    border-bottom: 1px solid #f1f3f5;
+}
+
+.table-borderless th {
+    font-weight: 600;
+    color: #6c757d;
+    padding: 14px 10px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.table-borderless td {
+    padding: 14px 10px;
+    font-weight: 500;
+    color: #212529;
+}
+
+/* Supaya value tidak terlalu mepet */
+.table-borderless td,
+.table-borderless th {
+    line-height: 1.6;
+}
+
+/* =========================
+   BADGE
+========================= */
+
+.badge {
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+}
+
+/* =========================
+   BUTTON
+========================= */
+
+.btn {
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 14px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+
+    .card-body {
+        padding: 18px;
+    }
+
+    .table-borderless,
+    .table-borderless tbody,
+    .table-borderless tr,
+    .table-borderless th,
+    .table-borderless td {
+        display: block;
+        width: 100%;
+    }
+
+    .table-borderless tr {
+        margin-bottom: 12px;
+        background: #fafafa;
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .table-borderless th {
+        padding: 0;
+        margin-bottom: 4px;
+        font-size: 13px;
+        color: #6c757d;
+    }
+
+    .table-borderless td {
+        padding: 0;
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-top: 12px;
+    }
+}
+
+/* EXTRA SMALL */
+@media (max-width: 480px) {
+
+    .card-header h5 {
+        font-size: 16px;
+    }
+
+    .table-borderless td {
+        font-size: 13px;
+    }
+
+    .badge {
+        font-size: 12px;
+    }
+}
+</style>
+
 @section('content')
 <div class="card">
     <div class="card-header">

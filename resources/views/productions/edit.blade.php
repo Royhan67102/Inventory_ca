@@ -2,6 +2,171 @@
 
 @section('title', 'Edit Production')
 @section('page-title', 'Edit Production')
+<style>
+   /* =========================
+   CARD STYLE
+========================= */
+
+.card {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+.card-header {
+    background: #f8f9fa;
+    font-weight: 600;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.card-body {
+    padding: 24px;
+}
+
+/* =========================
+   FORM LABEL
+========================= */
+
+.form-label {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+/* =========================
+   GLOBAL INPUT STYLE
+========================= */
+
+.form-control,
+.form-select,
+textarea {
+    border: 1.5px solid #d1d5db !important;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 10px 12px;
+    transition: 0.2s ease;
+}
+
+/* KHUSUS INPUT TEXT (TIM PRODUKSI FIX) */
+input[type="text"].form-control {
+    border: 1.5px solid #d1d5db !important;
+    background-color: #fff;
+}
+
+/* Hover effect */
+.form-control:hover,
+.form-select:hover,
+textarea:hover {
+    border-color: #9ca3af !important;
+}
+
+/* Focus */
+.form-control:focus,
+.form-select:focus,
+textarea:focus {
+    border: 1.5px solid #0d6efd !important;
+    box-shadow: 0 0 0 2px rgba(13,110,253,0.15);
+}
+
+/* Disabled */
+.form-control:disabled,
+.form-select:disabled,
+textarea:disabled {
+    border: 1.5px solid #e5e7eb !important;
+    background: #f5f5f5;
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+/* =========================
+   FILE INPUT
+========================= */
+
+input[type="file"].form-control {
+    border: 1.5px dashed #d1d5db !important;
+    background: #fafafa;
+    padding: 8px;
+}
+
+/* Disabled file */
+input[type="file"]:disabled {
+    border: 1.5px dashed #e5e7eb !important;
+    background: #f5f5f5;
+}
+
+/* =========================
+   TEXTAREA
+========================= */
+
+textarea.form-control {
+    resize: vertical;
+}
+
+/* =========================
+   BUTTON STYLE
+========================= */
+
+.btn {
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 14px;
+}
+
+/* =========================
+   ALERT
+========================= */
+
+.alert {
+    border-radius: 10px;
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+
+    .card-body {
+        padding: 18px;
+    }
+
+    .form-control,
+    .form-select,
+    textarea {
+        font-size: 14px;
+        padding: 9px 11px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .d-flex.justify-content-between {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+}
+
+/* EXTRA SMALL DEVICE */
+@media (max-width: 480px) {
+
+    .card-header h5 {
+        font-size: 16px;
+    }
+
+    .form-label {
+        font-size: 14px;
+    }
+
+    .form-control,
+    .form-select,
+    textarea {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+}
+</style>
 
 @section('content')
 <div class="row justify-content-center">
