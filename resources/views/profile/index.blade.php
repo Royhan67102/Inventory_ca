@@ -5,84 +5,122 @@
 
 @section('content')
 
+<style>
+.profile-card {
+    border-radius: 16px;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+}
+
+.profile-info-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.profile-info-item:last-child {
+    border-bottom: none;
+}
+
+.profile-label {
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.profile-value {
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .profile-info-item {
+        display: flex;
+        flex-direction: column;
+    }
+}
+</style>
+
 <div class="container-fluid py-4">
-    <div class="row">
+    <div class="row g-4">
 
         <!-- LEFT PROFILE CARD -->
-        <div class="col-md-4">
-            <div class="card card-profile">
+        <div class="col-lg-4">
+            <div class="card profile-card shadow-sm">
                 <div class="card-body text-center">
 
                     {{-- Foto Profile --}}
                     @if($user->photo)
                         <img src="{{ asset('storage/' . $user->photo) }}?v={{ time() }}"
-                            class="rounded-circle img-fluid mb-3"
-                            width="120">
+                             class="rounded-circle profile-avatar mb-3">
                     @else
                         <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}"
-                            class="rounded-circle img-fluid mb-3"
-                            width="120">
+                             class="rounded-circle profile-avatar mb-3">
                     @endif
 
-                    <h5 class="mb-0">{{ $user->name }}</h5>
+                    <h5 class="mb-1">{{ $user->name }}</h5>
 
-                    <p class="text-sm text-muted text-capitalize">
+                    <span class="badge bg-dark text-capitalize mb-3">
                         {{ $user->role }}
-                    </p>
+                    </span>
 
-                    <hr>
+                    <div class="d-grid">
+                        <a href="{{ route('profile.edit') }}"
+                           class="btn btn-outline-dark btn-sm">
+                            Edit Profile
+                        </a>
+                    </div>
 
-                    <a href="{{ route('profile.edit') }}"
-                        class="btn btn-dark btn-sm w-100">
-                        Edit Profile
-                    </a>
                 </div>
             </div>
         </div>
 
         <!-- RIGHT PROFILE DETAIL -->
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header pb-0">
-                    <h6>Personal Information</h6>
+        <div class="col-lg-8">
+            <div class="card shadow-sm profile-card">
+                <div class="card-header bg-white border-0">
+                    <h6 class="mb-0">Personal Information</h6>
                 </div>
 
                 <div class="card-body">
-                    <table class="table align-items-center">
-                        <tr>
-                            <th width="200">Name</th>
-                            <td>{{ $user->name }}</td>
-                        </tr>
 
-                        <tr>
-                            <th>Email</th>
-                            <td>{{ $user->email }}</td>
-                        </tr>
+                    <div class="profile-info-item">
+                        <div class="profile-label">Name</div>
+                        <div class="profile-value">{{ $user->name }}</div>
+                    </div>
 
-                        <tr>
-                            <th>Phone</th>
-                            <td>{{ $user->phone ?? '-' }}</td>
-                        </tr>
+                    <div class="profile-info-item">
+                        <div class="profile-label">Email</div>
+                        <div class="profile-value">{{ $user->email }}</div>
+                    </div>
 
-                        <tr>
-                            <th>Birthday</th>
-                            <td>
-                                {{ $user->birthday ? $user->birthday->format('d M Y') : '-' }}
-                            </td>
-                        </tr>
+                    <div class="profile-info-item">
+                        <div class="profile-label">Phone</div>
+                        <div class="profile-value">{{ $user->phone ?? '-' }}</div>
+                    </div>
 
-                        <tr>
-                            <th>Employee Number</th>
-                            <td>{{ $user->employee_number ?? '-' }}</td>
-                        </tr>
+                    <div class="profile-info-item">
+                        <div class="profile-label">Birthday</div>
+                        <div class="profile-value">
+                            {{ $user->birthday ? $user->birthday->format('d M Y') : '-' }}
+                        </div>
+                    </div>
 
-                        <tr>
-                            <th>Role</th>
-                            <td class="text-capitalize">
-                                {{ $user->role }}
-                            </td>
-                        </tr>
-                    </table>
+                    <div class="profile-info-item">
+                        <div class="profile-label">Employee Number</div>
+                        <div class="profile-value">
+                            {{ $user->employee_number ?? '-' }}
+                        </div>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <div class="profile-label">Role</div>
+                        <div class="profile-value text-capitalize">
+                            {{ $user->role }}
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

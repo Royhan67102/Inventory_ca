@@ -2,7 +2,6 @@
 <?php $__env->startSection('page-title', 'Stok Acrylic'); ?>
 
 <style>
-/* Card Wrapper */
 .table-card {
     background: #fff;
     border: 1px solid #e5e7eb;
@@ -11,14 +10,13 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
-/* Table Styling */
 .custom-table {
+    width: 100%;
+    min-width: 1000px; /* supaya bisa scroll horizontal */
     border-collapse: separate;
     border-spacing: 0;
-    width: 100%;
 }
 
-/* Header */
 .custom-table thead th {
     border: 1px solid #e5e7eb;
     background: #f9fafb;
@@ -26,83 +24,57 @@
     font-weight: 600;
     text-align: center;
     vertical-align: middle;
+    padding: 10px;
 }
 
-/* Body */
 .custom-table tbody td {
     border: 1px solid #e5e7eb;
     vertical-align: middle;
     font-size: 14px;
+    padding: 8px 10px;
 }
 
-/* Row Hover */
 .custom-table tbody tr:hover {
     background: #f9fafb;
 }
 
-/* Badge */
 .badge {
     padding: 6px 10px;
     border-radius: 8px;
     font-size: 12px;
 }
 
-/* Action Buttons */
 .action-buttons {
     display: flex;
-    flex-wrap: wrap;
     gap: 5px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
-/* Mobile Responsive Table */
+.text-number {
+    text-align: right;
+}
+
+/* Mobile hanya kecilkan font, jangan ubah jadi block */
 @media (max-width: 768px) {
-    .custom-table thead {
-        display: none;
-    }
-
-    .custom-table, 
-    .custom-table tbody, 
-    .custom-table tr, 
-    .custom-table td {
-        display: block;
-        width: 100%;
-    }
-
-    .custom-table tr {
-        margin-bottom: 12px;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 10px;
-        background: #fff;
-    }
-
-    .custom-table td {
-        border: none;
-        display: flex;
-        justify-content: space-between;
-        padding: 6px 0;
-    }
-
-    .custom-table td::before {
-        content: attr(data-label);
-        font-weight: 600;
-        color: #6b7280;
-    }
-
-    .action-buttons {
-        justify-content: flex-start;
+    .custom-table {
+        font-size: 13px;
     }
 }
 </style>
 
 <?php $__env->startSection('content'); ?>
 <div class="mb-3">
-    <a href="<?php echo e(route('acrylic-stocks.create')); ?>" class="btn btn-primary">+ Tambah Stok</a>
+    <a href="<?php echo e(route('acrylic-stocks.create')); ?>" class="btn btn-primary">
+        + Tambah Stok
+    </a>
 </div>
 
 <?php if(session('success')): ?>
-    <div class="alert alert-success"><?php echo e(session('success')); ?></div>
+    <div class="alert alert-success">
+        <?php echo e(session('success')); ?>
+
+    </div>
 <?php endif; ?>
 
 <!-- DELETE MODAL -->
@@ -116,7 +88,7 @@
       </div>
 
       <div class="modal-body">
-        <p>Apakah kamu yakin ingin menghapus stok acrylic ini?</p>
+        Apakah kamu yakin ingin menghapus stok acrylic ini?
       </div>
 
       <div class="modal-footer">
@@ -136,7 +108,6 @@
     </div>
   </div>
 </div>
-
 
 <div class="table-card">
 <div class="table-responsive">
@@ -158,34 +129,36 @@
     <tbody>
         <?php $__empty_1 = true; $__currentLoopData = $stocks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $stock): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
         <tr>
-            <td data-label="#"> <?php echo e($loop->iteration); ?> </td>
-            <td data-label="Merk"> <?php echo e($stock->merk); ?> </td>
-            <td data-label="Warna"> <?php echo e($stock->warna ?? '-'); ?> </td>
-            <td data-label="Jenis" class="text-center">
+            <td><?php echo e($loop->iteration); ?></td>
+            <td><?php echo e($stock->merk); ?></td>
+            <td><?php echo e($stock->warna ?? '-'); ?></td>
+            <td class="text-center">
                 <span class="badge bg-<?php echo e($stock->jenis == 'lembar' ? 'primary' : 'secondary'); ?>">
                     <?php echo e(ucfirst($stock->jenis)); ?>
 
                 </span>
             </td>
-            <td data-label="Ukuran"> <?php echo e($stock->panjang); ?> × <?php echo e($stock->lebar); ?> cm </td>
-            <td data-label="Ketebalan"> <?php echo e($stock->ketebalan); ?> mm </td>
-            <td data-label="Luas Total">
-                <?php echo e(number_format($stock->luas_total / 10000, 2)); ?>
-
+            <td><?php echo e($stock->panjang); ?> × <?php echo e($stock->lebar); ?> cm</td>
+            <td class="text-number"><?php echo e($stock->ketebalan); ?> mm</td>
+            <td class="text-number">
+                <?php echo e(number_format($stock->luas_total / 10000, 2)); ?> m²
             </td>
-            <td data-label="Luas Tersedia">
-                <?php echo e(number_format($stock->luas_tersedia / 10000, 2)); ?>
-
+            <td class="text-number">
+                <?php echo e(number_format($stock->luas_tersedia / 10000, 2)); ?> m²
             </td>
-            <td data-label="Jumlah"> <?php echo e($stock->jumlah_lembar); ?> </td>
-            <td data-label="Aksi">
+            <td class="text-number"><?php echo e($stock->jumlah_lembar); ?></td>
+            <td>
                 <div class="action-buttons">
-                    <a href="<?php echo e(route('acrylic-stocks.show', $stock)); ?>" class="btn btn-info btn-sm">Detail</a>
-                    <a href="<?php echo e(route('acrylic-stocks.edit', $stock)); ?>" class="btn btn-warning btn-sm">Edit</a>
-                    <button type="button" 
+                    <a href="<?php echo e(route('acrylic-stocks.show', $stock)); ?>"
+                       class="btn btn-info btn-sm">Detail</a>
+
+                    <a href="<?php echo e(route('acrylic-stocks.edit', $stock)); ?>"
+                       class="btn btn-warning btn-sm">Edit</a>
+
+                    <button type="button"
                             class="btn btn-danger btn-sm delete-btn"
                             data-url="<?php echo e(route('acrylic-stocks.destroy', $stock)); ?>"
-                            data-bs-toggle="modal" 
+                            data-bs-toggle="modal"
                             data-bs-target="#deleteModal">
                         Hapus
                     </button>
@@ -205,29 +178,18 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Get all delete buttons and modal elements
+document.addEventListener('DOMContentLoaded', function () {
     const deleteButtons = document.querySelectorAll('.delete-btn');
     const deleteForm = document.getElementById('deleteForm');
-    const deleteModal = document.getElementById('deleteModal');
 
-    // Handle delete button clicks
-    deleteButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const deleteUrl = this.getAttribute('data-url');
-            // Set the form action to the delete URL
-            deleteForm.action = deleteUrl;
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            deleteForm.setAttribute('action', this.dataset.url);
         });
     });
-
-    // Optional: Reset form when modal is hidden
-    if (deleteModal) {
-        deleteModal.addEventListener('hidden.bs.modal', function() {
-            deleteForm.action = '';
-        });
-    }
 });
 </script>
+
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/acrylicstocks/index.blade.php ENDPATH**/ ?>

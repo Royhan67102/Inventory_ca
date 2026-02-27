@@ -16,34 +16,12 @@
     align-items: center;
 }
 
-.table-responsive-card {
-    border: 1px solid #dee2e6;
-    border-radius: 10px;
-    padding: 10px;
-    background: white;
+.table-wrapper {
+    overflow-x: auto;
 }
 
-@media(max-width:768px){
-
-    .desktop-table {
-        display: none;
-    }
-
-    .mobile-card {
-        display: block;
-        border: 1px solid #dee2e6;
-        border-radius: 10px;
-        padding: 12px;
-        margin-bottom: 12px;
-        background: #fff;
-    }
-
-}
-
-@media(min-width:769px){
-    .mobile-card {
-        display: none;
-    }
+.inventory-table {
+    min-width: 900px; /* supaya bisa scroll di HP */
 }
 </style>
 
@@ -57,8 +35,8 @@
 <div class="card shadow-sm">
 <div class="card-body">
 
-<div class="table-responsive desktop-table">
-<table class="table align-middle">
+<div class="table-wrapper">
+<table class="table align-middle inventory-table">
     <thead class="table-light">
         <tr>
             <th>Nama Barang</th>
@@ -121,44 +99,6 @@
     </tbody>
 </table>
 </div>
-
-{{-- MOBILE VIEW --}}
-@foreach($inventories as $item)
-<div class="mobile-card">
-    <div class="table-box mb-2"><b>Nama:</b> {{ $item->nama_barang }}</div>
-    <div class="table-box mb-2"><b>Jenis:</b> {{ $item->jenis_barang }}</div>
-    <div class="table-box mb-2"><b>PIC:</b> {{ $item->pic_barang ?? '-' }}</div>
-    <div class="table-box mb-2">
-        <b>Stok:</b>
-        <span class="badge bg-{{ $item->jumlah > 0 ? 'success' : 'danger' }}">
-            {{ $item->jumlah }}
-        </span>
-    </div>
-    <div class="table-box mb-2"><b>Kondisi:</b> {{ $item->kondisi ?? '-' }}</div>
-
-    <div class="d-flex gap-2 mt-2 flex-wrap">
-        <a href="{{ route('inventories.show', $item->id) }}"
-           class="btn btn-sm btn-info">
-            Detail
-        </a>
-
-        <a href="{{ route('inventories.edit', $item->id) }}"
-           class="btn btn-sm btn-warning">
-            Edit
-        </a>
-
-        <form action="{{ route('inventories.destroy', $item->id) }}"
-              method="POST"
-              onsubmit="return confirm('Yakin hapus data ini?')">
-            @csrf
-            @method('DELETE')
-            <button class="btn btn-sm btn-danger">
-                Hapus
-            </button>
-        </form>
-    </div>
-</div>
-@endforeach
 
 </div>
 </div>
