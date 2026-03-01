@@ -213,6 +213,11 @@
             </tbody>
         </table>
         </div>
+
+        <div class="mt-3">
+            <?php echo e($orders->appends(request()->query())->links()); ?>
+
+        </div>
     </div>
 </div>
 

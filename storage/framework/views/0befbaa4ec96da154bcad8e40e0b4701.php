@@ -179,10 +179,16 @@
 </table>
 </div>
 
+<div class="mt-3">
+    <?php echo e($designs->appends(request()->query())->links()); ?>
+
+</div>
+
 </div>
 </div>
 </div>
 </div>
 
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/designs/index.blade.php ENDPATH**/ ?>

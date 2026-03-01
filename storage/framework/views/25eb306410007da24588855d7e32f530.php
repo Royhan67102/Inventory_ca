@@ -130,6 +130,11 @@
         </table>
 
     </div>
+
+    <div class="mt-3">
+            <?php echo e($pickups->appends(request()->query())->links()); ?>
+
+    </div>
 </div>
 <?php $__env->stopSection(); ?>
 

@@ -19,15 +19,33 @@ class OrderController extends Controller
     /* =====================
      * LIST ORDER
      * ===================== */
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with([
+        $query = Order::with([
             'customer',
             'production',
             'deliveryNote',
             'design',
             'pickup'
-        ])->where('status', '!=', 'selesai')->latest()->get();
+        ])->where('status', '!=', 'selesai');
+
+        if ($request->filled('search')) {
+
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('invoice_number', 'like', "%{$search}%")
+                ->orWhere('status', 'like', "%{$search}%")
+                ->orWhere('payment_status', 'like', "%{$search}%")
+                ->orWhere('tipe_order', 'like', "%{$search}%")
+                ->orWhereHas('customer', function ($c) use ($search) {
+                    $c->where('nama', 'like', "%{$search}%")
+                        ->orWhere('telepon', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $orders = $query->latest()->paginate(10);
 
         return view('orders.index', compact('orders'));
     }
@@ -334,7 +352,7 @@ class OrderController extends Controller
             // Hanya update flow status ketika masih di tahap desain
             // Jika sudah di tahap produksi atau lebih lanjut, jangan ubah statusnya lagi
             if ($order->status === 'desain') {
-                
+
                 if ($validated['tipe_order'] === 'custom') {
 
                     if ($validated['jasa_desain'] == 1) {

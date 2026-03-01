@@ -12,14 +12,33 @@ class PickupController extends Controller
     /* =====================
      * LIST PICKUP
      * ===================== */
-    public function index()
+    public function index(Request $request)
     {
-        $pickups = Pickup::with([
-                'order.customer'
-            ])
-            ->where('status', 'menunggu') // lebih tegas
-            ->latest()
-            ->get();
+        $query = Pickup::with([
+            'order.customer'
+        ])
+        ->where('status', 'menunggu');
+
+        // 🔎 SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // Cari berdasarkan invoice_number
+                $q->whereHas('order', function ($q2) use ($search) {
+                    $q2->where('invoice_number', 'like', "%$search%");
+                })
+
+                // Cari berdasarkan nama customer
+                ->orWhereHas('order.customer', function ($q3) use ($search) {
+                    $q3->where('nama', 'like', "%$search%");
+                });
+
+            });
+        }
+
+        $pickups = $query->latest()->paginate(10);
 
         return view('pickups.index', compact('pickups'));
     }
@@ -93,9 +112,6 @@ class PickupController extends Controller
             }
 
             $pickup->update($data);
-
-            // ✅ Model event handler di Pickup.php akan otomatis:
-            // - Mengupdate status order ke 'selesai' ketika pickup status = 'selesai'
         });
 
         return redirect()

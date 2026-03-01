@@ -12,14 +12,27 @@ class DesignController extends Controller
     /* =====================
      * LIST DESAIN
      * ===================== */
-    public function index()
+    public function index(Request $request)
     {
-        $designs = Design::with([
-                'order.customer'
-            ])
-            ->whereIn('status', ['menunggu', 'proses']) // lebih aman
-            ->latest()
-            ->get();
+        $query = Design::with(['order.customer'])
+            ->latest();
+
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('designer', 'like', '%' . $request->search . '%')
+                ->orWhereHas('order.customer', function ($q2) use ($request) {
+                    $q2->where('nama', 'like', '%' . $request->search . '%');
+                });
+            });
+        }
+
+        if ($request->status) {
+            $query->where('status', $request->status);
+        } else {
+            $query->whereIn('status', ['menunggu', 'proses']);
+        }
+
+        $designs = $query->paginate(10);
 
         return view('designs.index', compact('designs'));
     }

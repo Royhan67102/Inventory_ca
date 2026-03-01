@@ -11,12 +11,26 @@ class AcrylicStockController extends Controller
     /* =====================
      * LIST STOCK
      * ===================== */
-    public function index()
+    public function index(Request $request)
     {
-        $stocks = AcrylicStock::orderBy('merk')
+        $query = AcrylicStock::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('kode_stok', 'like', "%{$search}%")
+                ->orWhere('merk', 'like', "%{$search}%")
+                ->orWhere('warna', 'like', "%{$search}%")
+                ->orWhere('jenis', 'like', "%{$search}%")
+                ->orWhere('ketebalan', 'like', "%{$search}%");
+            });
+        }
+
+        $stocks = $query->orderBy('merk')
             ->orderBy('warna')
             ->orderBy('ketebalan')
-            ->get();
+            ->paginate(10);
 
         return view('acrylicstocks.index', compact('stocks'));
     }

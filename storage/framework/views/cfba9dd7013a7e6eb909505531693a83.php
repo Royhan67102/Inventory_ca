@@ -99,6 +99,11 @@
 </table>
 </div>
 
+<div class="mt-3">
+    <?php echo e($inventories->appends(request()->query())->links()); ?>
+
+</div>
+
 </div>
 </div>
 

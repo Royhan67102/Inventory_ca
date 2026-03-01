@@ -15,14 +15,41 @@ class DeliveryNoteController extends Controller
     /* =====================
      * LIST DELIVERY
      * ===================== */
-    public function index()
+    public function index(Request $request)
     {
-        $deliveries = DeliveryNote::with([
+        $query = DeliveryNote::with([
                 'order.customer'
             ])
-            ->where('status', '!=', 'selesai')
-            ->latest()
-            ->get();
+            ->where('status', '!=', 'selesai');
+
+        // 🔍 Jika ada search
+        if ($request->filled('search')) {
+
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // Cari berdasarkan status delivery
+                $q->where('status', 'like', "%{$search}%")
+
+                // Cari berdasarkan driver
+                ->orWhere('driver', 'like', "%{$search}%")
+
+                // Cari berdasarkan nama pengirim
+                ->orWhere('nama_pengirim', 'like', "%{$search}%")
+
+                // Cari berdasarkan invoice order
+                ->orWhereHas('order', function ($orderQuery) use ($search) {
+                    $orderQuery->where('invoice_number', 'like', "%{$search}%")
+                            ->orWhereHas('customer', function ($customerQuery) use ($search) {
+                                $customerQuery->where('nama', 'like', "%{$search}%")
+                                                ->orWhere('telepon', 'like', "%{$search}%");
+                            });
+                });
+            });
+        }
+
+        $deliveries = $query->latest()->paginate(10);
 
         return view('delivery.index', compact('deliveries'));
     }

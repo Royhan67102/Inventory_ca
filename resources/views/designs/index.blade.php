@@ -176,6 +176,10 @@
 </table>
 </div>
 
+<div class="mt-3">
+    {{ $designs->appends(request()->query())->links() }}
+</div>
+
 </div>
 </div>
 </div>

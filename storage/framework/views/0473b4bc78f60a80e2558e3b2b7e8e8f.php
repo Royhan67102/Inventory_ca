@@ -14,23 +14,16 @@
             </ol>
         </nav>
 
-        <div class="collapse navbar-collapse mt-sm-0 mt-2">
-            <form method="GET" action="<?php echo e(url()->current()); ?>" class="d-flex">
-                <div class="input-group input-group-outline">
-                    <input type="text"
-                        name="search"
-                        value="<?php echo e(request('search')); ?>"
-                        class="form-control"
-                        placeholder="Cari data...">
-                </div>
-            </form>
-
-            <ul class="navbar-nav align-items-center">
-                <li class="nav-item d-flex align-items-center">
-                    <i class="material-symbols-rounded">account_circle</i>
-                </li>
-            </ul>
-        </div>
+        <form method="GET" action="<?php echo e(url()->current()); ?>" class="d-flex">
+            <div class="input-group input-group-outline">
+                <input type="text"
+                    name="search"
+                    value="<?php echo e(request('search')); ?>"
+                    class="form-control"
+                    placeholder="Cari data..."
+                    onkeydown="if(event.key==='Enter'){this.form.submit();}">
+            </div>
+        </form>
 
     </div>
 </nav>

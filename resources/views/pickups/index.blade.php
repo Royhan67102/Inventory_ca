@@ -131,5 +131,9 @@
         </table>
 
     </div>
+
+    <div class="mt-3">
+            {{ $pickups->appends(request()->query())->links() }}
+    </div>
 </div>
 @endsection

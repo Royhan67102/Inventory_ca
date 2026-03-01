@@ -145,5 +145,9 @@
 </table>
 </div>
 
+<div class="mt-3">
+    {{ $deliveries->appends(request()->query())->links() }}
+</div>
+
 </div>
 @endsection

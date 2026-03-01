@@ -175,6 +175,10 @@
     </tbody>
 </table>
 </div>
+<div class="mt-3">
+    <?php echo e($stocks->appends(request()->query())->links()); ?>
+
+</div>
 </div>
 
 <script>

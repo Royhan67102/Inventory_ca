@@ -9,10 +9,34 @@ use Illuminate\Support\Facades\DB;
 
 class InventoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $inventories = Inventory::latest()->get();
-        return view('inventories.index', compact('inventories'));
+        $query = Inventory::query();
+
+        // 🔎 SEARCH TEXT
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_barang', 'like', "%$search%")
+                ->orWhere('jenis_barang', 'like', "%$search%")
+                ->orWhere('pic_barang', 'like', "%$search%");
+            });
+        }
+
+        // 📂 FILTER PER KATEGORI (jenis_barang)
+        if ($request->filled('kategori')) {
+            $query->where('jenis_barang', $request->kategori);
+        }
+
+        $inventories = $query->latest()->paginate(10);
+
+        // ambil daftar kategori unik untuk dropdown
+        $kategories = Inventory::select('jenis_barang')
+            ->distinct()
+            ->pluck('jenis_barang');
+
+        return view('inventories.index', compact('inventories', 'kategories'));
     }
 
     public function create()

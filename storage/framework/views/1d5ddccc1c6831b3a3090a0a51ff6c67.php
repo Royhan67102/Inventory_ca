@@ -148,6 +148,11 @@
 </table>
 </div>
 
+<div class="mt-3">
+    <?php echo e($deliveries->appends(request()->query())->links()); ?>
+
+</div>
+
 </div>
 <?php $__env->stopSection(); ?>
 

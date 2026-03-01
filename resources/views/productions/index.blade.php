@@ -296,7 +296,9 @@
                 </tbody>
             </table>
         </div>
-
+        <div class="mt-3">
+            {{ $productions->appends(request()->query())->links() }}
+        </div>
     </div>
 </div>
 @endsection

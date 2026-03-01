@@ -11,9 +11,9 @@ class ProductionController extends Controller
     /* =====================
      * LIST PRODUCTION
      * ===================== */
-    public function index()
+    public function index(Request $request)
     {
-        $productions = Production::with([
+        $query = Production::with([
                 'order.customer',
                 'order.design'
             ])
@@ -22,11 +22,37 @@ class ProductionController extends Controller
                 $query->whereHas('order.design', function ($q) {
                     $q->where('status', 'selesai');
                 })
-                ->orWhereDoesntHave('order.design'); // 🔥 TAMBAHKAN INI
+                ->orWhereDoesntHave('order.design');
             })
-            ->whereIn('status', ['menunggu', 'proses'])
-            ->latest()
-            ->get();
+            ->whereIn('status', ['menunggu', 'proses']);
+
+        // 🔍 SEARCH
+        if ($request->filled('search')) {
+
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // Cari berdasarkan status produksi
+                $q->where('status', 'like', "%{$search}%")
+
+                // Cari berdasarkan tim produksi
+                ->orWhere('tim_produksi', 'like', "%{$search}%")
+
+                // Cari berdasarkan invoice
+                ->orWhereHas('order', function ($orderQuery) use ($search) {
+                    $orderQuery->where('invoice_number', 'like', "%{$search}%")
+
+                    // Cari nama customer
+                    ->orWhereHas('customer', function ($customerQuery) use ($search) {
+                        $customerQuery->where('nama', 'like', "%{$search}%")
+                                    ->orWhere('telepon', 'like', "%{$search}%");
+                    });
+                });
+            });
+        }
+
+        $productions = $query->latest()->paginate(10);
 
         return view('productions.index', compact('productions'));
     }
