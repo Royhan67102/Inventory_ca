@@ -6,6 +6,9 @@ use App\Models\Inventory;
 use App\Models\InventoryHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class InventoryController extends Controller
 {
@@ -172,5 +175,60 @@ class InventoryController extends Controller
 
         return redirect()->route('inventories.index')
             ->with('success', 'Inventory berhasil dihapus');
+    }
+
+    public function exportExcel()
+    {
+        $inventories = Inventory::all();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header kolom
+        $sheet->fromArray([
+            [
+                'Nama Barang',
+                'Jenis Barang',
+                'Jumlah Stok',
+                'PIC Barang',
+                'Kondisi',
+                'Deskripsi'
+            ]
+        ], NULL, 'A1');
+
+        $rowNumber = 2;
+
+        foreach ($inventories as $item) {
+            $sheet->setCellValue("A{$rowNumber}", $item->nama_barang);
+            $sheet->setCellValue("B{$rowNumber}", $item->jenis_barang);
+            $sheet->setCellValue("C{$rowNumber}", $item->jumlah);
+            $sheet->setCellValue("D{$rowNumber}", $item->pic_barang);
+            $sheet->setCellValue("E{$rowNumber}", $item->kondisi);
+            $sheet->setCellValue("F{$rowNumber}", $item->deskripsi);
+
+            $rowNumber++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+
+        $fileName = 'inventory_barang.xlsx';
+
+        $response = new StreamedResponse(function() use ($writer) {
+            $writer->save('php://output');
+        });
+
+        $response->headers->set(
+            'Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+
+        $response->headers->set(
+            'Content-Disposition',
+            'attachment;filename="'.$fileName.'"'
+        );
+
+        $response->headers->set('Cache-Control', 'max-age=0');
+
+        return $response;
     }
 }

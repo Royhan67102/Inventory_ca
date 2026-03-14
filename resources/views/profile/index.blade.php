@@ -79,53 +79,117 @@
         <!-- RIGHT PROFILE DETAIL -->
         <div class="col-lg-8">
             <div class="card shadow-sm profile-card">
+
                 <div class="card-header bg-white border-0">
-                    <h6 class="mb-0">Personal Information</h6>
+                    <h6 class="mb-0">Account Information</h6>
                 </div>
 
                 <div class="card-body">
 
-                    <div class="profile-info-item">
-                        <div class="profile-label">Name</div>
-                        <div class="profile-value">{{ $user->name }}</div>
-                    </div>
+                    <!-- PERSONAL INFORMATION -->
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3">Personal Information</h6>
 
-                    <div class="profile-info-item">
-                        <div class="profile-label">Email</div>
-                        <div class="profile-value">{{ $user->email }}</div>
-                    </div>
+                        <div class="profile-info-item">
+                            <div class="profile-label">Name</div>
+                            <div class="profile-value">{{ $user->name }}</div>
+                        </div>
 
-                    <div class="profile-info-item">
-                        <div class="profile-label">Phone</div>
-                        <div class="profile-value">{{ $user->phone ?? '-' }}</div>
-                    </div>
+                        <div class="profile-info-item">
+                            <div class="profile-label">Email</div>
+                            <div class="profile-value">{{ $user->email }}</div>
+                        </div>
 
-                    <div class="profile-info-item">
-                        <div class="profile-label">Birthday</div>
-                        <div class="profile-value">
-                            {{ $user->birthday ? $user->birthday->format('d M Y') : '-' }}
+                        <div class="profile-info-item">
+                            <div class="profile-label">Phone</div>
+                            <div class="profile-value">{{ $user->phone ?? '-' }}</div>
+                        </div>
+
+                        <div class="profile-info-item">
+                            <div class="profile-label">Birthday</div>
+                            <div class="profile-value">
+                                {{ $user->birthday ? $user->birthday->format('d M Y') : '-' }}
+                            </div>
+                        </div>
+
+                        <div class="profile-info-item">
+                            <div class="profile-label">Employee Number</div>
+                            <div class="profile-value">
+                                {{ $user->employee_number ?? '-' }}
+                            </div>
+                        </div>
+
+                        <div class="profile-info-item">
+                            <div class="profile-label">Role</div>
+                            <div class="profile-value text-capitalize">
+                                {{ $user->role }}
+                            </div>
                         </div>
                     </div>
 
-                    <div class="profile-info-item">
-                        <div class="profile-label">Employee Number</div>
-                        <div class="profile-value">
-                            {{ $user->employee_number ?? '-' }}
-                        </div>
-                    </div>
 
-                    <div class="profile-info-item">
-                        <div class="profile-label">Role</div>
-                        <div class="profile-value text-capitalize">
-                            {{ $user->role }}
-                        </div>
+                    <hr class="my-4">
+
+
+                    <!-- CHANGE PASSWORD -->
+                    <div>
+
+                        <h6 class="text-muted mb-3">
+                            <i class="fa-solid fa-lock me-2"></i>
+                            Change Password
+                        </h6>
+
+                        @if (session('status') === 'password-updated')
+                            <div class="alert alert-success">
+                                Password berhasil diperbarui
+                            </div>
+                        @endif
+
+                        <form method="POST" action="{{ route('password.update') }}">
+                            @csrf
+                            @method('PUT')
+
+                            <div class="mb-3">
+                                <label class="form-label">Current Password</label>
+                                <input type="password"
+                                    name="current_password"
+                                    class="form-control"
+                                    required>
+                                @error('current_password')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">New Password</label>
+                                <input type="password"
+                                    name="password"
+                                    class="form-control"
+                                    required>
+                                @error('password')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Confirm Password</label>
+                                <input type="password"
+                                    name="password_confirmation"
+                                    class="form-control"
+                                    required>
+                            </div>
+
+                            <button type="submit" class="btn btn-dark">
+                                Update Password
+                            </button>
+
+                        </form>
+
                     </div>
 
                 </div>
+
             </div>
         </div>
-
-    </div>
-</div>
 
 @endsection

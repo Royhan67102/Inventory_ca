@@ -113,6 +113,7 @@
                     <th style="min-width:100px">Kode</th>
                     <th style="min-width:110px">Tanggal</th>
                     <th style="min-width:150px">Customer</th>
+                    <th style="min-width:120px">Tipe order</th>
                     <th style="min-width:120px">Total</th>
                     <th style="min-width:120px">Pembayaran</th>
                     <th style="min-width:120px">Status</th>
@@ -139,6 +140,12 @@
                     
                     <td>
                         <?php echo e(optional($order->customer)->nama ?? '-'); ?>
+
+                    </td>
+
+                    
+                    <td class="text-center">
+                        <?php echo e(ucfirst($order->tipe_order ?? '-')); ?>
 
                     </td>
 

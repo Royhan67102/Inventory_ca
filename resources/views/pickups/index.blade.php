@@ -79,6 +79,7 @@
                     <th>#</th>
                     <th>Invoice</th>
                     <th>Customer</th>
+                    <th>Produk</th>
                     <th>Status</th>
                     <th width="180">Aksi</th>
                 </tr>
@@ -89,6 +90,7 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $pickup->order->invoice_number ?? '-' }}</td>
                     <td>{{ $pickup->order->customer->nama ?? '-' }}</td>
+                    <td>{{ $pickup->order->produk_name ?? '-' }}</td>
                     <td class="text-center">
                         <span class="badge
                             {{ $pickup->status === 'selesai' ? 'bg-success' : 'bg-warning text-dark' }}">

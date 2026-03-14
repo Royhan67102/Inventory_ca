@@ -17,14 +17,14 @@ class RoleMiddleware
 
         $user = Auth::user();
 
-        // Admin boleh akses semua
+        // Admin bisa akses semua
         if ($user->role === 'admin') {
             return $next($request);
         }
 
-        // Jika role tidak sesuai
+        // Jika role tidak ada dalam daftar yang diizinkan
         if (!in_array($user->role, $roles)) {
-            abort(403, 'Unauthorized');
+            abort(403);
         }
 
         return $next($request);

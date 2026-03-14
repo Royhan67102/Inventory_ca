@@ -25,11 +25,20 @@
 }
 </style>
 
-<div class="d-flex flex-wrap justify-content-between mb-3 gap-2">
-    <h5>Daftar Inventory</h5>
-    <a href="{{ route('inventories.create') }}" class="btn btn-primary">
-        + Tambah Inventory
-    </a>
+<div class="mb-3">
+
+    <h5 class="mb-2">Daftar Inventory</h5>
+
+    <div class="d-flex gap-2">
+        <a href="{{ route('inventories.create') }}" class="btn btn-primary">
+            + Tambah Inventory
+        </a>
+
+        <a href="{{ route('inventories.export') }}" class="btn btn-success">
+            Download Excel
+        </a>
+    </div>
+
 </div>
 
 <div class="card shadow-sm">

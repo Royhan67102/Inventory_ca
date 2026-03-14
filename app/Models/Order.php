@@ -31,6 +31,8 @@ class Order extends Model
 
         'catatan',
         'total_harga',
+        'diskon',
+        'jumlah_bayar',
     ];
 
     protected $casts = [
@@ -43,6 +45,8 @@ class Order extends Model
         'total_harga'       => 'float',
         'biaya_pengiriman'  => 'float',
         'biaya_pemasangan'  => 'float',
+        'diskon'            => 'float',
+        'jumlah_bayar'      => 'float',
     ];
 
     /* ================= RELATION ================= */
@@ -94,7 +98,14 @@ class Order extends Model
 
     public function hitungTotal(): float
     {
-        return $this->totalItem() + $this->totalJasa();
+        $total = $this->totalItem() + $this->totalJasa();
+
+        return $total - (float) ($this->diskon ?? 0);
+    }
+
+    public function sisaPembayaran(): float
+    {
+        return max(0, $this->total_harga - (float) ($this->jumlah_bayar ?? 0));
     }
 
     public function refreshTotal(): void
@@ -102,6 +113,16 @@ class Order extends Model
         $this->updateQuietly([
             'total_harga' => $this->hitungTotal(),
         ]);
+    }
+
+    public function isLunas(): bool
+    {
+        return $this->payment_status === 'lunas';
+    }
+
+    public function isDP(): bool
+    {
+        return $this->payment_status === 'dp';
     }
 
     /* ================= FLOW HELPER ================= */

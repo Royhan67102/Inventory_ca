@@ -1,108 +1,74 @@
-<?php $__env->startSection('title', 'Invoice'); ?>
-<?php $__env->startSection('page-title', 'Invoice'); ?>
-
 <?php $__env->startSection('content'); ?>
-<div class="card shadow-sm">
-    <div class="card-body">
 
-        
-        <div class="d-flex flex-column flex-md-row justify-content-between mb-4 gap-3">
-            <div>
-                <p><strong>Nama Pemesan</strong> : <?php echo e($order->customer->nama); ?></p>
-                <p><strong>Nama Penerima</strong> : Cahaya Akrilik</p>
-                <p><strong>Tanggal Pemesanan</strong> : <?php echo e($order->tanggal_pemesanan->format('d F Y')); ?></p>
-                <p><strong>No Rekening</strong> : BCA A/N Mahmud</p>
-            </div>
-            <div class="text-end">
-                <h4 class="fw-bold">INVOICE</h4>
-                <p><strong>No Invoice</strong><br><?php echo e($order->invoice_number); ?></p>
-            </div>
-        </div>
+<div class="card">
 
-        
-        <div class="table-responsive">
-            <table class="table table-bordered">
-            <thead class="table-light text-center">
-                <tr>
-                    <th width="5%">No</th>
-                    <th>Keterangan</th>
-                    <th width="10%">QTY</th>
-                    <th width="15%">Harga</th>
-                    <th width="15%">Total</th>
-                </tr>
-            </thead>
-          <tbody>
-                <?php $__currentLoopData = $order->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <tr>
-                    <td class="text-center"><?php echo e($i + 1); ?></td>
-                    <td>
-                        <?php echo e(strtoupper($item->product_name)); ?><br>
-                        <?php echo e($item->panjang_cm); ?> x <?php echo e($item->lebar_cm); ?> CM
-                    </td>
-                    <td class="text-center"><?php echo e($item->qty); ?> SET</td>
-
-                
-                <td class="text-end">
-                Rp <?php echo e(number_format(
-                $item->jenis_order === 'custom'
-                    ? $item->harga_per_cm2
-                    : $item->harga_per_lembar,
-                0, ',', '.'
-            )); ?>
-
-    </td>
+<div class="card-body text-center">
 
     
-    <td class="text-end">
-        Rp <?php echo e(number_format($item->subtotal,0,',','.')); ?>
-
-    </td>
-</tr>
-<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-</tbody>
-
-        </table>
-        </div>
-
-        
-        <div class="row mt-3 align-items-start">
-    <div class="col-12 col-md-6 mb-2 mb-md-0">
-        <p class="fw-bold">TOTAL SISA PEMBAYARAN</p>
+    <div id="area-print">
+        <?php echo $__env->make('orders.invoice-pdf', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     </div>
-    <div class="col-12 col-md-6 text-md-end text-start">
-            <div class="col-md-6 text-end">
-                <p><strong>TOTAL :</strong> Rp <?php echo e(number_format($order->total_harga,0,',','.')); ?></p>
-                <p><strong>DP :</strong> Rp 0</p>
-                <p><strong>SISA :</strong> Rp <?php echo e(number_format($order->total_harga,0,',','.')); ?></p>
-            </div>
-        </div>
 
-        
-        <p class="mt-3">
-            Kami tidak menerima selain pembayaran atau transaksi ke No rekening yang tertera.
-        </p>
+    <br>
 
-        
-        <div class="row mt-5">
-            <div class="col text-end">
-                <p>Penerima</p>
-                <br><br>
-                <p><strong>Mahmud</strong></p>
-            </div>
-        </div>
+    
+    <div class="no-print">
 
-        
-        <div class="mt-4 d-flex gap-2">
-            <a href="<?php echo e(route('orders.invoice.download', $order)); ?>" class="btn btn-success">
-                Download PDF
-            </a>
-            <button onclick="window.print()" class="btn btn-secondary">
-                Print
-            </button>
-        </div>
+        <a href="<?php echo e(route('orders.invoice.download',$order)); ?>"
+        class="btn btn-success">
+            Download PDF
+        </a>
+
+        <button onclick="window.print()"
+        class="btn btn-secondary">
+            Print
+        </button>
 
     </div>
+
 </div>
+
+</div>
+
 <?php $__env->stopSection(); ?>
+
+
+
+<?php $__env->startPush('styles'); ?>
+
+<style>
+
+/* ================= PRINT AREA ================= */
+
+@media print {
+
+body *{
+    visibility:hidden;
+}
+
+/* tampilkan hanya invoice */
+#area-print,
+#area-print *{
+    visibility:visible;
+}
+
+/* posisi invoice */
+#area-print{
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+}
+
+/* sembunyikan tombol */
+.no-print{
+    display:none;
+}
+
+}
+
+</style>
+
+<?php $__env->stopPush(); ?>
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/orders/invoice.blade.php ENDPATH**/ ?>

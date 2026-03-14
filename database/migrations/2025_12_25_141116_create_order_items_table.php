@@ -16,6 +16,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             // INFO PRODUK (SESUAI FORM)
+            $table->string('product_name')->nullable();
             $table->string('merk')->nullable();
             $table->string('ketebalan')->nullable();
             $table->string('warna')->nullable();

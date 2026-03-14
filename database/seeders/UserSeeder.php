@@ -10,44 +10,94 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-            'email_verified_at' => now(),
-        ]);
+        $users = [
 
-        User::create([
-            'name' => 'Tim Desain',
-            'email' => 'desain@gmail.com',
-            'password' => Hash::make('password'),
-            'role' => 'tim_desain',
-            'email_verified_at' => now(),
-        ]);
+            // ADMIN
+            [
+                'name' => 'FARIDA',
+                'email' => 'farida@gmail.com',
+                'password' => 'faridacuantik09',
+                'role' => 'admin',
+            ],
+            [
+                'name' => 'ROYHAN',
+                'email' => 'royhan@gmail.com',
+                'password' => 'royhanaja14',
+                'role' => 'admin',
+            ],
+            [
+                'name' => 'MAHMUD',
+                'email' => 'mahmudnia838@gmail.com',
+                'password' => 'MahmudNia_838#',
+                'role' => 'admin',
+            ],
 
-        User::create([
-            'name' => 'Tim Produksi',
-            'email' => 'produksi@gmail.com',
-            'password' => Hash::make('password'),
-            'role' => 'tim_produksi',
-            'email_verified_at' => now(),
-        ]);
+            // DESAIN
+            [
+                'name' => 'ANWAR',
+                'email' => 'AnwarSanusi@gmail.com',
+                'password' => 'anwarr838#',
+                'role' => 'tim_desain',
+            ],
 
-        User::create([
-            'name' => 'Driver',
-            'email' => 'driver@gmail.com',
-            'password' => Hash::make('password'),
-            'role' => 'driver',
-            'email_verified_at' => now(),
-        ]);
+            // PRODUKSI
+            [
+                'name' => 'JAMAL',
+                'email' => 'jamal@gmail.com',
+                'password' => 'jamal_838',
+                'role' => 'tim_produksi',
+            ],
+            [
+                'name' => 'JUJUN',
+                'email' => 'Djunaidi@gmail.com',
+                'password' => 'jujun#838',
+                'role' => 'tim_produksi',
+            ],
 
-        User::create([
-            'name' => 'Logistik',
-            'email' => 'logistik@gmail.com',
-            'password' => Hash::make('password'),
-            'role' => 'logistik',
-            'email_verified_at' => now(),
-        ]);
+            // DRIVER1
+            [
+                'name' => 'UDIN',
+                'email' => 'SaefudinMulia@gmail.com',
+                'password' => 'udinmulia838',
+                'role' => 'driver1',
+            ],
+
+            // DRIVER
+            [
+                'name' => 'RAFLI',
+                'email' => 'RafliAndhaka@gmail.com',
+                'password' => 'rafli_838!',
+                'role' => 'driver',
+            ],
+            [
+                'name' => 'AJI',
+                'email' => 'ajitullah@gmail.com',
+                'password' => 'aji838_!',
+                'role' => 'driver',
+            ],
+
+            // LOGISTIK
+            [
+                'name' => 'WORO',
+                'email' => 'woro@gmail.com',
+                'password' => 'woro_#838',
+                'role' => 'logistik',
+            ],
+
+        ];
+
+        foreach ($users as $user) {
+
+            User::updateOrCreate(
+                ['email' => $user['email']],
+                [
+                    'name' => $user['name'],
+                    'password' => Hash::make($user['password']),
+                    'role' => $user['role'],
+                    'email_verified_at' => now(),
+                ]
+            );
+
+        }
     }
 }

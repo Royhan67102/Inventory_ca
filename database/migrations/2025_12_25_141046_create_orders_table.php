@@ -44,6 +44,8 @@ return new class extends Migration
 
             // ================= TOTAL =================
             $table->decimal('total_harga', 15, 2)->default(0);
+            $table->decimal('diskon', 15, 2)->default(0); // tambahan
+            $table->decimal('jumlah_bayar', 15, 2)->default(0); // tambahan
 
             // ================= JASA TAMBAHAN =================
             $table->boolean('antar_barang')->default(false);
@@ -53,7 +55,6 @@ return new class extends Migration
             $table->decimal('biaya_pemasangan', 15, 2)->default(0);
 
             $table->text('catatan')->nullable();
-
             $table->timestamps();
         });
     }

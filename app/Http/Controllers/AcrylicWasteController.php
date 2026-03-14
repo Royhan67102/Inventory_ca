@@ -11,7 +11,7 @@ use App\Models\AcrylicStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class OrderController extends Controller
+class AcrylicWasteController extends Controller
 {
     /* =====================
      * LIST ORDER

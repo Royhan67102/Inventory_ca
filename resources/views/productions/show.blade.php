@@ -156,6 +156,11 @@
                 <td>{{ $production->order->customer->nama ?? '-' }}</td>
             </tr>
 
+            <tr>
+                <th>Produk</th>
+                <td>{{ $production->order->produk_name ?? '-' }}</td>
+            </tr>
+
             {{-- STATUS --}}
             <tr>
                 <th>Status Production</th>
@@ -231,6 +236,12 @@
                         -
                     @endif
                 </td>
+            </tr>
+
+            {{-- KETERANGAN --}}
+            <tr>
+                <th>Keterangan</th>
+                <td>{{ $production->keterangan ?? '-' }}</td>
             </tr>
 
             {{-- CATATAN PRODUKSI --}}

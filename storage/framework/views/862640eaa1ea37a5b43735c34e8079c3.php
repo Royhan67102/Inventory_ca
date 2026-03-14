@@ -35,9 +35,12 @@
     white-space: nowrap;
 }
 
-#tableItemOrder input {
-    border: 1px solid #ced4da;
-    border-radius: 6px;
+#tableItemOrder input{
+min-width:90px;
+}
+
+#tableItemOrder td{
+text-align:center;
 }
 
 /* GRAND TOTAL */
@@ -195,78 +198,119 @@
 </div>
 
 
-<div class="card mb-4">
-    <div class="card-body">
-        <h6 class="fw-bold">Item Order</h6>
+<div id="itemContainer">
 
-        <div class="table-responsive">
-            <table class="table table-bordered" id="tableItemOrder">
-            <thead class="text-center">
-                <tr>
-                    <th style="width:30px"></th>
-                    <th>Merk</th>
-                    <th>Ketebalan</th>
-                    <th>Warna</th>
-                    <th>Panjang (cm)</th>
-                    <th>Lebar (cm)</th>
-                    <th>Luas (m²)</th>
-                    <th>Qty</th>
-                    <th>Harga</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="item-row">
-                    <td class="text-center align-middle">
-                        <button type="button"
-                            class="btn btn-danger btn-sm btn-clear-row">
-                            <i class="bi bi-x"></i>
-                        </button>
-                    </td>
-                    <td><input name="merk[]" class="form-control form-control-sm text-center"></td>
-                    <td><input name="ketebalan[]" class="form-control form-control-sm text-center"></td>
-                    <td><input name="warna[]" class="form-control form-control-sm text-center"></td>
+    <div class="card mb-3 item-row">
+        <div class="card-body">
 
-                    <td>
-                        <input type="number" name="panjang_cm[]"
-                            class="form-control form-control-sm panjang" step="0.01">
-                    </td>
+            <div class="d-flex justify-content-between mb-3">
+                <h6 class="fw-bold">Item</h6>
 
-                    <td>
-                        <input type="number" name="lebar_cm[]"
-                            class="form-control form-control-sm lebar" step="0.01">
-                    </td>
+                <button type="button"
+                class="btn btn-danger btn-sm btn-clear-row">
+                Hapus
+                </button>
+            </div>
 
-                    <td>
-                        <input type="text" name="luas[]"
-                            class="form-control form-control-sm luas" readonly>
-                    </td>
+            <div class="mb-3">
+                <label class="form-label">Produk</label>
+                <input name="product_name[]" class="form-control">
+            </div>
 
-                    <td style="width:70px">
-                        <input type="number" name="qty[]"
-                            class="form-control form-control-sm qty" value="1">
-                    </td>
+            <div class="mb-3">
+                <label class="form-label">Merk</label>
+                <input name="merk[]" class="form-control">
+            </div>
 
-                    <td style="width:110px">
-                        <input type="number" name="harga[]"
-                            class="form-control form-control-sm harga">
-                    </td>
+            <div class="mb-3">
+                <label class="form-label">Ketebalan</label>
+                <input name="ketebalan[]" class="form-control">
+            </div>
 
-                    <td style="width:130px">
-                        <input type="text" name="subtotal[]"
-                            class="form-control form-control-sm subtotal" readonly>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            <div class="mb-3">
+                <label class="form-label">Warna</label>
+                <input name="warna[]" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Keterangan</label>
+                <input name="keterangan[]" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Panjang (cm)</label>
+                <input type="number"
+                name="panjang_cm[]"
+                class="form-control panjang">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Lebar (cm)</label>
+                <input type="number"
+                name="lebar_cm[]"
+                class="form-control lebar">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Luas</label>
+                <input name="luas[]"
+                class="form-control luas"
+                readonly>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Qty</label>
+                <input type="number"
+                name="qty[]"
+                class="form-control qty"
+                value="1">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Harga</label>
+                <input type="number"
+                name="harga[]"
+                class="form-control harga">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Subtotal</label>
+                <input name="subtotal[]"
+                class="form-control subtotal"
+                readonly>
+            </div>
+
+        </div>
     </div>
+
 </div>
 
+<div class="row mt-3 justify-content-end">
+
+<div class="col-md-3">
+    <label class="form-label">Diskon</label>
+    <input type="number" name="diskon"
+        class="form-control"
+        value="0"
+        id="diskonInput">
+</div>
+
+</div>
 <div class="text-end mt-3">
     <h5>
         Grand Total :
         <span id="grandTotalText">Rp0</span>
     </h5>
+</div>
+
+<div class="row mt-3 justify-content-end">
+    <div class="col-md-3">
+        <label class="form-label">Jumlah Bayar</label>
+        <input type="number"
+        name="jumlah_bayar"
+        class="form-control"
+        value="0">
+    </div>
 </div>
 
 
@@ -328,6 +372,7 @@ function hitungRow(row) {
 
 /* ================= GRAND TOTAL ================= */
 function hitungGrandTotal() {
+
     let totalItem = 0;
 
     document.querySelectorAll('.subtotal').forEach(el => {
@@ -336,9 +381,12 @@ function hitungGrandTotal() {
 
     const antar  = angka(document.querySelector('[name="biaya_pengiriman"]')?.value);
     const pasang = angka(document.querySelector('[name="biaya_pemasangan"]')?.value);
+    const diskon = angka(document.getElementById('diskonInput')?.value);
 
-    document.getElementById('grandTotalText').innerText =
-        formatRp(totalItem + antar + pasang);
+    const grand = totalItem + antar + pasang - diskon;
+
+    document.getElementById('grandTotalText').innerText = formatRp(grand);
+
 }
 
 /* ================= BIND ROW ================= */
@@ -354,18 +402,22 @@ document.querySelectorAll('.item-row').forEach(bindRow);
 
 /* ================= TAMBAH ROW ================= */
 document.getElementById('addRow').addEventListener('click', () => {
-    const tbody = document.querySelector('#tableItemOrder tbody');
-    const template = tbody.querySelector('.item-row');
+
+    const container = document.getElementById('itemContainer');
+    const template  = container.querySelector('.item-row');
+
     const row = template.cloneNode(true);
 
     // reset input
     row.querySelectorAll('input').forEach(i => i.value = '');
 
-    // default qty = 1
+    // default qty
     row.querySelector('.qty').value = 1;
 
-    tbody.appendChild(row);
+    container.appendChild(row);
+
     bindRow(row);
+
 });
 
 /* ================= BIAYA TAMBAHAN ================= */
@@ -374,16 +426,20 @@ document.getElementById('addRow').addEventListener('click', () => {
         ?.addEventListener('input', hitungGrandTotal);
 });
 
+/* ================= DISKON ================= */
+document.getElementById('diskonInput')
+?.addEventListener('input', hitungGrandTotal);
+
 /* ================= HAPUS SATU BARIS ================= */
 document.addEventListener('click', function (e) {
     const btn = e.target.closest('.btn-clear-row');
     if (!btn) return;
 
     const row = btn.closest('.item-row');
-    const tbody = row.closest('tbody');
+    const container = row.closest('#itemContainer');
 
     // minimal harus ada 1 baris
-    if (tbody.querySelectorAll('.item-row').length === 1) {
+    if (container.querySelectorAll('.item-row').length === 1){
         // kalau tinggal satu, jangan hapus — cukup reset
         row.querySelectorAll('input, select, textarea').forEach(el => el.value = '');
         row.querySelector('.qty').value = 1;
@@ -406,6 +462,40 @@ document.getElementById('tipeOrder')?.addEventListener('change', function() {
     }
 
     toggleForm('jasaDesain', 'formDesain');
+});
+
+document.querySelector('[name="jumlah_bayar"]')
+?.addEventListener('input', function(){
+
+const bayar = angka(this.value);
+
+const totalText = document
+.getElementById('grandTotalText')
+.innerText.replace(/[^\d]/g,'');
+
+const total = angka(totalText);
+
+const status = document.querySelector('[name="payment_status"]');
+
+if(bayar >= total && total > 0){
+    status.value = "lunas";
+}else if(bayar > 0){
+    status.value = "dp";
+}else{
+    status.value = "belum_bayar";
+}
+
+});
+
+document.getElementById('tipeOrder')
+.addEventListener('change', function(){
+
+const isCustom = this.value === "custom";
+
+document.querySelectorAll('.panjang,.lebar').forEach(el=>{
+    el.disabled = !isCustom;
+});
+
 });
 
 </script>

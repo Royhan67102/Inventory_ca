@@ -1,147 +1,347 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Invoice <?php echo e($order->invoice->invoice_number ?? 'INV-'.$order->id); ?></title>
-    <style>
+<meta charset="utf-8">
 
-body {
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    margin: 20px;
+<style>
+
+body{
+    font-family: monospace;
+    font-size:12px;
+    margin:0;
 }
 
-/* CONTAINER */
-.invoice-wrapper {
-    max-width: 900px;
-    margin: auto;
+/* ukuran nota dotmatrix */
+.wrapper{
+    width:90%;
+    margin:0 auto;
 }
 
-/* TITLE */
-.invoice-title {
-    text-align: center;
-    margin-bottom: 20px;
+/* HEADER */
+
+.header{
+    text-align:center;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+/* INFO */
+
+.info{
+    width:100%;
+    margin-bottom:10px;
+}
+
+.info td{
+    border:none;
+    padding:2px;
 }
 
 /* TABLE */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+
+table{
+    width:100%;
+    border-collapse:collapse;
 }
 
-th, td {
-    border: 1px solid #000;
-    padding: 8px;
-    font-size: 12px;
+th,td{
+    border:1px solid #000;
+    padding:5px;
 }
 
-th {
-    background: #f5f5f5;
+th{
+    text-align:center;
 }
 
-.text-right { text-align: right; }
-.text-center { text-align: center; }
-
-/* SIGNATURE */
-.signature-table td {
-    border: none;
-    padding-top: 40px;
+.text-center{
+    text-align:center;
 }
 
-/* ================= MOBILE ================= */
-@media (max-width: 768px) {
-
-    body {
-        font-size: 11px;
-        margin: 10px;
-    }
-
-    th, td {
-        font-size: 10px;
-        padding: 6px;
-    }
-
-    .invoice-title {
-        font-size: 16px;
-    }
-
-    /* TABLE SCROLL */
-    .table-responsive {
-        overflow-x: auto;
-    }
-
+.text-right{
+    text-align:right;
 }
 
-/* ================= PRINT ================= */
-@media print {
-    body {
-        margin: 0;
-    }
+/* WATERMARK */
+
+.watermark{
+    position:fixed;
+    top:45%;
+    left:50%;
+    transform:translate(-50%,-50%) rotate(-30deg);
+    font-size:80px;
+    color:rgba(0,0,0,0.07);
+    font-weight:bold;
+}
+
+/* TTD */
+
+.ttd td{
+    border:none;
+    padding-top:30px;
+}
+
+.td{
+    border:1px solid #000;
+    padding:6px;
 }
 
 </style>
+
 </head>
+
 <body>
-<div class="invoice-wrapper">
 
-<h3 class="invoice-title">INVOICE</h3>
+<?php
 
-<p><strong>Nama Pemesan:</strong> <?php echo e($order->customer->nama); ?></p>
-<p><strong>Tanggal:</strong> <?php echo e($order->tanggal_pemesanan?->format('d M Y')); ?></p>
+$total = $order->total_harga;
+$dp = $order->jumlah_bayar ?? 0;
+$discount = $order->diskon ?? 0;
 
-<div class="table-responsive">
-<table>
-    <thead>
-        <tr>
-            <th>Produk</th>
-            <th>Ukuran (cm)</th>
-            <th>Qty</th>
-            <th>Harga / m²</th>
-            <th>Subtotal</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php $__currentLoopData = $order->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-        <tr>
-            <td><?php echo e($item->product_name); ?></td>
-            <td><?php echo e($item->panjang_cm); ?> x <?php echo e($item->lebar_cm); ?></td>
-            <td><?php echo e($item->qty); ?></td>
-            <td>Rp <?php echo e(number_format($item->harga_per_m2,0,',','.')); ?></td>
-            <td>Rp <?php echo e(number_format($item->subtotal,0,',','.')); ?></td>
-        </tr>
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-    </tbody>
+$totalDiskon = $total;
+$sisa = $totalDiskon - $dp;
+
+?>
+
+
+<?php if($order->payment_status == 'lunas'): ?>
+<div class="watermark">LUNAS</div>
+<?php endif; ?>
+
+
+<div class="wrapper">
+
+<div class="header">
+<h3>INVOICE</h3>
+</div>
+
+
+<table class="info">
+
+<tr>
+
+<td width="60%">
+Nama Pemesan : <?php echo e($order->customer->nama); ?> <br>
+Nama Pengirim : CAHAYA ACRYLIC <br>
+Tanggal Pemesanan : <?php echo e($order->tanggal_pemesanan->format('d/m/Y')); ?> <br>
+No rekening : BCA AN MAHMUD 8720516501
+</td>
+
+<td width="40%" class="text-right">
+No Invoice : <?php echo e($order->invoice_number); ?>
+
+</td>
+
+</tr>
+
 </table>
 
+
+
+<table>
+
+<thead>
+
+<tr>
+<th width="5%">No</th>
+<th>Keterangan</th>
+<th width="10%">QTY</th>
+<th width="20%">Harga</th>
+<th width="20%">Total</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+<?php for($i = 1; $i <= 7; $i++): ?>
+
+<tr>
+
+<td class="text-center">
+<?php echo e($i); ?>
+
+</td>
+
+<?php if(isset($order->items[$i-1])): ?>
+
+<td>
+
+<strong>
+<?php echo e(strtoupper($order->items[$i-1]->product_name)); ?>
+
+</strong>
+
+<?php if($order->items[$i-1]->merk): ?>
+<br>Merk : <?php echo e($order->items[$i-1]->merk); ?>
+
+<?php endif; ?>
+
+<?php if($order->items[$i-1]->ketebalan): ?>
+<br>Ketebalan : <?php echo e($order->items[$i-1]->ketebalan); ?>
+
+<?php endif; ?>
+
+<?php if($order->items[$i-1]->warna): ?>
+<br>Warna : <?php echo e($order->items[$i-1]->warna); ?>
+
+<?php endif; ?>
+
+<?php if($order->items[$i-1]->keterangan): ?>
+<br><?php echo e($order->items[$i-1]->keterangan); ?>
+
+<?php endif; ?>
+
+</td>
+
+<td class="text-center">
+<?php echo e($order->items[$i-1]->qty); ?>
+
+</td>
+
+<td class="text-right">
+Rp <?php echo e(number_format($order->items[$i-1]->harga,0,',','.')); ?>
+
+</td>
+
+<td class="text-right">
+Rp <?php echo e(number_format($order->items[$i-1]->subtotal,0,',','.')); ?>
+
+</td>
+
+<?php else: ?>
+
+<td></td>
+<td></td>
+<td></td>
+<td class="text-center">-</td>
+
+<?php endif; ?>
+
+</tr>
+
+<?php endfor; ?>
+
+
+<tr>
+
+<td colspan="4" class="text-center">
+TOTAL
+</td>
+
+<td class="text-right">
+Rp <?php echo e(number_format($totalDiskon,0,',','.')); ?>
+
+</td>
+
+</tr>
+
+
+<?php if($discount > 0): ?>
+
+<tr>
+
+<td colspan="4" class="text-center">
+DISCOUNT
+</td>
+
+<td class="text-right">
+- Rp <?php echo e(number_format($discount,0,',','.')); ?>
+
+</td>
+
+</tr>
+
+<?php endif; ?>
+
+
+
+<?php if($order->payment_status == 'dp'): ?>
+
+<tr>
+
+<td colspan="4" class="text-center">
+DP
+</td>
+
+<td class="text-right">
+Rp <?php echo e(number_format($dp,0,',','.')); ?>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td colspan="4" class="text-center">
+TOTAL SISA PEMBAYARAN
+</td>
+
+<td class="text-right">
+Rp <?php echo e(number_format($sisa,0,',','.')); ?>
+
+</td>
+
+</tr>
+
+<?php endif; ?>
+
+
+
+<?php if($order->payment_status == 'lunas'): ?>
+
+<tr>
+
+<td colspan="4" class="text-center">
+LUNAS
+</td>
+
+<td class="text-right">
+Rp <?php echo e(number_format($totalDiskon,0,',','.')); ?>
+
+</td>
+
+</tr>
+
+<?php endif; ?>
+
+</tbody>
+
+</table>
+
+
 <br>
 
-<p><strong>Total:</strong> Rp <?php echo e(number_format($order->invoice->total_harga ?? $order->total_harga,0,',','.')); ?></p>
-<p><strong>DP:</strong> Rp <?php echo e(number_format($order->invoice->dp ?? 0,0,',','.')); ?></p>
-<p><strong>Sisa Pembayaran:</strong> Rp <?php echo e(number_format($order->invoice->sisa_pembayaran ?? ($order->total_harga - ($order->invoice->dp ?? 0)),0,',','.')); ?></p>
-
-<br>
-
-<p><strong>Catatan:</strong></p>
 <p>
-Kami tidak menerima pembayaran selain melalui rekening resmi.
-Segala bentuk kesalahan transfer bukan tanggung jawab kami.
+* Kami tidak menerima selain pembayaran atau transaksi ke No rekening yang tertera
 </p>
+
 
 <br><br>
 
-<table class="signature-table" width="100%">
+
+<table class="ttd">
+
 <tr>
-    <td align="center">
-        Admin<br><br><br>____________________
-    </td>
-    <td align="center">
-        Penerima<br><br><br>____________________
-    </td>
+
+<td class="text-center">
+Admin
+<br><br><br>
+(_______________)
+</td>
+
+<td class="text-center">
+Penerima
+<br><br><br>
+<br>
+(_______________)
+</td>
+
 </tr>
+
 </table>
+
 </div>
 
 </body>
-</div>
 </html>
 <?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/orders/invoice-pdf.blade.php ENDPATH**/ ?>

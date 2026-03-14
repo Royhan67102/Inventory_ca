@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\AcrylicStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
 
 class AcrylicStockController extends Controller
 {
@@ -192,5 +196,70 @@ class AcrylicStockController extends Controller
         return redirect()
             ->route('acrylic-stocks.index')
             ->with('success', 'Stok akrilik dihapus');
+    }
+
+    public function exportExcel()
+    {
+        $stocks = AcrylicStock::all();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header kolom
+        $sheet->fromArray([
+            [
+                'Kode Stok',
+                'Merk',
+                'Warna',
+                'Jenis',
+                'Panjang',
+                'Lebar',
+                'Ketebalan',
+                'Jumlah Lembar',
+                'Luas Total',
+                'Luas Tersedia',
+                'Harga / Lembar'
+            ]
+        ], NULL, 'A1');
+
+        $rowNumber = 2;
+
+        foreach ($stocks as $stock) {
+            $sheet->setCellValue("A{$rowNumber}", $stock->kode_stok);
+            $sheet->setCellValue("B{$rowNumber}", $stock->merk);
+            $sheet->setCellValue("C{$rowNumber}", $stock->warna);
+            $sheet->setCellValue("D{$rowNumber}", $stock->jenis);
+            $sheet->setCellValue("E{$rowNumber}", $stock->panjang);
+            $sheet->setCellValue("F{$rowNumber}", $stock->lebar);
+            $sheet->setCellValue("G{$rowNumber}", $stock->ketebalan);
+            $sheet->setCellValue("H{$rowNumber}", $stock->jumlah_lembar);
+            $sheet->setCellValue("I{$rowNumber}", $stock->luas_total);
+            $sheet->setCellValue("J{$rowNumber}", $stock->luas_tersedia);
+            $sheet->setCellValue("K{$rowNumber}", $stock->harga_lembar);
+
+            $rowNumber++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+
+        $fileName = 'stok_acrylic.xlsx';
+
+        $response = new StreamedResponse(function() use ($writer) {
+            $writer->save('php://output');
+        });
+
+        $response->headers->set(
+            'Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+
+        $response->headers->set(
+            'Content-Disposition',
+            'attachment;filename="'.$fileName.'"'
+        );
+
+        $response->headers->set('Cache-Control', 'max-age=0');
+
+        return $response;
     }
 }

@@ -216,12 +216,14 @@ use Illuminate\Support\Facades\Storage;
             <table class="table table-sm table-bordered align-middle">
                 <thead class="text-center">
                     <tr>
+                        <th>Produk</th>
                         <th>Merk</th>
                         <th>Ketebalan</th>
                         <th>Warna</th>
                         <th>Panjang</th>
                         <th>Lebar</th>
                         <th>Luas (m²)</th>
+                        <th>Keterangan</th>
                         <th>Qty</th>
                         <th>Harga</th>
                         <th>Total</th>
@@ -234,12 +236,14 @@ use Illuminate\Support\Facades\Storage;
                         $total = $item->harga * $item->qty;
                     @endphp
                         <tr>
+                            <td>{{ $item->product_name }}</td>
                             <td>{{ $item->merk }}</td>
                             <td>{{ $item->ketebalan ?? '-' }}</td>
                             <td>{{ $item->warna ?? '-' }}</td>
                             <td class="text-end">{{ $item->panjang_cm }}</td>
                             <td class="text-end">{{ $item->lebar_cm }}</td>
                             <td class="text-end">{{ number_format($luas,2) }}</td>
+                            <td>{{ $item->keterangan }}</td>
                             <td class="text-center">{{ $item->qty }}</td>
                             <td class="text-end">
                     Rp{{ number_format($item->harga,0,',','.') }}
@@ -265,7 +269,7 @@ use Illuminate\Support\Facades\Storage;
         </strong>
     </div>
 </div>
-    
+
 </div>
 
 </div>

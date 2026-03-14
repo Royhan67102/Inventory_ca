@@ -122,11 +122,16 @@
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm gap-2">
                     <label class="flex items-center">
                         <input type="checkbox" name="remember"
-                               class="mr-2 rounded text-red-500 focus:ring-red-400">
+                            class="mr-2 rounded text-red-500 focus:ring-red-400">
                         Remember me
                     </label>
 
-                    
+                    <?php if(Route::has('password.request')): ?>
+                        <a href="<?php echo e(route('password.request')); ?>"
+                        class="text-red-500 hover:underline">
+                            Forgot your password?
+                        </a>
+                    <?php endif; ?>
                 </div>
 
                 
@@ -163,4 +168,5 @@ unset($__errorArgs, $__bag); ?>
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 </body>
-</html><?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/auth/login.blade.php ENDPATH**/ ?>
+</html>
+<?php /**PATH C:\xampp\htdocs\Inventory_ca\resources\views/auth/login.blade.php ENDPATH**/ ?>

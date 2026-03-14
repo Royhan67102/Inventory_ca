@@ -105,6 +105,8 @@ class OrderController extends Controller
             'lebar_cm.*'   => 'nullable|numeric|min:0',
             'qty.*'        => 'nullable|integer|min:1',
             'harga.*'      => 'nullable|numeric|min:0',
+            'diskon'       => 'nullable|numeric|min:0',
+            'jumlah_bayar' => 'nullable|numeric|min:0',
 
             'file_desain'  => 'nullable|file|max:51200',
         ]);
@@ -141,6 +143,8 @@ class OrderController extends Controller
                 'jasa_pemasangan'   => $validated['jasa_pemasangan'],
                 'biaya_pemasangan'  => $validated['biaya_pemasangan'] ?? 0,
                 'catatan'           => $validated['catatan'] ?? null,
+                'diskon'       => $validated['diskon'] ?? 0,
+                'jumlah_bayar' => $validated['jumlah_bayar'] ?? 0,
                 'total_harga'       => 0,
             ]);
 
@@ -162,6 +166,7 @@ class OrderController extends Controller
 
                 OrderItem::create([
                     'order_id'   => $order->id,
+                    'product_name'  => $validated['product_name'][$i] ?? null,
                     'merk'       => $merk,
                     'ketebalan'  => $validated['ketebalan'][$i] ?? null,
                     'warna'      => $validated['warna'][$i] ?? null,
@@ -181,7 +186,8 @@ class OrderController extends Controller
                 'total_harga' =>
                     $totalItem +
                     $order->biaya_pengiriman +
-                    $order->biaya_pemasangan
+                    $order->biaya_pemasangan -
+                    ($order->diskon ?? 0)
             ]);
 
             /* ================= DESIGN (CUSTOM DENGAN JASA DESAIN) ================= */
@@ -203,28 +209,10 @@ class OrderController extends Controller
                 ]);
             }
 
-            /* ================= PRODUCTION (CUSTOM TANPA JASA DESAIN) ================= */
-            if (
-                $validated['tipe_order'] === 'custom' &&
-                ($validated['jasa_desain'] ?? '0') == '0'
-            ) {
-                // Langsung buat Production record
-                Production::create([
-                    'order_id' => $order->id,
-                    'status'   => 'menunggu',
-                ]);
-            }
-
             /* ================= PRODUCTION ================= */
-            // Semua order harus melewati produksi (kecuali yang pakai desain, itu nanti otomatis)
-            if ($validated['tipe_order'] === 'custom' && ($validated['jasa_desain'] ?? '0') == '0') {
-                // Custom tanpa jasa desain → langsung buat Production
-                Production::create([
-                    'order_id' => $order->id,
-                    'status'   => 'menunggu',
-                ]);
-            } else if ($validated['tipe_order'] === 'lembaran') {
-                // Tipe lembaran → langsung buat Production
+            if ($validated['tipe_order'] === 'lembaran' ||
+            ($validated['tipe_order'] === 'custom' && ($validated['jasa_desain'] ?? '0') == '0')) {
+
                 Production::create([
                     'order_id' => $order->id,
                     'status'   => 'menunggu',
@@ -276,6 +264,7 @@ class OrderController extends Controller
             'biaya_pengiriman'  => 'nullable|numeric|min:0',
             'biaya_pemasangan'  => 'nullable|numeric|min:0',
 
+            'product_name.*' => 'nullable|string|max:100',
             'merk.*'            => 'nullable|string',
             'ketebalan.*'       => 'nullable|string',
             'warna.*'           => 'nullable|string',
@@ -326,6 +315,7 @@ class OrderController extends Controller
 
                 OrderItem::create([
                     'order_id'   => $order->id,
+                    'product_name' => $validated['product_name'][$i] ?? null,
                     'merk'       => $merk,
                     'ketebalan'  => $validated['ketebalan'][$i] ?? null,
                     'warna'      => $validated['warna'][$i] ?? null,
@@ -453,20 +443,18 @@ class OrderController extends Controller
      * ===================== */
     public function invoice(Order $order)
     {
-        $order->load(['customer', 'items']);
+        $order->load(['customer','items']);
         return view('orders.invoice', compact('order'));
     }
 
-    /* =====================
-     * DOWNLOAD INVOICE
-     * ===================== */
     public function downloadInvoice(Order $order)
     {
-        $order->load(['customer', 'items']);
+        $order->load(['customer','items']);
 
         $pdf = Pdf::loadView('orders.invoice-pdf', compact('order'))
-            ->setPaper('A4', 'portrait');
+            ->setPaper([0,0,685,396]);
+            // 241mm x 140mm (dotmatrix)
 
-        return $pdf->download('Invoice-' . $order->invoice_number . '.pdf');
+        return $pdf->download('Invoice-'.$order->invoice_number.'.pdf');
     }
 }

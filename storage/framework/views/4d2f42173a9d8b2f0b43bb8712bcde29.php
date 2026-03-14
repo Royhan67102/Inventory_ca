@@ -154,6 +154,11 @@
                 <td><?php echo e($production->order->customer->nama ?? '-'); ?></td>
             </tr>
 
+            <tr>
+                <th>Produk</th>
+                <td><?php echo e($production->order->produk_name ?? '-'); ?></td>
+            </tr>
+
             
             <tr>
                 <th>Status Production</th>
@@ -232,6 +237,12 @@
                         -
                     <?php endif; ?>
                 </td>
+            </tr>
+
+            
+            <tr>
+                <th>Keterangan</th>
+                <td><?php echo e($production->keterangan ?? '-'); ?></td>
             </tr>
 
             

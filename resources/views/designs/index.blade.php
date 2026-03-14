@@ -70,6 +70,7 @@
     <th>#</th>
     <th>Kode</th>
     <th>Customer</th>
+    <th>Produk</th>
     <th>Status</th>
     <th>Designer</th>
     <th>Catatan</th>
@@ -93,6 +94,10 @@
 
 <td>
     {{ $design->order->customer->nama ?? '-' }}
+</td>
+
+<td>
+    {{ $design->order->produk_name ?? '-' }}
 </td>
 
 <td class="text-center">

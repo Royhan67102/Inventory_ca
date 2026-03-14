@@ -196,10 +196,12 @@
                     <tr>
                         <th>#</th>
                         <th>Invoice</th>
+                        <th>Produk</th>
                         <th>Customer</th>
                         <th>Tim</th>
                         <th>Bukti</th>
                         <th>Deadline</th>
+                        <th>Keterangan</th>
                         <th>Status</th>
                         <th width="170">Aksi</th>
                     </tr>
@@ -217,6 +219,12 @@
                         
                         <td>
                             <?php echo e($production->order->invoice_number ?? '-'); ?>
+
+                        </td>
+
+                        
+                        <td>
+                            <?php echo e($production->order->produk_name ?? '-'); ?>
 
                         </td>
 
@@ -248,6 +256,12 @@
                         
                         <td class="text-center">
                             <?php echo e(optional($production->order->deadline)->format('d/m/Y') ?? '-'); ?>
+
+                        </td>
+
+                        
+                        <td>
+                            <?php echo e($production->keterangan ?? '-'); ?>
 
                         </td>
 

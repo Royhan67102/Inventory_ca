@@ -73,6 +73,11 @@
             </td>
 
             <td>
+                <?php echo e($delivery->order->produk_name ?? '-'); ?>
+
+            </td>
+
+            <td>
                 <?php echo e($delivery->order->customer->nama ?? '-'); ?>
 
             </td>

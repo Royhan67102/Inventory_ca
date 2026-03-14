@@ -272,12 +272,14 @@
             <thead class="text-center">
                 <tr>
                     <th style="width:40px"></th>
+                    <th>Produk</th>
                     <th>Merk</th>
                     <th>Ketebalan</th>
                     <th>Warna</th>
                     <th>Panjang</th>
                     <th>Lebar</th>
                     <th>Luas</th>
+                    <th>Keterangan</th>
                     <th>Qty</th>
                     <th>Harga</th>
                     <th>Total</th>
@@ -291,12 +293,14 @@
                             ×
                         </button>
                     </td>
+                    <td><input name="product_name[]" class="form-control form-control-sm text-center"value="{{ $item->product_name }}"></td>
                     <td><input name="merk[]" class="form-control form-control-sm text-center" value="{{ $item->merk }}"></td>
                     <td><input name="ketebalan[]" class="form-control form-control-sm text-center" value="{{ $item->ketebalan }}"></td>
                     <td><input name="warna[]" class="form-control form-control-sm text-center" value="{{ $item->warna }}"></td>
                     <td><input name="panjang_cm[]" class="form-control form-control-sm panjang" value="{{ $item->panjang_cm }}"></td>
                     <td><input name="lebar_cm[]" class="form-control form-control-sm lebar" value="{{ $item->lebar_cm }}"></td>
                     <td><input name="luas[]" class="form-control form-control-sm luas" readonly></td>
+                    <td><input name="keterangan[]" class="form-control form-control-sm" value="{{ $item->keterangan }}"></td>
                     <td><input name="qty[]" class="form-control form-control-sm qty" value="{{ $item->qty }}"></td>
                     <td><input name="harga[]" class="form-control form-control-sm harga" value="{{ $item->harga }}"></td>
                     <td><input name="subtotal[]" class="form-control form-control-sm subtotal" readonly></td>

@@ -14,13 +14,17 @@
 
 .custom-table {
     width: 100%;
-    min-width: 1000px; /* supaya bisa scroll horizontal */
+    min-width: 1000px;
     border-collapse: separate;
     border-spacing: 0;
 }
 
+.custom-table th,
+.custom-table td {
+    border-bottom: 1px solid #e5e7eb;
+}
+
 .custom-table thead th {
-    border: 1px solid #e5e7eb;
     background: #f9fafb;
     font-size: 14px;
     font-weight: 600;
@@ -30,10 +34,9 @@
 }
 
 .custom-table tbody td {
-    border: 1px solid #e5e7eb;
     vertical-align: middle;
     font-size: 14px;
-    padding: 8px 10px;
+    padding: 10px;
 }
 
 .custom-table tbody tr:hover {
@@ -69,6 +72,9 @@
 <div class="mb-3">
     <a href="{{ route('acrylic-stocks.create') }}" class="btn btn-primary">
         + Tambah Stok
+    </a>
+    <a href="{{ route('acrylic-stocks.export') }}" class="btn btn-success">
+        Download Excel
     </a>
 </div>
 

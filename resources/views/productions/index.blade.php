@@ -196,10 +196,12 @@
                     <tr>
                         <th>#</th>
                         <th>Invoice</th>
+                        <th>Produk</th>
                         <th>Customer</th>
                         <th>Tim</th>
                         <th>Bukti</th>
                         <th>Deadline</th>
+                        <th>Keterangan</th>
                         <th>Status</th>
                         <th width="170">Aksi</th>
                     </tr>
@@ -223,6 +225,11 @@
                             {{ $production->order->customer->nama ?? '-' }}
                         </td>
 
+                        {{-- PRODUK --}}
+                        <td>
+                            {{ $production->order->produk_name ?? '-' }}
+                        </td>
+
                         {{-- TIM --}}
                         <td>
                             {{ $production->tim_produksi ?? '-' }}
@@ -244,6 +251,11 @@
                         {{-- DEADLINE --}}
                         <td class="text-center">
                             {{ optional($production->order->deadline)->format('d/m/Y') ?? '-' }}
+                        </td>
+
+                        {{-- KETERANGAN --}}
+                        <td>
+                            {{ $production->keterangan ?? '-' }}
                         </td>
 
                         {{-- STATUS --}}

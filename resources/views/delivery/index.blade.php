@@ -73,6 +73,10 @@
             </td>
 
             <td>
+                {{ $delivery->order->produk_name ?? '-' }}
+            </td>
+
+            <td>
                 {{ $delivery->order->customer->nama ?? '-' }}
             </td>
 
